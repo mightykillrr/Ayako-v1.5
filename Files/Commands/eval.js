@@ -23,7 +23,7 @@ module.exports = {
 			else msg.client.ch.reply(msg, `\`\`\`q\n${clean(evaled)}\`\`\``); 
 		} catch (err) { 
 			if (err.length > 2000) msg.client.ch.reply(msg, 'Too long, check console'), console.log(err); 
-			msg.client.ch.reply(msg, `\`ERROR\` \`\`\`q\n${clean(err)}\n\`\`\``); 
+			else msg.client.ch.reply(msg, `\`ERROR\` \`\`\`q\n${clean(err)}\n\`\`\``); 
 		}
 		// eslint-disable-next-line no-unused-vars
 		async function send(text) {
