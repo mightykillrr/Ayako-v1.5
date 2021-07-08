@@ -11,7 +11,7 @@ module.exports = {
 		let prefixStandard = Constants.standard.prefix;
 		let prefixCustom;
 		if (msg.channel.type !== 'dm') {
-			const res = await ch.query('SELECT * FROM prefix WHERE guildid = $1;', [msg.guild.id]);
+			const res = await ch.query('SELECT * FROM guildsettings WHERE guildid = $1;', [msg.guild.id]);
 			if (res && res.rowCount > 0) prefixCustom = res.rows[0].prefix;
 		}
 		if (msg.content.toLowerCase().startsWith(prefixStandard)) prefix = prefixStandard;

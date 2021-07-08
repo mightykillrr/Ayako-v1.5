@@ -28,20 +28,9 @@ module.exports = {
 				}
 				categoryText += `__${category}__:\n\`\`\`${`${t.map(s => `${s}`)}`.replace(/,/g, '')}\`\`\`\n`;
 			}
-			const interactionsmodeRes = await msg.client.ch.query('SELECT * FROM interactionsmode WHERE guildid = $1;', [msg.guild.id]);
-			const interactionsMode = interactionsmodeRes.rows[0] ? interactionsmodeRes.rows[0].mode == true ? `${msg.client.constants.emotes.small} ${msg.language.small}` : `${msg.client.constants.emotes.big} ${msg.language.big}` :  `${msg.client.constants.emotes.small} ${msg.language.small}`;
-			const prefixRes = await msg.client.ch.query('SELECT * FROM prefix WHERE guildid = $1;', [msg.guild.id]);
-			const prefix = prefixRes.rows[0] ? `\`${msg.client.constants.standard.prefix}\`, \`${prefixRes.rows[0].prefix}\`` : `\`${msg.client.constants.standard.prefix}\``;
-			const muteroleRes = await msg.client.ch.query('SELECT * FROM muterole WHERE guildid = $1;', [msg.guild.id]);
-			const muteroles = muteroleRes.rows[0] ? msg.guild.roles.cache.get(muteroleRes.rows[0].muteroleid) ? msg.client.constants.emotes.tick+` ${msg.guild.roles.cache.get(muteroleRes.rows[0].muteroleid)}` : msg.client.constants.emotes.warning+' '+msg.lan.overview.muteRoleError : msg.client.constants.emotes.cross+' '+msg.language.none;
 			const embed = new Discord.MessageEmbed()
 				.setAuthor(msg.lan.overview.author, msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
 				.setDescription(msg.client.ch.stp(msg.lan.overview.desc, {prefix: msg.client.constants.standard.prefix, commands: categoryText})+'\n\n'+msg.client.ch.makeBold(msg.client.ch.makeUnderlined(msg.language.settingsOverview)))
-				.addFields(
-					{name: msg.language.prefix, value: prefix, inline: true},
-					{name: msg.language.interactionsMode, value: interactionsMode, inline: true},
-					{name: msg.language.muteRole, value: muteroles, inline: true},
-				)
 				.setColor(msg.client.constants.commands.settings.color);
 			msg.client.ch.reply(msg, embed);
 		} else {
@@ -68,7 +57,7 @@ function noEmbed(msg) {
 async function display(msg, file) {
 	msg.lanSettings = msg.language.commands.settings;
 	let r;
-	const res = await msg.client.ch.query('SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = $1;', [msg.guild.id]);
+	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 	if (res && res.rowCount > 0) r = res.rows[0];
 	else return setup(msg);
 	const embed = typeof(file.displayEmbed) == 'function' ? file.displayEmbed(msg, r) : noEmbed(msg);
@@ -89,7 +78,7 @@ async function edit(msg, file, answer) {
 	let additionalIdentifiers; let r;
 	file.name = msg.args[0].toLowerCase();
 	msg.file = file;
-	const res = await msg.client.ch.query('SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = $1;', [msg.guild.id]);
+	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 	if (res && res.rowCount > 0) r = res.rows[0];
 	else return setup(msg);
 	if (file.perm && !msg.member.permissions.has(new Discord.Permissions(file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
@@ -644,9 +633,9 @@ async function edit(msg, file, answer) {
 		r[msg.property] = answered;
 		if (r[msg.property] !== undefined && r[msg.property] !== null) {
 			if (Array.isArray(r[msg.property])) {
-				if (r[msg.property].length > 0) msg.client.ch.query(`UPDATE $1 SET $2 = $3 WHERE guildid = $4${additionalIdentifiers ? ' $5' : ''};`, [msg.client.contants.commands.settings.tablenames[file.name], msg.property, [r[msg.property]], msg.guild.id, additionalIdentifiers]);
-				else msg.client.ch.query(`UPDATE $1 SET $2 = $3 WHERE guildid = $4${additionalIdentifiers ? ' $5' : ''};`, [msg.client.contants.commands.settings.tablenames[file.name], msg.property, null, msg.guild.id, additionalIdentifiers]);
-			} else msg.client.ch.query(`UPDATE $1 SET $2 = $3 WHERE guildid = $4${additionalIdentifiers ? ' $5' : ''};`, [msg.client.contants.commands.settings.tablenames[file.name], msg.property, r[msg.property], msg.guild.id, additionalIdentifiers]);
+				if (r[msg.property].length > 0) msg.client.ch.query(`UPDATE $1 SET $2 = $3 WHERE guildid = $4${additionalIdentifiers ? ' $5' : ''};`, [msg.client.constants.commands.settings.tablenames[file.name], msg.property, [r[msg.property]], msg.guild.id, additionalIdentifiers]);
+				else msg.client.ch.query(`UPDATE $1 SET $2 = $3 WHERE guildid = $4${additionalIdentifiers ? ' $5' : ''};`, [msg.client.constants.commands.settings.tablenames[file.name], msg.property, null, msg.guild.id, additionalIdentifiers]);
+			} else msg.client.ch.query(`UPDATE $1 SET $2 = $3 WHERE guildid = $4${additionalIdentifiers ? ' $5' : ''};`, [msg.client.constants.commands.settings.tablenames[file.name], msg.property, r[msg.property], msg.guild.id, additionalIdentifiers]);
 			setTimeout(() => {edit(msg, file);}, 3000);
 		}
 	}
@@ -670,27 +659,63 @@ async function edit(msg, file, answer) {
 
 async function setup(msg) {
 	const embed = new Discord.MessageEmbed()
-		.setAuthor(msg.lan.setup.author, msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
-		.setDescription(msg.lan.setup.question)
-		.addField(msg.language.commands.settings.valid, msg.lan.setup.answers);
-	msg.m = await msg.client.ch.reply(msg, embed);
-	let collected = await msg.channel.awaitMessages({filter: m => m.author.id == msg.author.id, max: 1, time: 60000});
-	if (!collected.first()) return;
-	const answer = collected.first().content.toLowerCase();
-	if (answer == msg.language.yes) {
-		await msg.client.ch.query('INSERT INTO $1 ($2) VALUES ($3);', [msg.client.constants.commands.settings.tablenames[msg.file.name], msg.client.constants.commands.settings.setupQueries[msg.file.name].cols, msg.client.constants.commands.settings.setupQueries[msg.file.name].vals]);
-		collected.first().delete().catch(() => {});
+		.setAuthor(msg.lanSettings.setup.author, msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
+		.setDescription(msg.client.ch.stp(msg.lanSettings.setup.question, {type: msg.lan.type}))
+		.addField(msg.language.commands.settings.valid, msg.lanSettings.setup.answers);
+	const yes = new Discord.MessageButton()
+		.setCustomID('yes')
+		.setLabel(msg.language.yes)
+		.setStyle('SUCCESS');
+	const no = new Discord.MessageButton()
+		.setCustomID('no')
+		.setLabel(msg.language.no)
+		.setStyle('DANGER');
+	msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: [[yes,no]]});
+	const messageCollector = new Discord.MessageCollector(msg.channel, {time: 60000});
+	const buttonsCollector = new Discord.MessageComponentInteractionCollector(msg.m, {time: 60000});
+	messageCollector.on('collect', (message) => {
+		if (message.author.id == msg.author.id) {
+			if (msg.content == msg.language.yes) yesFunc(message, null);
+			else if (msg.content == msg.language.no) noFunc(message, null);
+			else return notValid(msg);
+			buttonsCollector.stop();
+			messageCollector.stop();
+		}
+	});
+	buttonsCollector.on('collect', (clickButton) => {
+		if (clickButton.user.id == msg.author.id) {
+			if (clickButton.customID == 'yes') yesFunc(null, clickButton);
+			else if (clickButton.customID == 'no') noFunc(null, clickButton);
+			else return notValid(msg);
+			buttonsCollector.stop();
+			messageCollector.stop();
+		} else msg.client.ch.notYours(clickButton);
+	});
+	buttonsCollector.on('end', (collected, reason) => {
+		if (reason == 'time') {
+			const embed = new Discord.MessageEmbed()
+				.setAuthor(msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
+				.setDescription(msg.language.timeError);
+			msg.m.edit({embeds: [embed], components: []}).catch(() => {});
+		}
+	});
+	async function yesFunc(message, clickButton) {
+		msg.client.ch.query('INSERT INTO $1 ($2) VALUES ($3);', [msg.client.constants.commands.settings.tablenames[msg.file.name], msg.client.constants.commands.settings.setupQueries[msg.file.name].cols, msg.client.constants.commands.settings.setupQueries[msg.file.name].vals]);
+		if (message) message.delete().catch(() => {});
 		const endEmbed = new Discord.MessageEmbed()
 			.setAuthor(msg.lan.setup.author, msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
 			.setDescription(msg.client.ch.stp(msg.lan.setup.done, {loading: msg.client.constants.emotes.loading}));
-		msg.m.edit({embeds: [endEmbed]}).catch(() => {});
+		if (clickButton) clickButton.update({embeds: [endEmbed], components: []}).catch(() => {});
+		else msg.m.edit({embeds: [endEmbed], components: []}).catch(() => {});
 		setTimeout(() => {this.exe(msg);}, 3000);
-	} else if (answer == msg.language.no) {
-		collected.first().delete().catch(() => {});
+	}
+	async function noFunc(message, clickButton) {
+		if (message) message.delete().catch(() => {});
 		const endEmbed = new Discord.MessageEmbed()
 			.setAuthor(msg.lan.setup.author, msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
 			.setDescription(msg.lan.setup.abort);
-		msg.m.edit({embeds: [endEmbed]}).catch(() => {});
+		if (clickButton) clickButton.update({embeds: [endEmbed], components: []}).catch(() => {});
+		else msg.m.edit({embeds: [endEmbed], components: []}).catch(() => {});
 	}
 }
 async function notValid(msg) {

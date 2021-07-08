@@ -1086,6 +1086,7 @@
                 "desc": "No Settings available for the selected Setting"
             },
             "setup": {
+                "author": "Ayako Settings Set-Up",
                 "question": "Would you like to set-up Ayako {{type}}?",
                 "answers": "`Yes` or `No`",
                 "done": "Setup finished\nRedirecting {{loading}}",
@@ -1154,7 +1155,7 @@
                         "answers": "`Number`",
                         "recommended": "Recommended: `6`"
                     },
-                    "antispamtof": {
+                    "active": {
                         "name": "[{{trigger}}] Anti-Spam",
                         "trigger": ["`active`"],
                         "answers": "`True` or `False`",
@@ -1599,12 +1600,8 @@
                     "affectedRoles": "Affected Roles",
                     "notExistent":  "This Number doesn't exist"
                 }
-            }
-        },
-        "help": {
-
-        },
-        "giveaway": {
+            },
+            "giveaway": {
                 "category": ["Automation", "Fun"],
                 "embed": {
                     "list": "`{{prefix}}list` - List all running Giveaways on your Server",
@@ -1614,6 +1611,10 @@
                     "delete": "`{{prefix}}delete [message ID]` - Delete a Giveaway",
                     "reroll": "`{{prefix}}reroll [message ID]` - Reroll a Giveaway"
                 }
+            }
+        },
+        "help": {
+
         }
     }
 }

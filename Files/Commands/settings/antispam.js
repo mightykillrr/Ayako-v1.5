@@ -5,7 +5,7 @@ module.exports = {
 	type: 1,
 	displayEmbed(msg, r) {
 		const embed = new Discord.MessageEmbed()
-			.addField(msg.lan.type, r.antispamtof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled, false)
+			.addField(msg.lan.type, r.active ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled, false)
 			.addField(msg.lan.bpchannels, `${r.bpchannelid && r.bpchannelid !== [] ? `${r.bpchannelid.map(id => ` <#${id}>`)}`.length > 0 ? r.bpchannelid.map(id => ` <#${id}>`) : msg.language.none : msg.language.none}`, false)
 			.addField(msg.lan.bpusers, `${r.bpuserid && r.bpuserid !== [] ? `${r.bpuserid.map(id => ` <@${id}>`)}`.length > 0 ? r.bpuserid.map(id => ` <@${id}>`) : msg.language.none : msg.language.none}`, false)
 			.addField(msg.lan.bproles, `${r.bproleid && r.bproleid !== [] ? `${r.bproleid.map(id => ` <@&${id}>`)}`.length > 0 ? r.bproleid.map(id => ` <@&${id}>`) : msg.language.none : msg.language.none}`, false)
@@ -21,7 +21,7 @@ module.exports = {
 	editEmbed(msg, r) {
 		const embed = new Discord.MessageEmbed()
 			.addFields(
-				{name: msg.client.ch.stp(msg.lan.edit.antispamtof.name, {trigger: msg.lan.edit.antispamtof.trigger}), value: `${r.antispamtof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}`, inline: false},
+				{name: msg.client.ch.stp(msg.lan.edit.active.name, {trigger: msg.lan.edit.active.trigger}), value: `${r.active ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}`, inline: false},
 				{name: msg.client.ch.stp(msg.lan.edit.bpchannelid.name, {trigger: msg.lan.edit.bpchannelid.trigger}), value: `${r.bpchannelid && r.bpchannelid !== [] ? `${r.bpchannelid.map(id => ` <#${id}> (${id})`)}`.length > 0 ? r.bpchannelid.map(id => ` <#${id}> (${id})`) : msg.language.none : msg.language.none}`, inline: false},
 				{name: msg.client.ch.stp(msg.lan.edit.bpuserid.name, {trigger: msg.lan.edit.bpuserid.trigger}), value: `${r.bpuserid && r.bpuserid !== [] ? `${r.bpuserid.map(id => ` <@${id}> (${id})`)}`.length > 0 ? r.bpuserid.map(id => ` <@${id}> (${id})`) : msg.language.none : msg.language.none}`, inline: false},
 				{name: msg.client.ch.stp(msg.lan.edit.bproleid.name, {trigger: msg.lan.edit.bproleid.trigger}), value: `${r.bproleid && r.bproleid !== [] ? `${r.bproleid.map(id => ` <@&${id}> (${id})`)}`.length > 0 ? r.bproleid.map(id => ` <@&${id}> (${id})`) : msg.language.none : msg.language.none}`, inline: false},
@@ -37,9 +37,9 @@ module.exports = {
 	},
 	buttons(msg, r) {
 		const active = new Discord.MessageButton()
-			.setCustomID(`${msg.lan.edit.antispamtof.trigger[1] ? msg.lan.edit.antispamtof.trigger[1].replace(/`/g, '') : msg.lan.edit.antispamtof.trigger[0].replace(/`/g, '')}`)
+			.setCustomID(`${msg.lan.edit.active.trigger[1] ? msg.lan.edit.active.trigger[1].replace(/`/g, '') : msg.lan.edit.active.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.lan.type)
-			.setStyle(r.antispamtof ? 'SUCCESS' : 'DANGER');
+			.setStyle(r.active ? 'SUCCESS' : 'DANGER');
 		const rw = new Discord.MessageButton()
 			.setCustomID(`${msg.lan.edit.readofwarnstof.trigger[1] ? msg.lan.edit.readofwarnstof.trigger[1].replace(/`/g, '') : msg.lan.edit.readofwarnstof.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.lan.readWarns.replace(/\*/g, '').slice(0, 14))
