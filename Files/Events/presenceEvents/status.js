@@ -6,9 +6,9 @@ module.exports = {
 		const user = newPresence.user;
 		ch.query(`
 		INSERT INTO status (userid, status, since) 
-		VALUES ('${user.id}', '${newPresence.status}', '${Date.now()}') 
+		VALUES ($1, $2, $3) 
 		ON CONFLICT (userid) 
-		DO UPDATE SET status = '${newPresence.status}', since = '${Date.now()}';
-		`);
+		DO UPDATE SET status = $2, since = $3;
+		`, [user.id, newPresence.status, Date.now()]);
 	}
 };

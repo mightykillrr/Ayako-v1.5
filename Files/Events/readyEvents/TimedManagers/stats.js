@@ -14,6 +14,6 @@ module.exports = {
 		UPDATE stats SET channelcount = '${client.channels.cache.size}';
 		UPDATE stats SET rolecount = '${totalrolecount}';
 		UPDATE stats SET allusers = '${totalusers}';
-		`);
+		`, [client.users.cache.size, client.guilds.cache.size, client.channels.cache.size, totalrolecount, totalusers]);
 	}
 };

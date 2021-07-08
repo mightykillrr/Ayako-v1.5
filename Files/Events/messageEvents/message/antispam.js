@@ -43,7 +43,7 @@ module.exports = {
 		if (msg.author.bot) return;
 		let warnnr;
 		const guildSettings = {};
-		const res = await msg.client.ch.query(`SELECT * FROM antispamsettings WHERE guildid = '${msg.guild.id}';`);
+		const res = await msg.client.ch.query('SELECT * FROM antispamsettings WHERE guildid = $1;', [msg.guild.id]);
 		if (res && res.rowCount > 0) {
 			guildSettings.guildid = res.rows[0].guildid;
 			guildSettings.bpchannelID = res.rows[0].bpchannelid;
@@ -60,7 +60,7 @@ module.exports = {
 			guildSettings.banEnabledToF = res.rows[0].banenabledtof;
 			guildSettings.deleteToF = res.rows[0].deletetof;
 		} else return;
-		const res2 = await msg.client.ch.query(`SELECT * FROM warns WHERE guildid = '${msg.guild.id}' AND userid = '${msg.author.id}';`);
+		const res2 = await msg.client.ch.query('SELECT * FROM warns WHERE guildid = $1 AND userid = $2;', [msg.guild.id, msg.author.id]);
 		if (res2 && res2.rowCount > 0) warnnr = res2.rowCount;
 		else warnnr = 1;
 		msg.member = await msg.client.ch.member(msg.guild, msg.author);

@@ -25,7 +25,7 @@ module.exports = {
 										.setTimestamp();
 									const m = await ch.send(channel, `${user}`, embed);
 									if (!m || !m.id) ch.send(user, ch.stp(language.ready.reminder.failedMsg, {channel: channel}), embed);
-									ch.query(`DELETE FROM reminders WHERE userid = '${user.id}' AND duration = '${duration}';`);
+									ch.query('DELETE FROM reminders WHERE userid = $1 AND duration = $2;', [user.id, duration]);
 								} else {
 									const language = await ch.languageSelector('en');
 									const embed = new Discord.MessageEmbed()
@@ -33,7 +33,7 @@ module.exports = {
 										.setColor(guild.me.displayHexColor)
 										.setTimestamp();
 									ch.send(user, embed);
-									ch.query(`DELETE FROM reminders WHERE userid = '${user.id}' AND duration = '${duration}';`);
+									ch.query('DELETE FROM reminders WHERE userid = $1 AND duration = $2;', [user.id, duration]);
 								}
 							}
 						}
@@ -48,7 +48,7 @@ module.exports = {
 				const duration = res.rows[i].duration;
 				const channel = res.rows[i].channelid;
 				const user = res.rows[i].userid;
-				await ch.query(`UPDATE reminders SET rnr = '${i}' WHERE text = '${text.replace(/'/g, '')}' AND duration = '${duration}' AND channelid = '${channel}' and user = '${user}';`);
+				await ch.query('UPDATE reminders SET rnr = $1 WHERE text = $2 AND duration = $3 AND channelid = $4 and user = $5;', [i, text, duration, channel, user]);
 			}
 		}
 

@@ -8,9 +8,9 @@ module.exports = {
 		if (msg.author.bot) return;
 		if (msg.channel.type == 'dm') return;
 		const language = await msg.client.ch.languageSelector(msg.guild);
-		const resG = await msg.client.ch.query(`SELECT * FROM levelglobal WHERE userid = '${msg.author.id}';`);
+		const resG = await msg.client.ch.query('SELECT * FROM levelglobal WHERE userid = $1;', [msg.author.id]);
 		if (resG && resG.rowCount > 0) {
-			const resSpam = await msg.client.ch.query(`SELECT * FROM antilevelspam WHERE userid = '${msg.author.id}';`);
+			const resSpam = await msg.client.ch.query('SELECT * FROM antilevelspam WHERE userid = $1;', [msg.author.id]);
 			if (resSpam && resSpam.rowCount > 0) {
 				if (msg.content.replace(/'/g, '').replace('`', '') == resSpam.rows[0].message) return;
 			}
@@ -24,24 +24,22 @@ module.exports = {
 				if (!cooldown.has(msg.author.id)) {
 					cooldown.add(msg.author.id);
 					if (resSpam) {
-						if (resSpam.rows[0]) msg.client.ch.query(`UPDATE antilevelspam SET message = '${msg.content.replace(/'/g, '').replace('`', '')}' WHERE userid = '${msg.author.id}';`);
-						else msg.client.ch.query(`INSERT INTO antilevelspam (userid, message) VALUES ('${msg.author.id}', '${msg.content.replace(/'/g, '').replace('`', '')}');`);
-					} else msg.client.ch.query(`INSERT INTO antilevelspam (userid, message) VALUES ('${msg.author.id}', '${msg.content.replace(/'/g, '').replace('`', '')}');`);
+						if (resSpam.rows[0]) msg.client.ch.query('UPDATE antilevelspam SET message = $1 WHERE userid = $2;', [msg.content, msg.author.id]);
+						else msg.client.ch.query('INSERT INTO antilevelspam (userid, message) VALUES ($2, $1);', [msg.content, msg.author.id]);
+					} else msg.client.ch.query('INSERT INTO antilevelspam (userid, message) VALUES ($2, $1);', [msg.content, msg.author.id]);
 					setTimeout(() => {
 						cooldown.delete(msg.author.id);
 					}, 60000);
 					const newXP = Math.floor(Math.random() * 10 + 10) * +votegain;
 					const XP = +curXP + +newXP;
-					await msg.client.ch.query(`UPDATE levelglobal SET xp = '${XP}' WHERE userid = '${user.id}';`);
+					await msg.client.ch.query('UPDATE levelglobal SET xp = $1 WHERE userid = $2;', [XP, user.id]);
 					const newLevel = +curLvL + 1;
 					const neededXP = 5 / 6 * +newLevel * (2 * +newLevel * +newLevel + 27 * +newLevel + 91);
-					if (+XP > +neededXP) {
-						await msg.client.ch.query(`UPDATE levelglobal SET level = '${newLevel}' WHERE userid = '${user.id}';`);
-					}
+					if (+XP > +neededXP) await msg.client.ch.query('UPDATE levelglobal SET level = $1 WHERE userid = $2;', [newLevel, user.id]);
 				}
 			}
-		} else msg.client.ch.query(`INSERT INTO levelglobal(userid, xp, level) VALUES ('${msg.author.id}', '1', '0');`).catch(() => {});
-		const resS = await msg.client.ch.query(`SELECT * FROM levelsettings WHERE guildid = '${msg.guild.id}';`);
+		} else msg.client.ch.query('INSERT INTO levelglobal(userid, xp, level) VALUES ($1, $2, $3);', [msg.author.id, 1, 0]);
+		const resS = await msg.client.ch.query('SELECT * FROM levelsettings WHERE userid = $1;', [msg.author.id]);
 		let settings;
 		if (resS && resS.rowCount > 0) settings = resS.rows[0];
 		else {
@@ -61,7 +59,7 @@ module.exports = {
 				setTimeout(() => {
 					cooldownServer.delete(msg.author.id);
 				}, 60000);
-				const result = await msg.client.ch.query(`SELECT * FROM levelserver WHERE userid = '${msg.author.id}' AND guildid = '${msg.guild.id}';`);
+				const result = await msg.client.ch.query('SELECT * FROM levelserver WHERE userid = $1 AND guildid = $2;', [msg.author.id, msg.guild.id]);
 				if (result && result.rowCount > 0) {
 					const member = await msg.client.ch.member(msg.guild, msg.author);
 					if (result.rows[0].blroleid) {
@@ -69,18 +67,18 @@ module.exports = {
 							const role = msg.guild.roles.cache.get(id);
 							if (!role) {
 								result.rows[0].blroleid.splice(result.rows[0].blroleid.indexOf(id), 1);
-								msg.client.ch.query(`UPDATE levelserver SET blroleid = ARRAY[${result.rows[0].blroleid}] WHERE guildid = '${msg.guild.id}';`);
+								msg.client.ch.query('UPDATE levelserver SET blroleid = $1 WHERE guildid = $2;', [result.rows[0].blroleid, msg.guild.id]);
 							} else if (member.roles.cache.has(role.id)) return;
 						}
 					}
 					const curXP = result.rows[0].xp;
 					const curLvL = result.rows[0].level;
 					let multiplier;
-					const mRes = await msg.client.ch.query(`SELECT * FROM levelmultiroles WHERE guildid = '${msg.guild.id}';`);
+					const mRes = await msg.client.ch.query('SELECT * FROM levelmultiroles WHERE guildid = $1;', [msg.guild.id]);
 					if (mRes && mRes.rowCount > 0) {
 						mRes.rows.forEach(async row => {
 							const role = msg.guild.roles.cache.get(row.role);
-							if (!role) return msg.client.ch.query(`DELETE FROM levelmultiroles WHERE guildid = '${msg.guild.id}' AND roleid = '${row.roleid}';`);
+							if (!role) return msg.client.ch.query('DELETE FROM levelmultiroles WHERE guildid = $1 AND roleid = $2;', [msg.guild.id, row.roleid]);
 							else {
 								if (member && member.roles.cache.has(role.id)) multiplier + row.multiplier;
 							}
@@ -88,11 +86,11 @@ module.exports = {
 					}
 					const newXP = Math.floor(Math.random() * 10 + 15) * +settings.xpgain * multiplier ? multiplier : 1;
 					const XP = +curXP + +newXP;
-					await msg.client.ch.query(`UPDATE levelserver SET xp = '${XP}' WHERE userid = '${msg.author.id}' AND guildid = '${msg.guild.id}';`);
+					await msg.client.ch.query('UPDATE levelserver SET xp = $1 WHERE userid = $2 AND guildid = $3;', [XP, msg.author.id, msg.guild.id]);
 					const newLevel = +curLvL + 1;
 					const neededXP = 5 / 6 * +newLevel * (2 * +newLevel * +newLevel + 27 * +newLevel + 91);
 					if (+XP > +neededXP) {
-						await msg.client.ch.query(`UPDATE levelserver SET level = '${newLevel}' WHERE userid = '${msg.author.id}' AND guildid = '${msg.guild.id}';`);
+						await msg.client.ch.query('UPDATE levelserver SET level = $1 WHERE userid = $2 AND guildid = $3;', [newLevel, msg.author.id, msg.guild.id]);
 						if (newLevel == 1) { 
 							if (settings.lvlupmode == 'reactions') {
 								const LevelUpEmbed = new Discord.MessageEmbed()
@@ -120,7 +118,7 @@ module.exports = {
 							}
 						} else {
 							let leveluptext = msg.client.ch.stp(language.commands.leveling.levelUp.author, {user: msg.author, level: newLevel});
-							if (result.rows[0].text) leveluptext = result.rows[0].text.replace('{user}', `${msg.author}`).replace('{level}', `${newLevel}`).replace('/u2b', '\'');
+							if (result.rows[0].text) leveluptext = result.rows[0].text.replace('{user}', `${msg.author}`).replace('{level}', `${newLevel}`);
 							if (settings.lvlupmode == 'reactions') {
 								msg.react(msg.client.emotes.ayakoPeekID).catch(() => {});
 								msg.react(msg.client.emotes.up).catch(() => {});
@@ -137,7 +135,7 @@ module.exports = {
 								msg.client.ch.send(msg.channel, `${msg.author}`, embed).catch(() => {});
 							}
 						}
-						const resR = await msg.client.ch.query(`SELECT * FROM levelroles WHERE guildid = '${msg.guild.id}' AND level < '${+newLevel + 1}';`);
+						const resR = await msg.client.ch.query('SELECT * FROM levelroles WHERE guildid = $1 AND level < $2;', [msg.guild.id, +newLevel+1]);
 						if (resR && resR.rowCount > 0) {
 							for (let i = 0; i < resR.rowCount; i++) {
 								const role = msg.guild.roles.cache.find(role => role.id === resR.rows[i].roleid);
@@ -147,7 +145,7 @@ module.exports = {
 					}
 				} else {
 					const newXP = Math.floor(Math.random() * 10 + 15);
-					await msg.client.ch.query(`INSERT INTO levelserver(guildid, userid, xp, level) VALUES ('${msg.guild.id}', '${msg.author.id}', '${newXP}', '0');`);
+					await msg.client.ch.query('INSERT INTO levelserver(guildid, userid, xp, level) VALUES ($1, $2, $3, $4);', [msg.guild.id, msg.author.id, newXP, 0]);
 				}
 			}
 		}

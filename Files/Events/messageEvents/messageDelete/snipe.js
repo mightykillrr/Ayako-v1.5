@@ -2,9 +2,8 @@ const { client } = require('../../../BaseClient/DiscordClient.js');
 
 module.exports = {
 	async execute(msg) {
-		let contained = false;
 		const ch = client.ch;
-		const res = await ch.query(`SELECT * FROM blacklists WHERE guildid = '${msg.guild.id}';`);
+		const res = await ch.query('SELECT * FROM blacklists WHERE guildid = $1;', [msg.guild.id]);
 		if (msg.content.toLowerCase().includes('https://')) return;
 		if (res && res.rowCount > 0) {
 			const args = msg.content.split(/ +/);
@@ -19,22 +18,11 @@ module.exports = {
 						}
 					}
 				}
-				if (words.length > 0) {
-					return;
-				}
+				if (words.length > 0) return;
 			}
 		}
-		if (contained == false) {
-			const res = await ch.query(`SELECT * FROM snipe WHERE channelid = '${msg.channel.id}';`);
-			if (res && res.rowCount > 0) {
-				ch.query(`
-                    UPDATE snipe SET text = '${msg.content.replace(/'/g, '').replace(/`/g, '')}' WHERE channelid = '${msg.channel.id}';
-                    UPDATE snipe SET userid = '${msg.author.id}' WHERE channelid = '${msg.channel.id}';
-                    `);
-			} else {
-				ch.query(`INSERT INTO snipe (channelid, userid, text) VALUES ('${msg.channel.id}', '${msg.author.id}', '${msg.content.replace(/'/g, '').replace(/`/g, '')}');`).catch(()  => {});
-			}
-		}
-
+		const res2 = await ch.query('SELECT * FROM snipe WHERE channelid = $1;', [msg.channel.id]);
+		if (res2 && res2.rowCount > 0) ch.query('UPDATE snipe SET text = $1 WHERE channelid = $2; UPDATE snipe SET userid = $3 WHERE channelid = $2;', [msg.content, msg.channel.id, msg.author.id]);
+		else ch.query('INSERT INTO snipe (channelid, userid, text) VALUES ($1, $2, $3);', [msg.channel.id, msg.author.id, msg.content]);
 	}
 };

@@ -11,7 +11,7 @@ module.exports = {
 		let prefixStandard = Constants.standard.prefix;
 		let prefixCustom;
 		if (msg.channel.type !== 'dm') {
-			const res = await ch.query(`SELECT * FROM prefix WHERE guildid = '${msg.guild.id}';`);
+			const res = await ch.query('SELECT * FROM prefix WHERE guildid = $1;', [msg.guild.id]);
 			if (res && res.rowCount > 0) prefixCustom = res.rows[0].prefix;
 		}
 		if (msg.content.toLowerCase().startsWith(prefixStandard)) prefix = prefixStandard;
@@ -44,7 +44,7 @@ module.exports = {
 			const now = Date.now();
 			let timestamps = cooldowns.get(msg.command.name);
 			let cooldownAmount = (msg.command.cooldown || 0);
-			const res = await msg.client.ch.query(`SELECT * FROM cooldowns WHERE channelid = '${msg.channel.id}' AND command = '${msg.command.name}';`);
+			const res = await msg.client.ch.query('SELECT * FROM cooldowns WHERE channelid = $1 AND command = $2;', [msg.channel.id, msg.command.name]);
 			if (res && res.rowCount > 0) cooldownAmount = res.rows[0].cooldown;
 			if (timestamps.has(msg.channel.id)) {
 				const expirationTime = +timestamps.get(msg.channel.id) + +cooldownAmount;
@@ -66,10 +66,8 @@ module.exports = {
 		this.commandCheck(msg);
 	},
 	async commandCheck(msg) {
-		const res = await msg.client.ch.query(`SELECT * FROM disabledcommands WHERE guildid = '${msg.guild.id}';`);
-		if (res && res.rowCount > 0) {
-			if (res.rows[0].disabled.includes(msg.command.name.toLowerCase())); return msg.client.ch.reply(msg, msg.client.ch.stp(msg.language.commands.commandHandler.CommandDisabled, {name: msg.command.name}));
-		} 
+		const res = await msg.client.ch.query('SELECT * FROM disabledcommands WHERE guildid = $1;', [msg.guild.id]);
+		if (res && res.rowCount > 0 && res.rows[0].disabled.includes(msg.command.name.toLowerCase())) return msg.client.ch.reply(msg, msg.client.ch.stp(msg.language.commands.commandHandler.CommandDisabled, {name: msg.command.name}));
 		this.permissionCheck(msg);
 	},
 	async permissionCheck(msg) {
@@ -93,7 +91,7 @@ module.exports = {
 			const member = await msg.client.ch.member(msg.guild, msg.author);
 			const names = ['ban', 'unban', 'mute', 'unmute', 'tempmute', 'kick', 'clear', 'announce', 'pardon', 'warn', 'edit', 'takerole', 'giverole'];
 			if (names.includes(msg.command.name)) {
-				const res = await msg.client.ch.query(`SELECT * FROM modrolesnew WHERE guildid = '${msg.guild.id}';`);
+				const res = await msg.client.ch.query('SELECT * FROM modrolesnew WHERE guildid = $1;', [msg.guild.id]);
 				if (res && res.rowCount > 0) {
 					for (const r of res.rows) {
 						const role = msg.guild.roles.cache.get(r.roleid);
@@ -153,7 +151,7 @@ module.exports = {
 	},
 	async commandExe(msg) {
 		if (msg.channel.type !== 'dm') {
-			const res = await msg.client.ch.query(`SELECT * FROM logchannels WHERE guildid = '${msg.guild.id}';`);
+			const res = await msg.client.ch.query('SELECT * FROM logchannels WHERE guildid = $1;', [msg.guild.id]);
 			if (res && res.rowCount > 0) msg.logchannel = msg.client.channels.cache.get(res.rows[0].modlogs);
 		}
 		if (msg.author.id == msg.client.user.id) msg.delete();

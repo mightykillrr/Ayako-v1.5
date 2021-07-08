@@ -6,7 +6,7 @@ module.exports = {
 		const ch = client.ch;
 		const guild = oldMember ? oldMember.guild : newMember.guild;
 		const member = newMember ? newMember : ch.member(guild, oldMember.user);
-		const res = await ch.query(`SELECT * FROM roleseparator WHERE active = true AND guildid = '${guild.id}';`);
+		const res = await ch.query('SELECT * FROM roleseparator WHERE active = true AND guildid = $1;', [guild.id]);
 		if (res && res.rowCount > 0) {
 			res.rows.forEach(async (row) => {
 				const guild = client.guilds.cache.get(row.guildid);
@@ -21,7 +21,7 @@ module.exports = {
 									if ((stopRole.rawPosition > separator.rawPosition) && (r.rawPosition < stopRole.rawPosition && r.rawPosition > separator.rawPosition)) roles.push(r.id);
 									else if ((stopRole.rawPosition < separator.rawPosition) && (r.rawPosition > stopRole.rawPosition && r.rawPosition < separator.rawPosition)) roles.push(r.id);
 								});
-							} else ch.query(`UPDATE roleseparator SET active = false WHERE stoprole = '${row.stoprole}';`);
+							} else ch.query('UPDATE roleseparator SET active = false WHERE stoprole = $1;', [row.stoprole]);
 						} else guild.roles.cache.forEach(r => {if (r.rawPosition > separator.rawPosition) roles.push(r.id);});
 						if (roles[0]) {
 							let aknowledgedSeperator = false;
@@ -34,7 +34,7 @@ module.exports = {
 							}
 							if (aknowledgedSeperator == false && member.roles.cache.has(separator.id)) await member.roles.remove(separator).catch((e) => {console.log(e);});
 						}
-					} else ch.query(`UPDATE roleseparator SET active = false WHERE separator = '${row.separator}';`);
+					} else ch.query('UPDATE roleseparator SET active = false WHERE separator = $1;', [row.separator]);
 				}
 			});
 		}
@@ -43,10 +43,10 @@ module.exports = {
 		const members = [...msg.guild.members.cache.entries()];
 		const client = msg.client;
 		const ch = client.ch;
-		const res = await ch.query(`SELECT * FROM roleseparator WHERE active = true AND guildid = '${msg.guild.id}';`);
+		const res = await ch.query('SELECT * FROM roleseparator WHERE active = true AND guildid = $1;', [msg.guild.id]);
 		const r = res.rows[0];
 		if (+r.lastrun + +ms('7d') > Date.now()) return false;
-		msg.client.ch.query(`UPDATE roleseparator SET lastrun = '${Date.now()}' WHERE guildid = '${msg.guild.id}';`);
+		msg.client.ch.query('UPDATE roleseparator SET lastrun = $1 WHERE guildid = $2;', [Date.now(), msg.guild.id]);
 		await msg.guild.members.fetch();
 		const roles = [];
 		for (let i = 0; members.length > i; i++) {
@@ -62,7 +62,7 @@ module.exports = {
 							const stopRole = guild.roles.cache.get(row.stoprole);
 							if (stopRole) member.roles.cache.forEach((role) => stopRole.rawPosition > separator.rawPosition && role.rawPosition > separator.rawPosition && role.rawPosition < stopRole.rawPosition ? roleArr.push(separator, stopRole) :  stopRole.rawPosition < separator.rawPosition && role.rawPosition < separator.rawPosition && role.rawPosition > stopRole.rawPosition ? roleArr.push(separator, stopRole) : '');
 							else member.roles.cache.forEach((role) => role.rawPosition > separator.rawPosition ? roleArr.push(separator) : '');
-						} else ch.query(`UPDATE roleseparator SET active = false WHERE separator = '${row.separator}';`);
+						} else ch.query('UPDATE roleseparator SET active = false WHERE separator = $1;', [row.separator]);
 					}
 				});
 				const uniques = [...new Set(roleArr)];
@@ -78,10 +78,7 @@ module.exports = {
 				const member = uniques[i];
 				if (member.giveTheseRoles) {
 					setTimeout(async  () => {
-						for (let i = 0; i < member.giveTheseRoles.length; i++) {
-							const role = member.giveTheseRoles[i];
-							if (!member.roles.cache.has(role.id)) await member.roles.add(role).catch(() => {});
-						}
+						for (let i = 0; i < member.giveTheseRoles.length; i++) {if (!member.roles.cache.has(member.giveTheseRoles[i].id)) await member.roles.add(member.giveTheseRoles[i]).catch(() => {});}
 					}, (1500*uniques[i==0?0:i-1].giveTheseRoles.length)+i*1500);
 				}
 			}

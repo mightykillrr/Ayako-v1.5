@@ -21,7 +21,7 @@ module.exports = {
 			let err;
 			const unban = await msg.guild.unban(target, reason).catch((e) => {err = e;});
 			if (unban) {
-				const res = await msg.client.ch.query(`SELECT * FROM logchannels WHERE guildid = '${msg.guild.id}';`);
+				const res = await msg.client.ch.query('SELECT * FROM logchannels WHERE guildid = $1;', [msg.guild.id]);
 				let logchannel;
 				if (res && res.rowCount > 0) logchannel = msg.client.channels.cache.get(res.rows[0].guildEvents);
 				const embed = new Discord.MessageEmbed()

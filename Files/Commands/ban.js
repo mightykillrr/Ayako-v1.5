@@ -11,7 +11,7 @@ module.exports = {
 		let banReason = msg.args.slice(1).join(' ') ? msg.args.slice(1).join(' ') : lan.reason;
 		const guildmember = await msg.client.ch.member(msg.guild, user);
 		if (guildmember) {
-			const res = await msg.client.ch.query(`SELECT * FROM modrolesnew WHERE guildid = '${msg.guild.id}';`);
+			const res = await msg.client.ch.query('SELECT * FROM modrolesnew WHERE guildid = $1;', [msg.guild.id]);
 			if (res && res.rowCount > 0) {
 				for (const r of res.rows) {
 					const role = msg.guild.roles.cache.get(r.roleid);

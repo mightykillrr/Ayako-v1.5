@@ -19,7 +19,7 @@ module.exports = {
 			emMsg?.edit(em);
 			return false;
 		}
-		const resM = await msg.client.ch.query(`SELECT * FROM muterole WHERE guildid = '${msg.guild.id}';`);
+		const resM = await msg.client.ch.query('SELECT * FROM muterole WHERE guildid = $1;', [msg.guild.id]);
 		if (resM && resM.rowCount > 0) role = msg.roles.cache.get(resM.rows[0].muteroleid);
 		if ((memberClient.roles.highest.rawPosition < member.roles.highest.rawPosition || memberClient.roles.highest.rawPosition == member.roles.highest.rawPosition) || !memberClient.permissions.has(268435456)) {
 			em.setDescription(msg.client.constants.emotes.cross, lan.meNoPerms);
@@ -42,7 +42,7 @@ module.exports = {
 					.setTimestamp()
 					.setAuthor(msg.client.ch.stp(lan.dm.author, {guild: msg.guild}), lan.author.image, msg.client.ch.stp(lan.author.link), {guild: msg.guild});
 				msg.client.ch.send(dmChannel, DMembed);
-				const res = await msg.client.ch.query(`SELECT * FROM logchannels WHERE guildid = '${msg.guild.id}';`);
+				const res = await msg.client.ch.query('SELECT * FROM logchannels WHERE guildid = $1;', [msg.guild.id]);
 				if (res && res.rowCount > 0) logchannel = msg.client.channels.cache.get(res.rows[0].guildEvents);
 				const embed = new Discord.MessageEmbed()
 					.setColor(con.color)

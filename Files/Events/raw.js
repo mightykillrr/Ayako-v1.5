@@ -5,7 +5,7 @@ module.exports = {
 		if (event.t == 'MESSAGE_REACTION_ADD') {
 			const channel = client.channels.cache.get(event.d.channel_id);
 			if (channel.messages.cache.has(event.d.message_id)) return;
-			const res = await ch.query(`SELECT * FROM reactionroles WHERE msgid = '${event.d.message_id}';`);
+			const res = await ch.query('SELECT * FROM reactionroles WHERE msgid = $1;', [event.d.message_id]);
 			if (res && res.rowCount > 0) {
 				const r = res.rows[0];
 				const msg = await channel.messages.fetch(event.d.message_id).catch(() => {});
@@ -24,7 +24,7 @@ module.exports = {
 		if (event.t == 'MESSAGE_REACTION_REMOVE') {
 			const channel = client.channels.cache.get(event.d.channel_id);
 			if (channel.messages.cache.has(event.d.message_id)) return;
-			const res = await ch.query(`SELECT * FROM reactionroles WHERE msgid = '${event.d.message_id}';`);
+			const res = await ch.query('SELECT * FROM reactionroles WHERE msgid = $1;', [event.d.message_id]);
 			if (res && res.rowCount > 0) {
 				const r = res.rows[0];
 				if (channel.messages.cache.has(event.d.message_id)) return;
@@ -42,8 +42,8 @@ module.exports = {
 			}
 		}
 		if (event.t == 'MESSAGE_DELETE') {
-			const res = await ch.query(`SELECT * FROM giveawaysettings WHERE messageid = '${event.d.id}';`);
-			if (res && res.rowCount > 0) ch.query(`DELETE FROM giveawaysettings WHERE messageid = '${event.d.id}';`);
+			const res = await ch.query('SELECT * FROM giveawaysettings WHERE messageid = $1;', [event.d.id]);
+			if (res && res.rowCount > 0) ch.query('DELETE FROM giveawaysettings WHERE messageid = $1;', [event.d.id]);
 		}
 	}
 };

@@ -12,12 +12,12 @@ module.exports = {
 							if (embed.description.includes('got the card! ')) {
 								const argsS = embed.description.split(/ +/);
 								const user = msg.client.users.cache.get(argsS[1].replace(/\D+/g, ''));
-								const res = await msg.client.ch.query(`SELECT * FROM shoob WHERE userid = '${user.id}';`);
+								const res = await msg.client.ch.query('SELECT * FROM shoob WHERE userid = $1;', [user.id]);
 								let amount = 0;
 								if (res && res.rowCount > 0) {
 									amount = res.rows[0].amount+1;
-									msg.client.ch.query(`UPDATE shoob SET amount = '${amount}' WHERE userid = '${user.id}';`);
-								} else msg.client.ch.query(`INSERT INTO shoob (userid, amount) VALUES ('${user.id}', '1');`);
+									msg.client.ch.query('UPDATE shoob SET amount = $2 WHERE userid = $1;', [user.id, amount]);
+								} else msg.client.ch.query('INSERT INTO shoob (userid, amount) VALUES ($1, $2);', [user.id, 1]);
 								const twentyRole = msg.guild.roles.cache.find(role => role.id === '755962444547096677');
 								const fiftyRole = msg.guild.roles.cache.find(role => role.id === '756331367561822258');
 								const hundretRole = msg.guild.roles.cache.find(role => role.id === '756331587616112660');

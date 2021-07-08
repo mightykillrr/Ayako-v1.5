@@ -6,7 +6,7 @@ module.exports = {
 		const guild = msg.guild;
 		const ch = client.ch;
 		const Constants = client.constants;
-		const res = await ch.query(`SELECT * FROM logchannels WHERE guildid = '${guild.id}';`);
+		const res = await ch.query('SELECT * FROM logchannels WHERE guildid = $1;', [guild.id]);
 		if (res && res.rowCount > 0) {
 			const r = res.rows[0];
 			const logchannel = client.channels.cache.get(r.messageEvents);

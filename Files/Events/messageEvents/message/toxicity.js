@@ -8,7 +8,7 @@ module.exports = {
 		if (!msg.author || msg.author.bot) return;
 		const member = await msg.client.ch.member(msg.guild, msg.author);
 		if (member.permissions.has(8n)) return;
-		const result = await msg.client.ch.query(`SELECT * FROM blacklists WHERE guildid = '${msg.guild.id}';`);
+		const result = await msg.client.ch.query('SELECT * FROM blacklists WHERE guildid = $1;', [msg.guild.id]);
 		if (result && result.rowCount > 0) {
 			if (result.rows[0].active == false) return;
 			const args = msg.content.split(/ +/);
@@ -33,13 +33,13 @@ module.exports = {
 					.setColor(msg.client.constants.commands.toxicityCheck);
 				const DMchannel = await msg.author.createDM().catch(() => {});
 				if (DMchannel) msg.client.ch.send(DMchannel, embed);
-				const res = await msg.client.ch.query(`SELECT * FROM toxicitycheck WHERE userid = '${msg.author.id}' AND guildid = '${msg.guild.id}';`);
+				const res = await msg.client.ch.query('SELECT * FROM toxicitycheck WHERE userid = $2 AND guildid = $1;', [msg.guild.id, msg.author.id]);
 				let amount;
 				if (res && res.rowCount > 0) {
-					msg.client.ch.query(`UPDATE toxicitycheck SET amount = '${+res.rows[0].amount + 1}' WHERE userid = '${msg.author.id}' AND guildid = '${msg.guild.id}';`);
+					msg.client.ch.query('UPDATE toxicitycheck SET amount = $2 WHERE userid = $3 AND guildid = $1;', [msg.guild.id, +res.rows[0].amount + 1, msg.author.id]);
 					amount = res.rows[0].amount;
 				} else {
-					msg.client.ch.query(`INSERT INTO toxicitycheck (guildid, userid, amount) VALUES ('${msg.guild.id}', '${msg.author.id}', '1');`);
+					msg.client.ch.query('INSERT INTO toxicitycheck (guildid, userid, amount) VALUES ($1, $3, $2);', [msg.guild.id, 1, msg.author.id]);
 					amount = 0;
 				}
 				amount++;

@@ -49,10 +49,7 @@ module.exports = {
 									array = res.rows[0].willis;
 									array.push(msg.author.id);
 									const newnr = +res.rows[0].count + 1;
-									ch.query(`
-                                    UPDATE stats SET willis = ARRAY[${array}];
-                                    UPDATE stats SET count = '${newnr}';
-                                    `);
+									ch.query('UPDATE stats SET willis = $1; UPDATE stats SET count = $2;', [array, newnr]);
 								}
 							} else {
 								const embed = new Discord.MessageEmbed()
@@ -64,10 +61,7 @@ module.exports = {
 								const m = await ch.send(msg.author, embed);
 								if (m && m.id) log.react('670163913370894346');
 								else log.react('746392936807268474');
-								ch.query(`
-                                UPDATE stats SET willis = ARRAY[${msg.author.id}];
-                                UPDATE stats SET count = '1';
-                                `);
+								ch.query('UPDATE stats SET willis = $1; UPDATE stats SET count = $2;', [[msg.author.id], 1]);
 							}
 						}
 					}

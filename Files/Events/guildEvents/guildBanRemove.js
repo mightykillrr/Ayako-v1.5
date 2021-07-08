@@ -8,7 +8,7 @@ module.exports = {
 		const language = await ch.languageSelector(ban.guild);
 		const lan = language.guildBanRemove;
 		const con = Constants.guildBanRemove;
-		const res = await ch.query(`SELECT * FROM logchannels WHERE guildid = '${ban.guild.id}';`);
+		const res = await ch.query('SELECT * FROM logchannels WHERE guildid = $1;', [ban.guild.id]);
 		if (res && res.rowCount > 0) {
 			const r = res.rows[0];
 			const logchannel = client.channels.cache.get(r.guildEvents);

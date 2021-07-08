@@ -5,7 +5,7 @@ module.exports = {
 		const client = user.client;
 		const guild = member.guild;
 		const ch = client.ch;
-		const res = await ch.query(`SELECT * FROM welcome WHERE guildid = '${guild.id}';`);
+		const res = await ch.query('SELECT * FROM welcome WHERE guildid = $1;', [guild.id]);
 		if (res && res.rowCount > 0) {
 			const r = res.rows[0];
 			if (r.enabledtof == true) {

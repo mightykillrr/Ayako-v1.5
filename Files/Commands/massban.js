@@ -136,7 +136,7 @@ module.exports = {
 					.setField(msg.language.reason, msg.client.ch.makeCodeBlock(banreason))
 					.setColor(con.log.color)
 					.setTimestamp();
-				const res = await msg.client.ch.query(`SELECT * FROM logchannels WHERE guildid = '${msg.guild.id}';`);
+				const res = await msg.client.ch.query('SELECT * FROM logchannels WHERE guildid = $1;', [msg.guild.id]);
 				if (res && res.rowCount > 0) {
 					const path = await msg.client.ch.txtFileWriter(uniqueUsers);
 					const logchannel = msg.client.channels.cache.get(res.rows[0].logchannel);

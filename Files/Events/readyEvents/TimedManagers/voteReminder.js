@@ -24,9 +24,9 @@ module.exports = {
 						.setColor(Constants.standard.color)
 						.setTimestamp();
 					ch.send(DMchannel, reEmbed);
-					ch.query(`UPDATE levelglobal SET reminderdone = 'true' WHERE userid = '${user.id}';`);
+					ch.query('UPDATE levelglobal SET reminderdone = $1 WHERE userid = $2;', [true, user.id]);
 				}
-				if (Date.now() > +runsoutat && reminderdone == true && votegain !== 1.0) ch.query(`UPDATE levelglobal SET votegain = '1.0' WHERE userid = '${userid}';`);
+				if (Date.now() > +runsoutat && reminderdone == true && votegain !== 1.0) ch.query('UPDATE levelglobal SET votegain = $1 WHERE userid = $2;', [1.0, userid]);
 			}
 		}
 	}

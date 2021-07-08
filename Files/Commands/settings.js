@@ -28,11 +28,11 @@ module.exports = {
 				}
 				categoryText += `__${category}__:\n\`\`\`${`${t.map(s => `${s}`)}`.replace(/,/g, '')}\`\`\`\n`;
 			}
-			const interactionsmodeRes = await msg.client.ch.query(`SELECT * FROM interactionsmode WHERE guildid = '${msg.guild.id}';`);
+			const interactionsmodeRes = await msg.client.ch.query('SELECT * FROM interactionsmode WHERE guildid = $1;', [msg.guild.id]);
 			const interactionsMode = interactionsmodeRes.rows[0] ? interactionsmodeRes.rows[0].mode == true ? `${msg.client.constants.emotes.small} ${msg.language.small}` : `${msg.client.constants.emotes.big} ${msg.language.big}` :  `${msg.client.constants.emotes.small} ${msg.language.small}`;
-			const prefixRes = await msg.client.ch.query(`SELECT * FROM prefix WHERE guildid = '${msg.guild.id}';`);
+			const prefixRes = await msg.client.ch.query('SELECT * FROM prefix WHERE guildid = $1;', [msg.guild.id]);
 			const prefix = prefixRes.rows[0] ? `\`${msg.client.constants.standard.prefix}\`, \`${prefixRes.rows[0].prefix}\`` : `\`${msg.client.constants.standard.prefix}\``;
-			const muteroleRes = await msg.client.ch.query(`SELECT * FROM muterole WHERE guildid = '${msg.guild.id}';`);
+			const muteroleRes = await msg.client.ch.query('SELECT * FROM muterole WHERE guildid = $1;', [msg.guild.id]);
 			const muteroles = muteroleRes.rows[0] ? msg.guild.roles.cache.get(muteroleRes.rows[0].muteroleid) ? msg.client.constants.emotes.tick+` ${msg.guild.roles.cache.get(muteroleRes.rows[0].muteroleid)}` : msg.client.constants.emotes.warning+' '+msg.lan.overview.muteRoleError : msg.client.constants.emotes.cross+' '+msg.language.none;
 			const embed = new Discord.MessageEmbed()
 				.setAuthor(msg.lan.overview.author, msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
@@ -68,7 +68,7 @@ function noEmbed(msg) {
 async function display(msg, file) {
 	msg.lanSettings = msg.language.commands.settings;
 	let r;
-	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = '${msg.guild.id}';`);
+	const res = await msg.client.ch.query('SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = $1;', [msg.guild.id]);
 	if (res && res.rowCount > 0) r = res.rows[0];
 	else return setup(msg);
 	const embed = typeof(file.displayEmbed) == 'function' ? file.displayEmbed(msg, r) : noEmbed(msg);
@@ -89,7 +89,7 @@ async function edit(msg, file, answer) {
 	let additionalIdentifiers; let r;
 	file.name = msg.args[0].toLowerCase();
 	msg.file = file;
-	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = '${msg.guild.id}';`);
+	const res = await msg.client.ch.query('SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = $1;', [msg.guild.id]);
 	if (res && res.rowCount > 0) r = res.rows[0];
 	else return setup(msg);
 	if (file.perm && !msg.member.permissions.has(new Discord.Permissions(file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
@@ -618,7 +618,7 @@ async function edit(msg, file, answer) {
 	}
 	async function gotNewSettings(answered, fail, answer) {
 		let oldSettings;
-		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = '${msg.guild.id}';`);
+		const res = await msg.client.ch.query('SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = $1;', [msg.guild.id]);
 		if (res && res.rowCount > 0) oldSettings = res.rows[0];
 		const embed = new Discord.MessageEmbed()
 			.setAuthor(msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), msg.client.constants.standard.image, msg.client.constants.standard.invite)
@@ -644,9 +644,9 @@ async function edit(msg, file, answer) {
 		r[msg.property] = answered;
 		if (r[msg.property] !== undefined && r[msg.property] !== null) {
 			if (Array.isArray(r[msg.property])) {
-				if (r[msg.property].length > 0) msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[file.name]} SET ${msg.property} = ARRAY[${r[msg.property]}] WHERE guildid = '${msg.guild.id}' ${additionalIdentifiers ? ` AND ${additionalIdentifiers}` : ''};`); //`
-				else msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[file.name]} SET ${msg.property} = null WHERE guildid = '${msg.guild.id}' ${additionalIdentifiers ? ` AND ${additionalIdentifiers}` : ''};`); //`
-			} else msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[file.name]} SET ${msg.property} = ${r[msg.property]} WHERE guildid = '${msg.guild.id}' ${additionalIdentifiers ? ` AND ${additionalIdentifiers}` : ''};`); //`
+				if (r[msg.property].length > 0) msg.client.ch.query(`UPDATE $1 SET $2 = $3 WHERE guildid = $4${additionalIdentifiers ? ' $5' : ''};`, [msg.client.contants.commands.settings.tablenames[file.name], msg.property, [r[msg.property]], msg.guild.id, additionalIdentifiers]);
+				else msg.client.ch.query(`UPDATE $1 SET $2 = $3 WHERE guildid = $4${additionalIdentifiers ? ' $5' : ''};`, [msg.client.contants.commands.settings.tablenames[file.name], msg.property, null, msg.guild.id, additionalIdentifiers]);
+			} else msg.client.ch.query(`UPDATE $1 SET $2 = $3 WHERE guildid = $4${additionalIdentifiers ? ' $5' : ''};`, [msg.client.contants.commands.settings.tablenames[file.name], msg.property, r[msg.property], msg.guild.id, additionalIdentifiers]);
 			setTimeout(() => {edit(msg, file);}, 3000);
 		}
 	}
@@ -658,7 +658,7 @@ async function edit(msg, file, answer) {
 			.setDescription(msg.client.ch.stp(msg.language.selfLog.description, {msg: msg, setting: msg.file.name}));
 		if (before !== null || (Array.isArray(before) && before.length > 0)) embed.addField(msg.lanSettings.oldValue, `${Array.isArray(before) ? before.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`) : before}`);
 		if (after !== null || (Array.isArray(after) && after.length > 0)) embed.addField(msg.lanSettings.newValue, `${Array.isArray(after) ? after.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`) : after}`);
-		const res = await msg.client.ch.query(`SELECT * FROM logchannels WHERE guildid = '${msg.guild.id}';`);
+		const res = await msg.client.ch.query('SELECT * FROM logchannels WHERE guildid = $1;', [msg.guild.id]);
 		if (res && res.rowCount > 0 && res.rows[0].verbositylog) {
 			const channel = msg.client.channels.cache.get(res.rows[0].verbositylog);
 			if (channel) msg.client.ch.send(channel, {embeds: [embed]});
@@ -678,7 +678,7 @@ async function setup(msg) {
 	if (!collected.first()) return;
 	const answer = collected.first().content.toLowerCase();
 	if (answer == msg.language.yes) {
-		await msg.client.ch.query(`INSERT INTO ${msg.client.constants.commands.settings.tablenames[msg.file.name]} (${msg.client.constants.commands.settings.setupQueries[msg.file.name].cols}) VALUES (${msg.client.constants.commands.settings.setupQueries[msg.file.name].vals});`);
+		await msg.client.ch.query('INSERT INTO $1 ($2) VALUES ($3);', [msg.client.constants.commands.settings.tablenames[msg.file.name], msg.client.constants.commands.settings.setupQueries[msg.file.name].cols, msg.client.constants.commands.settings.setupQueries[msg.file.name].vals]);
 		collected.first().delete().catch(() => {});
 		const endEmbed = new Discord.MessageEmbed()
 			.setAuthor(msg.lan.setup.author, msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)

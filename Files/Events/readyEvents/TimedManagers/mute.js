@@ -3,7 +3,7 @@ module.exports = {
 		const { client } = require('../../../BaseClient/DiscordClient');
 		const ch = client.ch;
 		client.guilds.cache.forEach(async guild => {
-			const res = await ch.query(`SELECT * FROM warns WHERE type = 'Mute' AND guildid = '${guild.id}';`);
+			const res = await ch.query('SELECT * FROM warns WHERE type = $1 AND guildid = $2;', ['Mute', guild.id]);
 			if (res && res.rowCount > 0) {
 				for (let i = 0; i < res.rowCount; i++) {
 					const r = res.rows[i];
@@ -13,8 +13,8 @@ module.exports = {
 						if (end < Date.now()) {
 							let muteroleid;
 							let muterole;
-							if (guild && guild.id) {
-								const res = await ch.query(`SELECT muteroleid FROM muterole WHERE guildid = '${guild.id}';`);
+							if (guild && guild.id) {9;
+								const res = await ch.query('SELECT muteroleid FROM muterole WHERE guildid = $1;', [guild.id]);
 								if (res && res.rowCount > 0) {
 									muteroleid = res.rows[0].muteroleid;
 									muterole = guild.roles.cache.find(r => r.id === muteroleid);
@@ -43,5 +43,5 @@ module.exports = {
 
 function closed(guild, user, end) {
 	const client = guild.client;
-	client.ch.query(`UPDATE warns SET closed = 'true' WHERE guildid = '${guild.id}' AND userid = '${user.id}' AND type = 'Mute' AND duration = '${end}';`);
+	client.ch.query('UPDATE warns SET closed = $1 WHERE guildid = $2 AND userid = $3 AND type = $4 AND duration = $5;', [true, guild.id, user.id, 'Mute', end]);
 }

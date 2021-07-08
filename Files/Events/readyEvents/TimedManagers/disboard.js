@@ -26,9 +26,9 @@ module.exports = {
 								.setAuthor(language.ready.disboard.title, Constants.standard.image, Constants.standard.invite);
 							ch.send(channel, role, embed);
 							ch.query(`
-                                UPDATE disboard SET channelid = null WHERE guildid = '${guild.id}';
-                                UPDATE disboard SET lastbump = null WHERE guildid = '${guild.id}';
-                                `);
+                                UPDATE disboard SET channelid = null WHERE guildid = $1;
+                                UPDATE disboard SET lastbump = null WHERE guildid = $1;
+                                `, [guild.id]);
 						}
 					}
 				}

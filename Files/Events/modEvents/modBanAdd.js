@@ -53,7 +53,7 @@ module.exports = {
 			let err;
 			const ban = await msg.guild.members.ban(target, {reason: reason, days: 1}).catch((e) => {err = e;});
 			if (ban) {
-				const res = await msg.client.ch.query(`SELECT * FROM logchannels WHERE guildid = '${msg.guild.id}';`);
+				const res = await msg.client.ch.query('SELECT * FROM logchannels WHERE guildid = $1;', [msg.guild.id]);
 				let logchannel;
 				if (res && res.rowCount > 0) logchannel = msg.client.channels.cache.get(res.rows[0].guildEvents);
 				const embed = new Discord.MessageEmbed()

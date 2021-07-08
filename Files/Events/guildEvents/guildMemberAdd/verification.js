@@ -7,7 +7,7 @@ module.exports = {
 		const guild = member.guild;
 		const ch = client.ch;
 		const Constants = client.constants;
-		const res = await ch.query(`SELECT * FROM verification WHERE guildid = '${guild.id}';`);
+		const res = await ch.query('SELECT * FROM verification WHERE guildid = $1;', [guild.id]);
 		if (res && res.rowCount > 0) {
 			startProcess();
 		}

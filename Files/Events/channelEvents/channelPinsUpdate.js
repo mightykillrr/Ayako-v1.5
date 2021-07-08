@@ -6,7 +6,7 @@ module.exports = {
 		const guild = channel.guild;
 		const ch = require('../../BaseClient/ClientHelper'); 
 		const Constants = require('../../Constants.json');
-		const res = await ch.query(`SELECT * FROM logchannels WHERE guildid = '${guild.id}';`);
+		const res = await ch.query('SELECT * FROM logchannels WHERE guildid = $1;', [guild.id]);
 		if (res && res.rowCount > 0) {
 			const r = res.rows[0];
 			const logchannel = client.channels.cache.get(r.channelEvents);

@@ -21,22 +21,20 @@ module.exports = {
 		changedGames.forEach(async (game) => {
 			if (game.name == 'Custom Status') return;
 			if (game.when == 'old') {
-				game.name = game.name.replace(/`/g, '').replace(/'/g, '');
 				const timePlayed = `${now - game.createdTimestamp}`;
 				ch.query(`
 				INSERT INTO games (userid, gamename, playduration, lastcreated) 
-				VALUES ('${oldPresence.user.id}', '${game.name}', '${timePlayed}', '${game.createdTimestamp}')
+				VALUES ($1, $2, $3, $4)
 				ON CONFLICT (userid, gamename) 
-				DO UPDATE SET playduration = '${timePlayed}';
-				`);
+				DO UPDATE SET playduration = $3;
+				`, [oldPresence.user.id, game.name, timePlayed, game.createdTimestamp]);
 			} else if (game.when == 'new') {
-				game.name = game.name.replace(/`/g, '').replace(/'/g, '');
 				ch.query(`
 				INSERT INTO games (userid, gamename, lastcreated) 
-				VALUES ('${newPresence.user.id}', '${game.name}', '${game.createdTimestamp}')
+				VALUES ($1, $2, $3)
 				ON CONFLICT (userid, gamename)
-				DO UPDATE SET lastcreated = '${game.createdTimestamp}';
-				`);
+				DO UPDATE SET lastcreated = $3;
+				`, [newPresence.user.id, game.name, game.createdTimestamp]);
 			}
 		});
 	},

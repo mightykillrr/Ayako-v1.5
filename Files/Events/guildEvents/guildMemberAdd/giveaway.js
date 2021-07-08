@@ -5,7 +5,7 @@ module.exports = {
 		const client = user.client;
 		const ch = client.ch;
 		const Constants = client.constants;
-		const res = await ch.query(`SELECT * FROM giveawaysettings WHERE reqserverid = '${member.guild.id}';`);
+		const res = await ch.query('SELECT * FROM giveawaysettings WHERE reqserverid = $1;', [member.guild.id]);
 		if (res && res.rowCount > 0) {
 			const r = res.rows[0];
 			const channel = client.channels.cache.get(r.channelid);

@@ -10,7 +10,7 @@ module.exports = {
 		let contained = false;
 		if (oldMsg.content.toLowerCase().includes('https://') || oldMsg.content.toLowerCase().includes('http://')) return;
 		if (newMsg.content.toLowerCase().includes('https://') || newMsg.content.toLowerCase().includes('https://')) return;
-		const res = await ch.query(`SELECT * FROM blacklist WHERE guildid = '${oldMsg.guild.id}';`);
+		const res = await ch.query('SELECT * FROM blacklist WHERE guildid = $1;', [newMsg.guild.id]);
 		if (res && res.rowCount > 0) {
 			const r = res.rows[0];
 			const args = newMsg.content.split(/ +/);
@@ -31,16 +31,9 @@ module.exports = {
 			}
 		}
 		if (contained == false) {
-			const res = await ch.query(`SELECT * FROM esnipe WHERE channelid = '${oldMsg.channel.id}';`);
-			if (res && res.rowCount > 0) {
-				ch.query(`
-                        UPDATE esnipe SET before = '${oldMsg.content.replace(/'/g, '').replace(/`/g, '')}' WHERE channelid = '${oldMsg.channel.id}';
-                        UPDATE esnipe SET after = '${newMsg.content.replace(/'/g, '').replace(/`/g, '')}' WHERE channelid = '${oldMsg.channel.id}';
-                        UPDATE esnipe SET userid = '${oldMsg.author.id}' WHERE channelid = '${oldMsg.channel.id}';
-                        `);
-			} else {
-				ch.query(`INSERT INTO esnipe (channelid, userid, before, after) VALUES ('${oldMsg.channel.id}', '${oldMsg.author.id}', '${oldMsg.content.replace(/'/g, '').replace(/`/g, '')}', '${newMsg.content.replace(/'/g, '').replace(/`/g, '')}');`).catch(()  => {});
-			}
+			const res = await ch.query('SELECT * FROM esnipe WHERE channelid = $1;', [newMsg.channel.id]);
+			if (res && res.rowCount > 0) ch.query('UPDATE esnipe SET before = $1 WHERE channelid = $2; UPDATE esnipe SET after = $3 WHERE channelid = $2; UPDATE esnipe SET userid = $4 WHERE channelid = $2;', [oldMsg.content, oldMsg.channel.id, newMsg.content, oldMsg.author.id]);
+			else ch.query('INSERT INTO esnipe (channelid, userid, before, after) VALUES ($1, $2, $3, $4);', [oldMsg.channel.id, oldMsg.author.id, oldMsg.content, newMsg.content]);
 		}
 	}
 };

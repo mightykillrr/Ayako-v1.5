@@ -7,7 +7,7 @@ module.exports = {
 		if (!msg.channel || msg.channel.type == 'dm' || !msg.author || msg.author.bot) return;
 		if (msg.embeds) {
 			if (msg.content.toLowerCase().includes('https://tenor.com/view/') || msg.content.toLowerCase().includes('.gif')) {
-				const res = await msg.client.ch.query(`SELECT * FROM gifposter WHERE guild = '${msg.guild.id}';`);
+				const res = await msg.client.ch.query('SELECT * FROM gifposter WHERE guildid = $1;', [msg.guild.id]);
 				if (res && res.rowCount > 0) {
 					const r = res.rows[0];
 					if (r.active == false) return;
