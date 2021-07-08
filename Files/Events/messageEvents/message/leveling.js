@@ -39,7 +39,7 @@ module.exports = {
 				}
 			}
 		} else msg.client.ch.query('INSERT INTO levelglobal(userid, xp, level) VALUES ($1, $2, $3);', [msg.author.id, 1, 0]);
-		const resS = await msg.client.ch.query('SELECT * FROM levelsettings WHERE userid = $1;', [msg.author.id]);
+		const resS = await msg.client.ch.query('SELECT * FROM levelsettings WHERE guildid = $1;', [msg.guild.id]);
 		let settings;
 		if (resS && resS.rowCount > 0) settings = resS.rows[0];
 		else {

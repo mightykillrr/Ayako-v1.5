@@ -78,9 +78,9 @@ module.exports = {
 		});
 		return text;
 	},
-	async query(query) {
-		const res = await pool.query(query).catch((err) =>{
-			console.log(query);
+	async query(query, arr) {
+		const res = await pool.query(query, arr).catch((err) =>{
+			console.log(query, arr);
 			this.logger('Pool Query Error', err);
 		});
 		if (res) return res;
@@ -292,7 +292,7 @@ module.exports = {
 	},
 	async languageSelector(guild) {
 		if (guild.id) {
-			const resLan = await this.query(`SELECT * FROM language WHERE guildid = '${guild.id}';`);
+			const resLan = await this.query('SELECT * FROM language WHERE guildid = $1;', [guild.id]);
 			let lang = 'en';
 			if (resLan && resLan.rowCount > 0) lang = resLan.rows[0].language;
 			const language = require(`../Languages/lan-${lang}.json`);

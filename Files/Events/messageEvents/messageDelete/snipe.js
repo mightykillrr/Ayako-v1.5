@@ -22,7 +22,7 @@ module.exports = {
 			}
 		}
 		const res2 = await ch.query('SELECT * FROM snipe WHERE channelid = $1;', [msg.channel.id]);
-		if (res2 && res2.rowCount > 0) ch.query('UPDATE snipe SET text = $1 WHERE channelid = $2; UPDATE snipe SET userid = $3 WHERE channelid = $2;', [msg.content, msg.channel.id, msg.author.id]);
+		if (res2 && res2.rowCount > 0) ch.query('UPDATE snipe SET text = $1, userid = $3 WHERE channelid = $2;', [msg.content, msg.channel.id, msg.author.id]);
 		else ch.query('INSERT INTO snipe (channelid, userid, text) VALUES ($1, $2, $3);', [msg.channel.id, msg.author.id, msg.content]);
 	}
 };

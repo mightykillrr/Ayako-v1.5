@@ -32,7 +32,7 @@ module.exports = {
 		}
 		if (contained == false) {
 			const res = await ch.query('SELECT * FROM esnipe WHERE channelid = $1;', [newMsg.channel.id]);
-			if (res && res.rowCount > 0) ch.query('UPDATE esnipe SET before = $1 WHERE channelid = $2; UPDATE esnipe SET after = $3 WHERE channelid = $2; UPDATE esnipe SET userid = $4 WHERE channelid = $2;', [oldMsg.content, oldMsg.channel.id, newMsg.content, oldMsg.author.id]);
+			if (res && res.rowCount > 0) ch.query('UPDATE esnipe SET before = $1, after = $3, userid = $4 WHERE channelid = $2;', [oldMsg.content, oldMsg.channel.id, newMsg.content, oldMsg.author.id]);
 			else ch.query('INSERT INTO esnipe (channelid, userid, before, after) VALUES ($1, $2, $3, $4);', [oldMsg.channel.id, oldMsg.author.id, oldMsg.content, newMsg.content]);
 		}
 	}
