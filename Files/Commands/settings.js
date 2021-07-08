@@ -92,7 +92,7 @@ async function edit(msg, file, answer) {
 		const edit = Object.entries(msg.lan.edit)[o];
 		const name = edit[1];
 		const button = new Discord.MessageButton()
-			.setCustomID(`${name.name}`)
+			.setCustomId(`${name.name}`)
 			.setLabel(`${name.trigger[1] ? name.trigger[1].replace(/`/g, '') : name.trigger[0].replace(/`/g, '')}`)
 			.setStyle('PRIMARY');
 		rows.push(button);
@@ -104,12 +104,12 @@ async function edit(msg, file, answer) {
 	if (answer) answer.update({embeds: [editEmbed], components: buttons}).catch(() => {});
 	else if (msg.m) msg.m.edit({embeds: [editEmbed], components: buttons}).catch(() => {});
 	else msg.m = await msg.client.ch.reply(msg, {embeds: [editEmbed], components: buttons});
-	const buttonsCollector = new Discord.MessageComponentInteractionCollector(msg.m, {time: 60000});
-	const messageCollector = new Discord.MessageCollector(msg.channel, {time: 60000});
+	const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
+	const messageCollector = msg.channel.createMessageCollector({time: 60000});
 	buttonsCollector.on('collect', (clickButton) => {
 		if (clickButton.user.id == msg.author.id) {
 			let editing;
-			Object.entries(msg.lan.edit).forEach(e => {e[1].trigger.forEach(trigger => {if (trigger.replace(/`/g, '') == clickButton.customID) editing = e;});});
+			Object.entries(msg.lan.edit).forEach(e => {e[1].trigger.forEach(trigger => {if (trigger.replace(/`/g, '') == clickButton.customId) editing = e;});});
 			if (editing) {
 				gotEditing(editing, clickButton);
 				buttonsCollector.stop();
@@ -134,6 +134,7 @@ async function edit(msg, file, answer) {
 	async function gotEditing(e, answer) {
 		const propertyName = e[0];
 		msg.property = propertyName;
+		if (r[msg.property] && r[msg.property][0] && Array.isArray(r[msg.property][0])) r[msg.property] = r[msg.property][0];
 		const editing = e[1];
 		const embed = new Discord.MessageEmbed()
 			.setAuthor(msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), msg.client.constants.standard.image, msg.client.constants.standard.invite)
@@ -147,31 +148,31 @@ async function edit(msg, file, answer) {
 		if (type == 'button') {
 			if (settings == 'boolean') {
 				const PRIMARY = new Discord.MessageButton()
-					.setCustomID('true')
+					.setCustomId('true')
 					.setLabel(msg.language.true)
 					.setStyle('SUCCESS');
 				const SECONDARY = new Discord.MessageButton()
-					.setCustomID('false')
+					.setCustomId('false')
 					.setLabel(msg.language.false)
 					.setStyle('SECONDARY');
 				const DANGER = new Discord.MessageButton()
-					.setCustomID('back')
+					.setCustomId('back')
 					.setLabel(msg.language.back)
 					.setEmoji(msg.client.constants.emotes.back)
 					.setStyle('DANGER');
 				if (answer) answer.update({embeds: [embed], components: [[DANGER],[PRIMARY],[SECONDARY]]}).catch(() => {});
 				else msg.m.edit({embeds: [embed], components: [[DANGER],[PRIMARY],[SECONDARY]]}).catch(() => {});
 			}
-			const buttonsCollector = new Discord.MessageComponentInteractionCollector(msg.m, {time: 60000});
-			const messageCollector = new Discord.MessageCollector(msg.channel, {time: 60000});
+			const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
+			const messageCollector = msg.channel.createMessageCollector({time: 60000});
 			let newSetting;
 			buttonsCollector.on('collect', (buttonClick) => {
 				if (buttonClick.user.id == msg.author.id) {
 					buttonsCollector.stop();
 					messageCollector.stop();
-					if (buttonClick.customID == 'true') newSetting = true;
-					else if (buttonClick.customID == 'false') newSetting = false;
-					else if (buttonClick.customID == 'back') return edit(msg, file, buttonClick);
+					if (buttonClick.customId == 'true') newSetting = true;
+					else if (buttonClick.customId == 'false') newSetting = false;
+					else if (buttonClick.customId == 'back') return edit(msg, file, buttonClick);
 					gotNewSettings(newSetting, null, buttonClick);
 				} else msg.client.ch.notYours(buttonClick, msg);
 			});
@@ -201,27 +202,27 @@ async function edit(msg, file, answer) {
 				const take = [];
 				for(let j = 0; j < 25; j++) {take.push(options[j]);}
 				const menu = new Discord.MessageSelectMenu()
-					.setCustomID(msg.property)
+					.setCustomId(msg.property)
 					.addOptions(take)
 					.setMinValues(1)
 					.setMaxValues(settings.includes('s') ? take.length : 1)
 					.setPlaceholder(msg.language.select[settings].select);
 				const next = new Discord.MessageButton()
-					.setCustomID('next')
+					.setCustomId('next')
 					.setLabel(msg.language.next)
 					.setStyle('SUCCESS');
 				const prev = new Discord.MessageButton()
-					.setCustomID('prev')
+					.setCustomId('prev')
 					.setLabel(msg.language.prev)
 					.setDisabled(true)
 					.setStyle('DANGER');
 				const done = new Discord.MessageButton()
-					.setCustomID('done')
+					.setCustomId('done')
 					.setLabel(msg.language.done)
 					.setDisabled(true)
 					.setStyle('PRIMARY');
 				const back = new Discord.MessageButton()
-					.setCustomID('back')
+					.setCustomId('back')
 					.setLabel(msg.language.back)
 					.setEmoji(msg.client.constants.emotes.back)
 					.setStyle('DANGER');
@@ -230,41 +231,41 @@ async function edit(msg, file, answer) {
 					.setDescription(`${msg.language.select[settings].desc}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
 				if (answer) answer.update({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
 				else msg.m.edit({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
-				const buttonsCollector = new Discord.MessageComponentInteractionCollector(msg.m, {time: 60000});
-				const messageCollector = new Discord.MessageCollector(msg.channel, {time: 60000});
+				const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
+				const messageCollector = msg.channel.createMessageCollector({time: 60000});
 				buttonsCollector.on('collect', (clickButton) => {
 					if (clickButton.user.id == msg.author.id) {
-						if (clickButton.customID == 'next' || clickButton.customID == 'prev') {
+						if (clickButton.customId == 'next' || clickButton.customId == 'prev') {
 							let indexLast; let indexFirst;
 							for (let j = 0; options.length > j; j++) {
 								if (options[j] && options[j].value == clickButton.message.components[0].components[0].options[(clickButton.message.components[0].components[0].options.length-1)].value) indexLast = j;
 								if (options[j] && options[j].value == clickButton.message.components[0].components[0].options[0].value) indexFirst = j;
 							}
 							take.splice(0, take.length);
-							if (clickButton.customID == 'next') for (let j = indexLast+1; j < indexLast+26; j++) {if (options[j]) {take.push(options[j]);}}
-							if (clickButton.customID == 'prev') for (let j = indexFirst-25; j < indexFirst; j++) {if (options[j]) {take.push(options[j]);}}
+							if (clickButton.customId == 'next') for (let j = indexLast+1; j < indexLast+26; j++) {if (options[j]) {take.push(options[j]);}}
+							if (clickButton.customId == 'prev') for (let j = indexFirst-25; j < indexFirst; j++) {if (options[j]) {take.push(options[j]);}}
 							let page = clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0];
-							clickButton.customID == 'next' ? page++ : page--;
+							clickButton.customId == 'next' ? page++ : page--;
 							const menu = new Discord.MessageSelectMenu()
-								.setCustomID(msg.property)
+								.setCustomId(msg.property)
 								.addOptions(take)
 								.setMinValues(1)
 								.setMaxValues(settings.includes('s') ? take.length : 1)
 								.setPlaceholder(msg.language.select[settings].select);
 							const next = new Discord.MessageButton()
-								.setCustomID('next')
+								.setCustomId('next')
 								.setLabel(msg.language.next)
 								.setStyle('SUCCESS');
 							const prev = new Discord.MessageButton()
-								.setCustomID('prev')
+								.setCustomId('prev')
 								.setLabel(msg.language.prev)
 								.setStyle('DANGER');
 							const done = new Discord.MessageButton()
-								.setCustomID('done')
+								.setCustomId('done')
 								.setLabel(msg.language.done)
 								.setStyle('PRIMARY');
 							const back = new Discord.MessageButton()
-								.setCustomID('back')
+								.setCustomId('back')
 								.setLabel(msg.language.back)
 								.setEmoji(msg.client.constants.emotes.back)
 								.setStyle('DANGER');
@@ -279,7 +280,7 @@ async function edit(msg, file, answer) {
 							if (page > 1) prev.setDisabled(false);
 							else prev.setDisabled(true);
 							clickButton.update({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
-						} else if (clickButton.customID == 'done') {
+						} else if (clickButton.customId == 'done') {
 							if (compatibilityType == 'channels' || compatibilityType == 'roles') {
 								if (answered.length > 0) {
 									answered.forEach(id => { 
@@ -304,31 +305,31 @@ async function edit(msg, file, answer) {
 							messageCollector.stop('finished');
 							buttonsCollector.stop('finished');
 							gotNewSettings(r[msg.property], null, clickButton);
-						} else if (clickButton.customID == msg.property) {
+						} else if (clickButton.customId == msg.property) {
 							clickButton.values.forEach(val => {
 								if (!answered.includes(val)) msg.guild[settings].cache.get(val) ? answered.push(msg.guild[settings].cache.get(val).id) : '';
 								else answered.splice(answered.indexOf(val), 1);
 							});
 							const menu = new Discord.MessageSelectMenu()
-								.setCustomID(msg.property)
+								.setCustomId(msg.property)
 								.addOptions(take)
 								.setMinValues(1)
 								.setMaxValues(settings.includes('s') ? take.length : 1)
 								.setPlaceholder(msg.language.select[settings].select);
 							const next = new Discord.MessageButton()
-								.setCustomID('next')
+								.setCustomId('next')
 								.setLabel(msg.language.next)
 								.setStyle('SUCCESS');
 							const prev = new Discord.MessageButton()
-								.setCustomID('prev')
+								.setCustomId('prev')
 								.setLabel(msg.language.prev)
 								.setStyle('DANGER');
 							const done = new Discord.MessageButton()
-								.setCustomID('done')
+								.setCustomId('done')
 								.setLabel(msg.language.done)
 								.setStyle('PRIMARY');
 							const back = new Discord.MessageButton()
-								.setCustomID('back')
+								.setCustomId('back')
 								.setLabel(msg.language.back)
 								.setEmoji(msg.client.constants.emotes.back)
 								.setStyle('DANGER');
@@ -340,7 +341,7 @@ async function edit(msg, file, answer) {
 								.setDescription(`${msg.language.select[settings].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``)
 								.addField(msg.language.selected, `${answered.map(c => settings == 'channels' ? `<#${c}>` : settings == 'roles' ? `<@&${c}>` : ` ${c}`)} `);
 							clickButton.update({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
-						} else if (clickButton.customID == 'back') return edit(msg, msg.file, clickButton);
+						} else if (clickButton.customId == 'back') return edit(msg, msg.file, clickButton);
 					} else msg.client.ch.notYours(clickButton, msg);
 				});
 				messageCollector.on('collect', async (message) => {
@@ -363,8 +364,7 @@ async function edit(msg, file, answer) {
 							if (answered.length > 0) {
 								answered.forEach(id => { 
 									if (r[msg.property] && r[msg.property].includes(id)) {
-										const index = r[msg.property].indexOf(id);
-										r[msg.property].splice(index, 1);
+										r[msg.property].splice(r[msg.property].indexOf(id), 1);
 									} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(id);
 									else r[msg.property] = [id];
 								});
@@ -394,27 +394,27 @@ async function edit(msg, file, answer) {
 				const take = [];
 				for(let j = 0; j < 25; j++) {take.push(options[j]);}
 				const menu = new Discord.MessageSelectMenu()
-					.setCustomID(msg.property)
+					.setCustomId(msg.property)
 					.addOptions(take)
 					.setMinValues(1)
 					.setMaxValues(settings.includes('s') ? take.length : 1)
 					.setPlaceholder(msg.language.select[settings].select);
 				const next = new Discord.MessageButton()
-					.setCustomID('next')
+					.setCustomId('next')
 					.setLabel(msg.language.next)
 					.setStyle('SUCCESS');
 				const prev = new Discord.MessageButton()
-					.setCustomID('prev')
+					.setCustomId('prev')
 					.setLabel(msg.language.prev)
 					.setDisabled(true)
 					.setStyle('DANGER');
 				const done = new Discord.MessageButton()
-					.setCustomID('done')
+					.setCustomId('done')
 					.setLabel(msg.language.done)
 					.setDisabled(true)
 					.setStyle('PRIMARY');
 				const back = new Discord.MessageButton()
-					.setCustomID('back')
+					.setCustomId('back')
 					.setLabel(msg.language.back)
 					.setEmoji(msg.client.constants.emotes.back)
 					.setStyle('DANGER');
@@ -423,41 +423,41 @@ async function edit(msg, file, answer) {
 					.setDescription(`${msg.language.select[settings].desc}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
 				if (answer) answer.update({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
 				else msg.m.edit({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
-				const buttonsCollector = new Discord.MessageComponentInteractionCollector(msg.m, {time: 60000});
-				const messageCollector = new Discord.MessageCollector(msg.channel, {time: 60000});
+				const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
+				const messageCollector = msg.channel.createMessageCollector({time: 60000});
 				buttonsCollector.on('collect', (clickButton) => {
 					if (clickButton.user.id == msg.author.id) {
-						if (clickButton.customID == 'next' || clickButton.customID == 'prev') {
+						if (clickButton.customId == 'next' || clickButton.customId == 'prev') {
 							let indexLast; let indexFirst;
 							for (let j = 0; options.length > j; j++) {
 								if (options[j] && options[j].value == clickButton.message.components[0].components[0].options[(clickButton.message.components[0].components[0].options.length-1)].value) indexLast = j;
 								if (options[j] && options[j].value == clickButton.message.components[0].components[0].options[0].value) indexFirst = j;
 							}
 							take.splice(0, take.length);
-							if (clickButton.customID == 'next') for (let j = indexLast+1; j < indexLast+26; j++) {if (options[j]) {take.push(options[j]);}}
-							if (clickButton.customID == 'prev') for (let j = indexFirst-25; j < indexFirst; j++) {if (options[j]) {take.push(options[j]);}}
+							if (clickButton.customId == 'next') for (let j = indexLast+1; j < indexLast+26; j++) {if (options[j]) {take.push(options[j]);}}
+							if (clickButton.customId == 'prev') for (let j = indexFirst-25; j < indexFirst; j++) {if (options[j]) {take.push(options[j]);}}
 							let page = clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0];
-							clickButton.customID == 'next' ? page++ : page--;
+							clickButton.customId == 'next' ? page++ : page--;
 							const menu = new Discord.MessageSelectMenu()
-								.setCustomID(msg.property)
+								.setCustomId(msg.property)
 								.addOptions(take)
 								.setMinValues(1)
 								.setMaxValues(settings.includes('s') ? take.length : 1)
 								.setPlaceholder(msg.language.select[settings].select);
 							const next = new Discord.MessageButton()
-								.setCustomID('next')
+								.setCustomId('next')
 								.setLabel(msg.language.next)
 								.setStyle('SUCCESS');
 							const prev = new Discord.MessageButton()
-								.setCustomID('prev')
+								.setCustomId('prev')
 								.setLabel(msg.language.prev)
 								.setStyle('DANGER');
 							const done = new Discord.MessageButton()
-								.setCustomID('done')
+								.setCustomId('done')
 								.setLabel(msg.language.done)
 								.setStyle('PRIMARY');
 							const back = new Discord.MessageButton()
-								.setCustomID('back')
+								.setCustomId('back')
 								.setLabel(msg.language.back)
 								.setEmoji(msg.client.constants.emotes.back)
 								.setStyle('DANGER');
@@ -472,33 +472,33 @@ async function edit(msg, file, answer) {
 							if (page > 1) prev.setDisabled(false);
 							else prev.setDisabled(true);
 							clickButton.update({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
-						} else if (clickButton.customID == 'done') {
+						} else if (clickButton.customId == 'done') {
 							if (answered.length > 0) r[msg.property] = answered;
 							messageCollector.stop('finished');
 							buttonsCollector.stop('finished');
 							gotNewSettings(r[msg.property], null, clickButton);
-						} else if (clickButton.customID == msg.property) {
+						} else if (clickButton.customId == msg.property) {
 							answered = clickButton.values[0];
 							const menu = new Discord.MessageSelectMenu()
-								.setCustomID(msg.property)
+								.setCustomId(msg.property)
 								.addOptions(take)
 								.setMinValues(1)
 								.setMaxValues(settings.includes('s') ? take.length : 1)
 								.setPlaceholder(msg.language.select[settings].select);
 							const next = new Discord.MessageButton()
-								.setCustomID('next')
+								.setCustomId('next')
 								.setLabel(msg.language.next)
 								.setStyle('SUCCESS');
 							const prev = new Discord.MessageButton()
-								.setCustomID('prev')
+								.setCustomId('prev')
 								.setLabel(msg.language.prev)
 								.setStyle('DANGER');
 							const done = new Discord.MessageButton()
-								.setCustomID('done')
+								.setCustomId('done')
 								.setLabel(msg.language.done)
 								.setStyle('PRIMARY');
 							const back = new Discord.MessageButton()
-								.setCustomID('back')
+								.setCustomId('back')
 								.setLabel(msg.language.back)
 								.setEmoji(msg.client.constants.emotes.back)
 								.setStyle('DANGER');
@@ -510,7 +510,7 @@ async function edit(msg, file, answer) {
 								.setDescription(`${msg.language.select[settings].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``)
 								.addField(msg.language.selected, `${answered} `);
 							clickButton.update({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
-						} else if (clickButton.customID == 'back') return edit(msg, msg.file, clickButton);
+						} else if (clickButton.customId == 'back') return edit(msg, msg.file, clickButton);
 					} else msg.client.ch.notYours(clickButton, msg);
 				});
 				messageCollector.on('collect', async (message) => {
@@ -548,14 +548,14 @@ async function edit(msg, file, answer) {
 					.setAuthor(msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
 					.setDescription(`${msg.language.select[settings].select}`);
 				const DANGER = new Discord.MessageButton()
-					.setCustomID('back')
+					.setCustomId('back')
 					.setLabel(msg.language.back)
 					.setEmoji(msg.client.constants.emotes.back)
 					.setStyle('DANGER');
 				if (answer) answer.update({embeds: [embed], components: [[DANGER]]}).catch(() => {});
 				else msg.m.edit({embeds: [embed], components: [[DANGER]]}).catch(() => {});
-				const buttonsCollector = new Discord.MessageComponentInteractionCollector(msg.m, {time: 60000});
-				const messageCollector = new Discord.MessageCollector(msg.channel, {time: 60000});
+				const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
+				const messageCollector = msg.channel.createMessageCollector({time: 60000});
 				messageCollector.on('collect', async (message) => {
 					console.log(1);
 					if (message.author.id == msg.author.id) {
@@ -587,7 +587,7 @@ async function edit(msg, file, answer) {
 				});
 				buttonsCollector.on('collect', (clickButton) => {
 					if (clickButton.user.id == msg.author.id) {
-						if (clickButton.customID == 'back') {
+						if (clickButton.customId == 'back') {
 							buttonsCollector.stop();
 							messageCollector.stop();
 							return edit(msg, file, clickButton);
@@ -607,21 +607,19 @@ async function edit(msg, file, answer) {
 	}
 	async function gotNewSettings(answered, fail, answer) {
 		let oldSettings;
-		const res = await msg.client.ch.query('SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = $1;', [msg.guild.id]);
+		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 		if (res && res.rowCount > 0) oldSettings = res.rows[0];
 		const embed = new Discord.MessageEmbed()
 			.setAuthor(msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), msg.client.constants.standard.image, msg.client.constants.standard.invite)
 			.setColor(msg.client.constants.commands.settings.color)
 			.setDescription(msg.client.ch.stp(msg.lanSettings.done, {loading: msg.client.constants.emotes.loading}));
-		if (oldSettings) {
-			if (Array.isArray(oldSettings[msg.property])) embed.addField(msg.lanSettings.oldValue, `${oldSettings[msg.property].map(f => msg.property.includes('user') ? ` <@${f}>` : msg.property.includes('role') ? ` <@&${f}>` : msg.property.includes('channel') ? ` <#${f}>` : ` ${f}`)}`);
-			else embed.addField(msg.lanSettings.oldValue, `${oldSettings[msg.property]}`);
-		}
-		if ((answered !== undefined && answered !== null) || (answered.length > 0 && Array.isArray(answered))) {
-			if (Array.isArray(answered)) embed.addField(msg.lanSettings.newValue, `${answered.length > 0 ? answered.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`) : msg.language.none}`);
-			else embed.addField(msg.lanSettings.newValue, `${answered !== undefined && answered !== null ? answered : msg.language.none}`);
-		}
-		if (oldSettings && (answered !== undefined && answered !== null) || (answered.length > 0 && Array.isArray(answered))) log(oldSettings[msg.property], answered);
+		if (Array.isArray(oldSettings) && oldSettings.length > 0) embed.addField(msg.lanSettings.oldValue, `${oldSettings.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
+		else if (oldSettings !== null && oldSettings !== undefined) embed.addField(msg.lanSettings.oldValue, `${oldSettings}`);
+		else embed.addField(msg.lanSettings.oldValue, msg.language.none);
+		if (Array.isArray(answered) && answered.length > 0) embed.addField(msg.lanSettings.oldValue, `${answered.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
+		else if (answered !== null && answered !== undefined) embed.addField(msg.lanSettings.oldValue, `${answered}`);
+		else embed.addField(msg.lanSettings.oldValue, msg.language.none);		
+		if (oldSettings && (answered !== undefined && answered !== null) || (answered !== undefined && answered !== null && answered.length > 0 && Array.isArray(answered))) log(oldSettings[msg.property], answered);
 		else if ((answered !== undefined && answered !== null) || (answered.length > 0 && Array.isArray(answered))) log(null, answered);
 		else if (oldSettings) log(oldSettings[msg.property], null);
 		if (fail && fail.length > 0) {
@@ -633,20 +631,26 @@ async function edit(msg, file, answer) {
 		r[msg.property] = answered;
 		if (r[msg.property] !== undefined && r[msg.property] !== null) {
 			if (Array.isArray(r[msg.property])) {
-				if (r[msg.property].length > 0) msg.client.ch.query(`UPDATE $1 SET $2 = $3 WHERE guildid = $4${additionalIdentifiers ? ' $5' : ''};`, [msg.client.constants.commands.settings.tablenames[file.name], msg.property, [r[msg.property]], msg.guild.id, additionalIdentifiers]);
-				else msg.client.ch.query(`UPDATE $1 SET $2 = $3 WHERE guildid = $4${additionalIdentifiers ? ' $5' : ''};`, [msg.client.constants.commands.settings.tablenames[file.name], msg.property, null, msg.guild.id, additionalIdentifiers]);
-			} else msg.client.ch.query(`UPDATE $1 SET $2 = $3 WHERE guildid = $4${additionalIdentifiers ? ' $5' : ''};`, [msg.client.constants.commands.settings.tablenames[file.name], msg.property, r[msg.property], msg.guild.id, additionalIdentifiers]);
+				if (r[msg.property].length > 0) msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[file.name]} SET ${msg.property} = $1 WHERE guildid = $2${additionalIdentifiers ? ` ${additionalIdentifiers}` : ''};`, [r[msg.property], msg.guild.id]); //`
+				else msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[file.name]} SET ${msg.property} = $1 WHERE guildid = $2${additionalIdentifiers ? ` ${additionalIdentifiers}` : ''};`, [null, msg.guild.id]); //`
+			} else msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[file.name]} SET ${msg.property} = $1 WHERE guildid = $2${additionalIdentifiers ? ` ${additionalIdentifiers}` : ''};`, [r[msg.property], msg.guild.id]); //`
 			setTimeout(() => {edit(msg, file);}, 3000);
 		}
 	}
 	async function log(before, after) {
+		if (before == null || before == undefined) before = msg.language.none;
+		if (after == null || after == undefined) after = msg.language.none;
 		const embed = new Discord.MessageEmbed()
 			.setColor(msg.client.constants.commands.settings.log.color)
 			.setTimestamp()
 			.setAuthor(msg.client.ch.stp(msg.language.selfLog.author, {setting: msg.lan.type}))
 			.setDescription(msg.client.ch.stp(msg.language.selfLog.description, {msg: msg, setting: msg.file.name}));
-		if (before !== null || (Array.isArray(before) && before.length > 0)) embed.addField(msg.lanSettings.oldValue, `${Array.isArray(before) ? before.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`) : before}`);
-		if (after !== null || (Array.isArray(after) && after.length > 0)) embed.addField(msg.lanSettings.newValue, `${Array.isArray(after) ? after.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`) : after}`);
+		if (Array.isArray(before) && before.length > 0) embed.addField(msg.lanSettings.oldValue, `${before.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
+		else if (before !== null && before !== undefined) embed.addField(msg.lanSettings.oldValue, `${before}`);
+		else embed.addField(msg.lanSettings.oldValue, msg.language.none);
+		if (Array.isArray(after) && after.length > 0) embed.addField(msg.lanSettings.oldValue, `${after.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
+		else if (after !== null && after !== undefined) embed.addField(msg.lanSettings.oldValue, `${after}`);
+		else embed.addField(msg.lanSettings.oldValue, msg.language.none);		
 		const res = await msg.client.ch.query('SELECT * FROM logchannels WHERE guildid = $1;', [msg.guild.id]);
 		if (res && res.rowCount > 0 && res.rows[0].verbositylog) {
 			const channel = msg.client.channels.cache.get(res.rows[0].verbositylog);
@@ -663,16 +667,16 @@ async function setup(msg) {
 		.setDescription(msg.client.ch.stp(msg.lanSettings.setup.question, {type: msg.lan.type}))
 		.addField(msg.language.commands.settings.valid, msg.lanSettings.setup.answers);
 	const yes = new Discord.MessageButton()
-		.setCustomID('yes')
+		.setCustomId('yes')
 		.setLabel(msg.language.yes)
 		.setStyle('SUCCESS');
 	const no = new Discord.MessageButton()
-		.setCustomID('no')
+		.setCustomId('no')
 		.setLabel(msg.language.no)
 		.setStyle('DANGER');
 	msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: [[yes,no]]});
-	const messageCollector = new Discord.MessageCollector(msg.channel, {time: 60000});
-	const buttonsCollector = new Discord.MessageComponentInteractionCollector(msg.m, {time: 60000});
+	const messageCollector = msg.channel.createMessageCollector({time: 60000});
+	const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 	messageCollector.on('collect', (message) => {
 		if (message.author.id == msg.author.id) {
 			if (msg.content == msg.language.yes) yesFunc(message, null);
@@ -684,8 +688,8 @@ async function setup(msg) {
 	});
 	buttonsCollector.on('collect', (clickButton) => {
 		if (clickButton.user.id == msg.author.id) {
-			if (clickButton.customID == 'yes') yesFunc(null, clickButton);
-			else if (clickButton.customID == 'no') noFunc(null, clickButton);
+			if (clickButton.customId == 'yes') yesFunc(null, clickButton);
+			else if (clickButton.customId == 'no') noFunc(null, clickButton);
 			else return notValid(msg);
 			buttonsCollector.stop();
 			messageCollector.stop();

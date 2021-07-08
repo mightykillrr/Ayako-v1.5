@@ -37,51 +37,51 @@ module.exports = {
 	},
 	buttons(msg, r) {
 		const active = new Discord.MessageButton()
-			.setCustomID(`${msg.lan.edit.active.trigger[1] ? msg.lan.edit.active.trigger[1].replace(/`/g, '') : msg.lan.edit.active.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(`${msg.lan.edit.active.trigger[1] ? msg.lan.edit.active.trigger[1].replace(/`/g, '') : msg.lan.edit.active.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.lan.type)
 			.setStyle(r.active ? 'SUCCESS' : 'DANGER');
 		const rw = new Discord.MessageButton()
-			.setCustomID(`${msg.lan.edit.readofwarnstof.trigger[1] ? msg.lan.edit.readofwarnstof.trigger[1].replace(/`/g, '') : msg.lan.edit.readofwarnstof.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(`${msg.lan.edit.readofwarnstof.trigger[1] ? msg.lan.edit.readofwarnstof.trigger[1].replace(/`/g, '') : msg.lan.edit.readofwarnstof.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.lan.readWarns.replace(/\*/g, '').slice(0, 14))
 			.setStyle(r.readofwarnstof ? 'SUCCESS' : 'DANGER');
 		const wm = new Discord.MessageButton()
-			.setCustomID(`${msg.lan.edit.giveofficialwarnstof.trigger[1] ? msg.lan.edit.giveofficialwarnstof.trigger[1].replace(/`/g, '') : msg.lan.edit.giveofficialwarnstof.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(`${msg.lan.edit.giveofficialwarnstof.trigger[1] ? msg.lan.edit.giveofficialwarnstof.trigger[1].replace(/`/g, '') : msg.lan.edit.giveofficialwarnstof.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.lan.warn)
 			.setStyle(r.giveofficialwarnstof ? 'SUCCESS' : 'DANGER');
 		const mm = new Discord.MessageButton()
-			.setCustomID(`${msg.lan.edit.muteenabledtof.trigger[1] ? msg.lan.edit.muteenabledtof.trigger[1].replace(/`/g, '') : msg.lan.edit.muteenabledtof.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(`${msg.lan.edit.muteenabledtof.trigger[1] ? msg.lan.edit.muteenabledtof.trigger[1].replace(/`/g, '') : msg.lan.edit.muteenabledtof.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.lan.mute)
 			.setStyle(r.muteenabledtof ? 'SUCCESS' : 'DANGER');
 		const km = new Discord.MessageButton()
-			.setCustomID(`${msg.lan.edit.kickenabledtof.trigger[1] ? msg.lan.edit.kickenabledtof.trigger[1].replace(/`/g, '') : msg.lan.edit.kickenabledtof.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(`${msg.lan.edit.kickenabledtof.trigger[1] ? msg.lan.edit.kickenabledtof.trigger[1].replace(/`/g, '') : msg.lan.edit.kickenabledtof.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.lan.kick)
 			.setStyle(r.kickenabledtof ? 'SUCCESS' : 'DANGER');
 		const bm = new Discord.MessageButton()
-			.setCustomID(`${msg.lan.edit.banenabledtof.trigger[1] ? msg.lan.edit.banenabledtof.trigger[1].replace(/`/g, '') : msg.lan.edit.banenabledtof.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(`${msg.lan.edit.banenabledtof.trigger[1] ? msg.lan.edit.banenabledtof.trigger[1].replace(/`/g, '') : msg.lan.edit.banenabledtof.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.lan.ban)
 			.setStyle(r.banenabledtof ? 'SUCCESS' : 'DANGER');
 		const channel = new Discord.MessageButton()
-			.setCustomID(`${msg.lan.edit.bpchannelid.trigger[1] ? msg.lan.edit.bpchannelid.trigger[1].replace(/`/g, '') : msg.lan.edit.bpchannelid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(`${msg.lan.edit.bpchannelid.trigger[1] ? msg.lan.edit.bpchannelid.trigger[1].replace(/`/g, '') : msg.lan.edit.bpchannelid.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.lan.bpchannels)
 			.setStyle('PRIMARY');
 		const user = new Discord.MessageButton()
-			.setCustomID(`${msg.lan.edit.bpuserid.trigger[1] ? msg.lan.edit.bpuserid.trigger[1].replace(/`/g, '') : msg.lan.edit.bpuserid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(`${msg.lan.edit.bpuserid.trigger[1] ? msg.lan.edit.bpuserid.trigger[1].replace(/`/g, '') : msg.lan.edit.bpuserid.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.lan.bpusers)
 			.setStyle('PRIMARY');
 		const role = new Discord.MessageButton()
-			.setCustomID(`${msg.lan.edit.bproleid.trigger[1] ? msg.lan.edit.bproleid.trigger[1].replace(/`/g, '') : msg.lan.edit.bproleid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(`${msg.lan.edit.bproleid.trigger[1] ? msg.lan.edit.bproleid.trigger[1].replace(/`/g, '') : msg.lan.edit.bproleid.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.lan.bproles)
 			.setStyle('PRIMARY');
 		const maw = new Discord.MessageButton()
-			.setCustomID(`${msg.lan.edit.muteafterwarnsamount.trigger[1] ? msg.lan.edit.muteafterwarnsamount.trigger[1].replace(/`/g, '') : msg.lan.edit.muteafterwarnsamount.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(`${msg.lan.edit.muteafterwarnsamount.trigger[1] ? msg.lan.edit.muteafterwarnsamount.trigger[1].replace(/`/g, '') : msg.lan.edit.muteafterwarnsamount.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.client.ch.stp(msg.lan.muteAfter.replace(/\*/g, ''), {amount: r.muteafterwarnsamount}))
 			.setStyle(!r.readofwarnstof ? 'DANGER' : 'SECONDARY');
 		const kaw = new Discord.MessageButton()
-			.setCustomID(`${msg.lan.edit.kickafterwarnsamount.trigger[1] ? msg.lan.edit.kickafterwarnsamount.trigger[1].replace(/`/g, '') : msg.lan.edit.kickafterwarnsamount.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(`${msg.lan.edit.kickafterwarnsamount.trigger[1] ? msg.lan.edit.kickafterwarnsamount.trigger[1].replace(/`/g, '') : msg.lan.edit.kickafterwarnsamount.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.client.ch.stp(msg.lan.kickAfter.replace(/\*/g, ''), {amount: r.kickafterwarnsamount}))
 			.setStyle(!r.readofwarnstof ? 'DANGER' : 'SECONDARY');
 		const baw = new Discord.MessageButton()
-			.setCustomID(`${msg.lan.edit.banafterwarnsamount.trigger[1] ? msg.lan.edit.banafterwarnsamount.trigger[1].replace(/`/g, '') : msg.lan.edit.banafterwarnsamount.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(`${msg.lan.edit.banafterwarnsamount.trigger[1] ? msg.lan.edit.banafterwarnsamount.trigger[1].replace(/`/g, '') : msg.lan.edit.banafterwarnsamount.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.client.ch.stp(msg.lan.banAfter.replace(/\*/g, ''), {amount: r.banafterwarnsamount}))
 			.setStyle(!r.readofwarnstof ? 'DANGER' : 'SECONDARY');
 		return [[active], [channel,user,role], [rw,maw,kaw,baw], [wm,mm,km,bm]];
