@@ -5,33 +5,132 @@ module.exports = {
 	type: 1,
 	displayEmbed(msg, r) {
 		const embed = new Discord.MessageEmbed()
-			.addField(msg.lan.type, r.active ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled, false)
-			.addField(msg.lan.bpchannels, `${r.bpchannelid && r.bpchannelid !== [] ? `${r.bpchannelid.map(id => ` <#${id}>`)}`.length > 0 ? r.bpchannelid.map(id => ` <#${id}>`) : msg.language.none : msg.language.none}`, false)
-			.addField(msg.lan.bpusers, `${r.bpuserid && r.bpuserid !== [] ? `${r.bpuserid.map(id => ` <@${id}>`)}`.length > 0 ? r.bpuserid.map(id => ` <@${id}>`) : msg.language.none : msg.language.none}`, false)
-			.addField(msg.lan.bproles, `${r.bproleid && r.bproleid !== [] ? `${r.bproleid.map(id => ` <@&${id}>`)}`.length > 0 ? r.bproleid.map(id => ` <@&${id}>`) : msg.language.none : msg.language.none}`, false)
-			.addField('\u200b', '\u200b', false)
-			.addField('\u200b', `${msg.lan.readWarns}\n${r.readofwarnstof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}\n\n${msg.client.ch.stp(msg.lan.muteAfter, {amount: r.muteafterwarnsamount})}\n${msg.client.ch.stp(msg.lan.kickAfter, {amount: r.kickafterwarnsamount})}\n${msg.client.ch.stp(msg.lan.banAfter, {amount: r.banafterwarnsamount})}`, false)
-			.addField('\u200b', '\u200b', false)
-			.addField(msg.lan.warn, r.giveofficialwarnstof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled, true)
-			.addField(msg.lan.mute, r.muteenabledtof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled, true)
-			.addField(msg.lan.kick, r.kickenabledtof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled, true)
-			.addField(msg.lan.ban, r.banenabledtof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled, true);
+			.addFields(
+				{
+					name: msg.lan.type, 
+					value: r.active ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled, 
+					inline: false
+				},
+				{
+					name: msg.lan.bpchannels, 
+					value: `${r.bpchannelid && r.bpchannelid.length > 0 ? r.bpchannelid.map(id => ` <@&${id}>`) : msg.language.none}`, 
+					inline: false
+				},
+				{
+					name: msg.lan.bpusers, 
+					value: `${r.bpuserid && r.bpuserid.length > 0 ? r.bpuserid.map(id => ` <@&${id}>`) : msg.language.none}`, 
+					inline: false
+				},
+				{
+					name: msg.lan.bproles, 
+					value: `${r.bproleid && r.bproleid.length > 0 ? r.bproleid.map(id => ` <@&${id}>`) : msg.language.none}`, 
+					inline: false
+				},
+				{
+					name: '\u200b', 
+					'\u200b', 
+					inline: false
+				},
+				{
+					name: '\u200b', 
+					value: 
+					`${msg.lan.readWarns}\n${r.readofwarnstof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}\n\n`+
+					`${msg.client.ch.stp(msg.lan.muteAfter, {amount: r.muteafterwarnsamount})}\n`+
+					`${msg.client.ch.stp(msg.lan.kickAfter, {amount: r.kickafterwarnsamount})}\n`+
+					`${msg.client.ch.stp(msg.lan.banAfter, {amount: r.banafterwarnsamount})}`, 
+					inline: false
+				},
+				{
+					name: '\u200b', 
+					value: '\u200b', 
+					inline: false
+				},
+				{
+					name: msg.lan.warn, 
+					value: r.giveofficialwarnstof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled, 
+					inline: true
+				},
+				{
+					name: msg.lan.mute, 
+					value: r.muteenabledtof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled, 
+					inline: true
+				},
+				{
+					name: msg.lan.kick, 
+					value: r.kickenabledtof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled, 
+					inline: true
+				},
+				{
+					name: msg.lan.ban, 
+					value: r.banenabledtof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled, 
+					inline: true
+				}
+			);
 		return embed;
 	},
 	editEmbed(msg, r) {
 		const embed = new Discord.MessageEmbed()
 			.addFields(
-				{name: msg.client.ch.stp(msg.lan.edit.active.name, {trigger: msg.lan.edit.active.trigger}), value: `${r.active ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}`, inline: false},
-				{name: msg.client.ch.stp(msg.lan.edit.bpchannelid.name, {trigger: msg.lan.edit.bpchannelid.trigger}), value: `${r.bpchannelid && r.bpchannelid !== [] ? `${r.bpchannelid.map(id => ` <#${id}> (${id})`)}`.length > 0 ? r.bpchannelid.map(id => ` <#${id}> (${id})`) : msg.language.none : msg.language.none}`, inline: false},
-				{name: msg.client.ch.stp(msg.lan.edit.bpuserid.name, {trigger: msg.lan.edit.bpuserid.trigger}), value: `${r.bpuserid && r.bpuserid !== [] ? `${r.bpuserid.map(id => ` <@${id}> (${id})`)}`.length > 0 ? r.bpuserid.map(id => ` <@${id}> (${id})`) : msg.language.none : msg.language.none}`, inline: false},
-				{name: msg.client.ch.stp(msg.lan.edit.bproleid.name, {trigger: msg.lan.edit.bproleid.trigger}), value: `${r.bproleid && r.bproleid !== [] ? `${r.bproleid.map(id => ` <@&${id}> (${id})`)}`.length > 0 ? r.bproleid.map(id => ` <@&${id}> (${id})`) : msg.language.none : msg.language.none}`, inline: false},
-				{name: '\u200b', value: '\u200b', inline: false},
-				{name: '\u200b', value: `${msg.client.ch.stp(msg.lan.edit.readofwarnstof.name, {trigger: msg.lan.edit.readofwarnstof.trigger})}\n${r.readofwarnstof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}\n\n${msg.client.ch.stp(msg.lan.edit.muteafterwarnsamount.name, {amount: r.muteafterwarnsamount, trigger: msg.lan.edit.muteafterwarnsamount.trigger})}\n${msg.client.ch.stp(msg.lan.edit.kickafterwarnsamount.name, {amount: r.kickafterwarnsamount, trigger: msg.lan.edit.kickafterwarnsamount.trigger})}\n${msg.client.ch.stp(msg.lan.edit.banafterwarnsamount.name, {amount: r.banafterwarnsamount, trigger: msg.lan.edit.banafterwarnsamount.trigger})}`, inline: false},
-				{name: '\u200b', value: '\u200b', inline: false},
-				{name: msg.client.ch.stp(msg.lan.edit.giveofficialwarnstof.name, {trigger: msg.lan.edit.giveofficialwarnstof.trigger}), value: `${r.giveofficialwarnstof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}`, inline: true},
-				{name: msg.client.ch.stp(msg.lan.edit.muteenabledtof.name, {trigger: msg.lan.edit.muteenabledtof.trigger}), value: `${r.muteenabledtof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}`, inline: true},
-				{name: msg.client.ch.stp(msg.lan.edit.kickenabledtof.name, {trigger: msg.lan.edit.kickenabledtof.trigger}), value: `${r.kickenabledtof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}`, inline: true},
-				{name: msg.client.ch.stp(msg.lan.edit.banenabledtof.name, {trigger: msg.lan.edit.banenabledtof.trigger}), value: `${r.banenabledtof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}`, inline: true},
+				{
+					name: msg.client.ch.stp(msg.lan.edit.active.name, {trigger: msg.lan.edit.active.trigger}), 
+					value: `${r.active ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}`, 
+					inline: false
+				},
+				{
+					name: msg.client.ch.stp(msg.lan.edit.bpchannelid.name, {trigger: msg.lan.edit.bpchannelid.trigger}), 
+					value: `${r.bpchannelid && r.bpchannelid.length > 0 ? r.bpchannelid.map(id => ` <@&${id}>`) : msg.language.none}`, 
+					inline: false
+				},
+				{
+					name: msg.client.ch.stp(msg.lan.edit.bpuserid.name, {trigger: msg.lan.edit.bpuserid.trigger}), 
+					value: `${r.bpuserid  && r.bpuserid.length > 0 ? r.bpuserid.map(id => ` <@&${id}>`) : msg.language.none}`, 
+					inline: false
+				},
+				{
+					name: msg.client.ch.stp(msg.lan.edit.bproleid.name, {trigger: msg.lan.edit.bproleid.trigger}), 
+					value: `${r.bproleid && r.bproleid.length > 0 ? r.bproleid.map(id => ` <@&${id}>`) : msg.language.none}`, 
+					inline: false
+				},
+				{
+					name: '\u200b', 
+					value: '\u200b', 
+					inline: false
+				},
+				{
+					name: '\u200b', 
+					value: 
+					`${msg.client.ch.stp(msg.lan.edit.readofwarnstof.name, {trigger: msg.lan.edit.readofwarnstof.trigger})}\n`+
+					`${r.readofwarnstof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}\n\n`+
+					`${msg.client.ch.stp(msg.lan.edit.muteafterwarnsamount.name, {amount: r.muteafterwarnsamount, trigger: msg.lan.edit.muteafterwarnsamount.trigger})}\n`+
+					`${msg.client.ch.stp(msg.lan.edit.kickafterwarnsamount.name, {amount: r.kickafterwarnsamount, trigger: msg.lan.edit.kickafterwarnsamount.trigger})}\n`+
+					`${msg.client.ch.stp(msg.lan.edit.banafterwarnsamount.name, {amount: r.banafterwarnsamount, trigger: msg.lan.edit.banafterwarnsamount.trigger})}`, 
+					inline: false
+				},
+				{
+					name: '\u200b', 
+					value: '\u200b', 
+					inline: false
+				},
+				{
+					name: msg.client.ch.stp(msg.lan.edit.giveofficialwarnstof.name, {trigger: msg.lan.edit.giveofficialwarnstof.trigger}), 
+					value: `${r.giveofficialwarnstof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}`, 
+					inline: true
+				},
+				{
+					name: msg.client.ch.stp(msg.lan.edit.muteenabledtof.name, {trigger: msg.lan.edit.muteenabledtof.trigger}), 
+					value: `${r.muteenabledtof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}`, 
+					inline: true
+				},
+				{
+					name: msg.client.ch.stp(msg.lan.edit.kickenabledtof.name, {trigger: msg.lan.edit.kickenabledtof.trigger}), 
+					value: `${r.kickenabledtof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}`, 
+					inline: true
+				},
+				{
+					name: msg.client.ch.stp(msg.lan.edit.banenabledtof.name, {trigger: msg.lan.edit.banenabledtof.trigger}), 
+					value: `${r.banenabledtof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}`, 
+					inline: true
+				},
 			);
 		return embed;
 	},

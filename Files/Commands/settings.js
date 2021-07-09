@@ -29,7 +29,11 @@ module.exports = {
 				categoryText += `__${category}__:\n\`\`\`${`${t.map(s => `${s}`)}`.replace(/,/g, '')}\`\`\`\n`;
 			}
 			const embed = new Discord.MessageEmbed()
-				.setAuthor(msg.lan.overview.author, msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
+				.setAuthor(
+					msg.lan.overview.author, 
+					msg.client.constants.emotes.settingsLink, 
+					msg.client.constants.standard.invite
+				)
 				.setDescription(msg.client.ch.stp(msg.lan.overview.desc, {prefix: msg.client.constants.standard.prefix, commands: categoryText})+'\n\n'+msg.client.ch.makeBold(msg.client.ch.makeUnderlined(msg.language.settingsOverview)))
 				.setColor(msg.client.constants.commands.settings.color);
 			msg.client.ch.reply(msg, embed);
@@ -57,13 +61,21 @@ function noEmbed(msg) {
 async function display(msg, file) {
 	msg.lanSettings = msg.language.commands.settings;
 	let r;
+	file.name = msg.args[0].toLowerCase();
+	msg.file = file;
 	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = $1;`, [msg.guild.id]);
-	if (res && res.rowCount > 0) r = res.rows[0];
-	else return setup(msg);
-	const embed = typeof(file.displayEmbed) == 'function' ? file.displayEmbed(msg, r) : noEmbed(msg);
-	embed.setAuthor(msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite);
-	embed.setDescription(`${msg.client.ch.stp(msg.lanSettings.howToEdit, {prefix: msg.client.constants.standard.prefix, type: file.name})}\n\n${embed.description ? embed.description : ''}`);
-	embed.setColor(msg.client.constants.commands.settings.color);
+	let embed;
+	if (res && res.rowCount > 0) {
+		r = res.rows[0];
+		embed = typeof(file.displayEmbed) == 'function' ? file.displayEmbed(msg, r) : noEmbed(msg);
+	} else embed = noEmbed(msg);
+	embed.setAuthor(
+		msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+		msg.client.constants.emotes.settingsLink,
+		msg.client.constants.standard.invite
+	)
+		.setDescription(`${msg.client.ch.stp(msg.lanSettings.howToEdit, {prefix: msg.client.constants.standard.prefix, type: file.name})}\n\n${embed.description ? embed.description : ''}`)
+		.setColor(msg.client.constants.commands.settings.color);
 	msg.client.ch.reply(msg, {embeds: [embed]});
 	const collected = await msg.channel.awaitMessages({filter: (m) => m.author.id == msg.author.id, max: 1, time: 30000});
 	if (!collected) return;
@@ -74,10 +86,11 @@ async function display(msg, file) {
 }
 
 async function edit(msg, file, answer) {
-	let compatibilityType;
-	let additionalIdentifiers; let r;
+	msg.lanSettings = msg.language.commands.settings;
 	file.name = msg.args[0].toLowerCase();
 	msg.file = file;
+	let compatibilityType;
+	let additionalIdentifiers; let r;
 	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 	if (res && res.rowCount > 0) r = res.rows[0];
 	else return setup(msg);
@@ -86,7 +99,11 @@ async function edit(msg, file, answer) {
 	const editEmbed = typeof(file.editEmbed) == 'function' ? file.editEmbed(msg, r) : noEmbed(msg);
 	editEmbed.setDescription(`${msg.client.ch.stp(msg.lanSettings.howToEdit2, {prefix: msg.client.constants.standard.prefix, type: file.name})}\n\n${editEmbed.description ? editEmbed.description : ''}`);
 	editEmbed.setColor(msg.client.constants.commands.settings.color);
-	editEmbed.setAuthor(msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite);
+	editEmbed.setAuthor(
+		msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), 
+		msg.client.constants.emotes.settingsLink, 
+		msg.client.constants.standard.invite
+	);
 	let rows = [];
 	for (let o = 0; o < Object.keys(msg.lan.edit).length; o++) {
 		const edit = Object.entries(msg.lan.edit)[o];
@@ -137,7 +154,11 @@ async function edit(msg, file, answer) {
 		if (r[msg.property] && r[msg.property][0] && Array.isArray(r[msg.property][0])) r[msg.property] = r[msg.property][0];
 		const editing = e[1];
 		const embed = new Discord.MessageEmbed()
-			.setAuthor(msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), msg.client.constants.standard.image, msg.client.constants.standard.invite)
+			.setAuthor(
+				msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), 
+				msg.client.constants.standard.image,
+				msg.client.constants.standard.invite
+			)
 			.setColor(msg.client.constants.commands.settings.color);
 		if (editing.name) embed.setDescription(`${editing.name.replace('[{{trigger}}] ', '')}`);
 		if (editing.answers) embed.addField(msg.lanSettings.valid, editing.answers);
@@ -227,7 +248,11 @@ async function edit(msg, file, answer) {
 					.setEmoji(msg.client.constants.emotes.back)
 					.setStyle('DANGER');
 				const embed = new Discord.MessageEmbed()
-					.setAuthor(msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
+					.setAuthor(
+						msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}),
+						msg.client.constants.emotes.settingsLink, 
+						msg.client.constants.standard.invite
+					)
 					.setDescription(`${msg.language.select[settings].desc}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
 				if (answer) answer.update({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
 				else msg.m.edit({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
@@ -272,7 +297,11 @@ async function edit(msg, file, answer) {
 							if (answered.length > 0) done.setDisabled(false);
 							else done.setDisabled(true);
 							const embed = new Discord.MessageEmbed()
-								.setAuthor(msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
+								.setAuthor(
+									msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+									msg.client.constants.emotes.settingsLink, 
+									msg.client.constants.standard.invite
+								)
 								.setDescription(`${msg.language.select[settings].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``);
 							if (answered.length > 0) embed.addField(msg.language.selected, `${answered.map(c => compatibilityType == 'channels' ? `<#${c}>` : compatibilityType == 'roles' ? `<@&${c}>` : ` ${c}`)} `);
 							if (page >= Math.ceil(+options.length / 25)) next.setDisabled(true);
@@ -337,7 +366,11 @@ async function edit(msg, file, answer) {
 							else done.setDisabled(true);
 							let page = clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0];
 							const embed = new Discord.MessageEmbed()
-								.setAuthor(msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
+								.setAuthor(
+									msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+									msg.client.constants.emotes.settingsLink, 
+									msg.client.constants.standard.invite
+								)
 								.setDescription(`${msg.language.select[settings].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``)
 								.addField(msg.language.selected, `${answered.map(c => settings == 'channels' ? `<#${c}>` : settings == 'roles' ? `<@&${c}>` : ` ${c}`)} `);
 							clickButton.update({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
@@ -379,7 +412,11 @@ async function edit(msg, file, answer) {
 				buttonsCollector.on('end', (collected, reason) => {
 					if (reason == 'time') {
 						const embed = new Discord.MessageEmbed()
-							.setAuthor(msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
+							.setAuthor(
+								msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}),
+								msg.client.constants.emotes.settingsLink, 
+								msg.client.constants.standard.invite
+							)
 							.setDescription(msg.language.timeError);
 						msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 					}
@@ -419,7 +456,11 @@ async function edit(msg, file, answer) {
 					.setEmoji(msg.client.constants.emotes.back)
 					.setStyle('DANGER');
 				const embed = new Discord.MessageEmbed()
-					.setAuthor(msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
+					.setAuthor(
+						msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+						msg.client.constants.emotes.settingsLink, 
+						msg.client.constants.standard.invite
+					)
 					.setDescription(`${msg.language.select[settings].desc}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
 				if (answer) answer.update({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
 				else msg.m.edit({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
@@ -464,7 +505,11 @@ async function edit(msg, file, answer) {
 							if (answered.length > 0) done.setDisabled(false);
 							else done.setDisabled(true);
 							const embed = new Discord.MessageEmbed()
-								.setAuthor(msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
+								.setAuthor(
+									msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+									msg.client.constants.emotes.settingsLink, 
+									msg.client.constants.standard.invite
+								)
 								.setDescription(`${msg.language.select[settings].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``);
 							if (answered.length > 0) embed.addField(msg.language.selected, `${answered} `);
 							if (page >= Math.ceil(+options.length / 25)) next.setDisabled(true);
@@ -506,7 +551,11 @@ async function edit(msg, file, answer) {
 							else done.setDisabled(true);
 							let page = clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0];
 							const embed = new Discord.MessageEmbed()
-								.setAuthor(msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
+								.setAuthor(
+									msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+									msg.client.constants.emotes.settingsLink, 
+									msg.client.constants.standard.invite
+								)
 								.setDescription(`${msg.language.select[settings].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``)
 								.addField(msg.language.selected, `${answered} `);
 							clickButton.update({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
@@ -536,7 +585,11 @@ async function edit(msg, file, answer) {
 				buttonsCollector.on('end', (collected, reason) => {
 					if (reason == 'time') {
 						const embed = new Discord.MessageEmbed()
-							.setAuthor(msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
+							.setAuthor(
+								msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}),
+								msg.client.constants.emotes.settingsLink, 
+								msg.client.constants.standard.invite
+							)
 							.setDescription(msg.language.timeError);
 						msg.m.edit({embeds: [embed]}).catch(() => {});
 					}
@@ -545,7 +598,11 @@ async function edit(msg, file, answer) {
 		}  else if (type == 'string') {
 			if (settings == 'users') {
 				const embed = new Discord.MessageEmbed()
-					.setAuthor(msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
+					.setAuthor(
+						msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+						msg.client.constants.emotes.settingsLink, 
+						msg.client.constants.standard.invite
+					)
 					.setDescription(`${msg.language.select[settings].select}`);
 				const DANGER = new Discord.MessageButton()
 					.setCustomId('back')
@@ -597,7 +654,11 @@ async function edit(msg, file, answer) {
 				buttonsCollector.on('end', (collected, reason) => {
 					if (reason == 'time') {
 						const embed = new Discord.MessageEmbed()
-							.setAuthor(msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
+							.setAuthor(
+								msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+								msg.client.constants.emotes.settingsLink, 
+								msg.client.constants.standard.invite
+							)
 							.setDescription(msg.language.timeError);
 						msg.m.edit({embeds: [embed]}).catch(() => {});
 					}
@@ -610,7 +671,10 @@ async function edit(msg, file, answer) {
 		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 		if (res && res.rowCount > 0) oldSettings = res.rows[0];
 		const embed = new Discord.MessageEmbed()
-			.setAuthor(msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), msg.client.constants.standard.image, msg.client.constants.standard.invite)
+			.setAuthor(
+				msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), 
+				msg.client.constants.standard.image, msg.client.constants.standard.invite
+			)
 			.setColor(msg.client.constants.commands.settings.color)
 			.setDescription(msg.client.ch.stp(msg.lanSettings.done, {loading: msg.client.constants.emotes.loading}));
 		if (Array.isArray(oldSettings) && oldSettings.length > 0) embed.addField(msg.lanSettings.oldValue, `${oldSettings.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
@@ -659,13 +723,18 @@ async function edit(msg, file, answer) {
 	}
 }
 
-
-
 async function setup(msg) {
 	const embed = new Discord.MessageEmbed()
-		.setAuthor(msg.lanSettings.setup.author, msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
+		.setAuthor(
+			msg.lanSettings.setup.author, 
+			msg.client.constants.emotes.settingsLink, 
+			msg.client.constants.standard.invite
+		)
 		.setDescription(msg.client.ch.stp(msg.lanSettings.setup.question, {type: msg.lan.type}))
-		.addField(msg.language.commands.settings.valid, msg.lanSettings.setup.answers);
+		.addField(
+			msg.language.commands.settings.valid, 
+			msg.lanSettings.setup.answers
+		);
 	const yes = new Discord.MessageButton()
 		.setCustomId('yes')
 		.setLabel(msg.language.yes)
@@ -679,6 +748,7 @@ async function setup(msg) {
 	const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 	messageCollector.on('collect', (message) => {
 		if (message.author.id == msg.author.id) {
+			if (message.content == msg.language.cancel) return aborted(msg, [messageCollector, buttonsCollector]);
 			if (msg.content == msg.language.yes) yesFunc(message, null);
 			else if (msg.content == msg.language.no) noFunc(message, null);
 			else return notValid(msg);
@@ -698,36 +768,60 @@ async function setup(msg) {
 	buttonsCollector.on('end', (collected, reason) => {
 		if (reason == 'time') {
 			const embed = new Discord.MessageEmbed()
-				.setAuthor(msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
+				.setAuthor(
+					msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+					msg.client.constants.emotes.settingsLink, 
+					msg.client.constants.standard.invite
+				)
 				.setDescription(msg.language.timeError);
 			msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 		}
 	});
 	async function yesFunc(message, clickButton) {
-		msg.client.ch.query('INSERT INTO $1 ($2) VALUES ($3);', [msg.client.constants.commands.settings.tablenames[msg.file.name], msg.client.constants.commands.settings.setupQueries[msg.file.name].cols, msg.client.constants.commands.settings.setupQueries[msg.file.name].vals]);
+		const values = [];
+		msg.client.constants.commands.settings.setupQueries[msg.file.name].vals.forEach(val => {
+			if (typeof(val) == 'string') values.push(msg.client.ch.stp(val, {msg: msg}));
+			else values.push(val);
+		});
+		let valDeclaration = '';
+		for (let i = 0; i < values.length; i++) {valDeclaration += `$${i+1}, `;}
+		valDeclaration = valDeclaration.slice(0, valDeclaration.length-2);
+		msg.client.ch.query(`INSERT INTO ${msg.client.constants.commands.settings.tablenames[msg.file.name]} (${msg.client.constants.commands.settings.setupQueries[msg.file.name].cols}) VALUES (${valDeclaration});`, values);
 		if (message) message.delete().catch(() => {});
 		const endEmbed = new Discord.MessageEmbed()
-			.setAuthor(msg.lan.setup.author, msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
-			.setDescription(msg.client.ch.stp(msg.lan.setup.done, {loading: msg.client.constants.emotes.loading}));
+			.setAuthor(
+				msg.lanSettings.setup.author, 
+				msg.client.constants.emotes.settingsLink, 
+				msg.client.constants.standard.invite
+			)
+			.setDescription(msg.client.ch.stp(msg.lanSettings.setup.done, {loading: msg.client.constants.emotes.loading}));
 		if (clickButton) clickButton.update({embeds: [endEmbed], components: []}).catch(() => {});
 		else msg.m.edit({embeds: [endEmbed], components: []}).catch(() => {});
-		setTimeout(() => {this.exe(msg);}, 3000);
+		setTimeout(() => {edit(msg, msg.file);}, 3000);
 	}
 	async function noFunc(message, clickButton) {
 		if (message) message.delete().catch(() => {});
 		const endEmbed = new Discord.MessageEmbed()
-			.setAuthor(msg.lan.setup.author, msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
-			.setDescription(msg.lan.setup.abort);
+			.setAuthor(
+				msg.lanSettings.setup.author, 
+				msg.client.constants.emotes.settingsLink,
+				msg.client.constants.standard.invite
+			)
+			.setDescription(msg.lanSettings.setup.abort);
 		if (clickButton) clickButton.update({embeds: [endEmbed], components: []}).catch(() => {});
 		else msg.m.edit({embeds: [endEmbed], components: []}).catch(() => {});
 	}
 }
 async function notValid(msg) {
 	const embed = new Discord.MessageEmbed()
-		.setAuthor(`${msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type})}`, msg.client.constants.emotes.settingsLink, msg.client.constants.standard.invite)
+		.setAuthor(
+			`${msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type})}`, 
+			msg.client.constants.emotes.settingsLink, 
+			msg.client.constants.standard.invite
+		)
 		.setDescription(`${msg.lanSettings.notValid}`)
 		.setFooter(`${msg.lanSettings.pleaseRestart}`);
-	if (msg.lan.edit[msg.property].answers) embed.addField(msg.language.commands.settings.valid, msg.lan.edit[msg.property].answers);
+	if (msg.lan.answers) embed.addField(msg.language.commands.settings.valid, msg.lan.answers);
 	msg.client.ch.reply(msg.m, embed);
 }
 async function aborted(msg, collectors) {
