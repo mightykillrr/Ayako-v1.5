@@ -539,14 +539,18 @@
         "REQUEST_TO_SPEAK": "Request to Speak"
     },
     "channels": {
-        "text": "Text Channel",
-        "dm": "DM Channel",
-        "voice": "Voice Channel",
-        "unknown": "Group DM Channel",
-        "category": "Category",
-        "news": "Announcements Channel",
-        "store": "Store Channel",
-        "stage": "Stage Channel"
+        "GUILD_TEXT": "Text Channel",
+        "DM": "DM Channel",
+        "GUILD_VOICE": "Voice Channel",
+        "GROUP_DM": "Group DM Channel",
+        "GUILD_CATEGORY": "Category",
+        "GUILD_NEWS": "Announcements Channel",
+        "GUILD_STORE": "Store Channel",
+        "GUILD_STAGE_VOICE": "Stage Channel",
+        "GUILD_NEWS_THREAD": "News Channels public Thread Channel",
+        "GUILD_PUBLIC_THREAD": "Channels public Thread Channel",
+        "GUILD_PRIVATE_THREAD": "Channels private Thread Channel",
+        "UNKNOWN": "A generic Channel of unknown Type"
     },
     "channelsNrSorted": {
         "0": "Text Channel",
@@ -556,15 +560,18 @@
         "4": "Category",
         "5": "Announcements Channel",
         "6": "Store Channel",
-        "13": "Stage Channel"
+        "10": "Stage Channel",
+        "11": "News Channels public Thread Channel",
+        "12": "Channels public Thread Channel",
+        "13": "Channels private Thread Channel"
     },
     "features": {
         "ANIMATED_ICON": "```Animated Icon```\n`(Server can set an animated Server Icon)`",
         "BANNER": "```Banner```\n`(Server can set a Server Banner Image)`",
         "COMMERCE": "```Commerce```\n`(Server can use commerce Features(i.e. Create Store Channels))`",
         "COMMUNITY": "```Community```\n`(Server can enable Welcome Screen)`",
-        "DISCOVERABLE": "```Discoverable```\n`(Server can be discovered in the directory)`",
-        "FEATURABLE": "```Featurable```\n`(Server can be featured in the directory)`",
+        "DISCOVERABLE": "```Discoverable```\n`(Server can be discovered in the Server directory)`",
+        "FEATURABLE": "```Featurable```\n`(Server can be featured in the Server directory)`",
         "INVITE_SPLASH": "```Invite Splash```\n`(Server can set an Invite Splash Background)`",
         "MEMBER_VERIFICATION_GATE_ENABLED": "```Member Verification Gate enabled```\n`(Server has enabled Membership Screening)`",
         "NEWS": "```News```\n`(Server can create News Channels)`",
@@ -1102,17 +1109,17 @@
             "antispam": {
                 "category": ["Auto Moderation"],
                 "type": "Anti-Spam",
-                "ban": "Ban Members",
-                "kick": "Kick Members",
-                "mute": "Mute Members",
-                "warn": "Warn Members",
-                "muteAfter": "Mute after **{{amount}}** warns",
-                "kickAfter": "Kick after **{{amount}}** warns",
-                "banAfter": "Ban after **{{amount}}** warns",
-                "bpchannels": "Bypassed Channels",
-                "bproles": "Bypassed Roles",
-                "bpusers": "Bypassed Users",
-                "readWarns": "**Read Warnings** (required for the following 3 options)",
+                "banenabledtof": "Ban Members",
+                "kickenabledtof": "Kick Members",
+                "muteenabledtof": "Mute Members",
+                "giveofficialwarnstof": "Warn Members",
+                "muteafterwarnsamount": "Mute after **{{amount}}** warns",
+                "kickafterwarnsamount": "Kick after **{{amount}}** warns",
+                "banafterwarnsamount": "Ban after **{{amount}}** warns",
+                "bpchannelid": "Bypassed Channels",
+                "bproleid": "Bypassed Roles",
+                "bpuserid": "Bypassed Users",
+                "readofwarnstof": "**Read Warnings** (required for the following 3 options)",
                 "edit": {
                     "banenabledtof": {
                         "name": "[{{trigger}}] Ban Members",
@@ -1205,9 +1212,9 @@
             "autorole": {
                 "category": ["Automation"],
                 "type": "Auto-Role",
-                "botRole": "Roles given to joining Bots",
-                "userRole": "Roles given to joining Users",
-                "allRole": "Roles given to joining Bots and Users",
+                "botroleid": "Roles given to joining Bots",
+                "userroleid": "Roles given to joining Users",
+                "allroleid": "Roles given to joining Bots and Users",
                 "edit": {
                     "active": {
                         "name": "[{{trigger}}] Auto-Role",
@@ -1261,9 +1268,9 @@
                 "mutetof": "Mute Members",
                 "kicktof": "Kick Members",
                 "bantof": "Ban Members",
-                "bpchannels": "Bypassed Channels",
-                "bproles": "Bypassed Roles",
-                "bpusers": "Bypassed Users",
+                "bpchannelid": "Bypassed Channels",
+                "bproleid": "Bypassed Roles",
+                "bpuserid": "Bypassed Users",
                 "warnafter": "Warn after **{{amount}}** blacklisted Words",
                 "muteafter": "Mute after **{{amount}}** blacklisted Words",
                 "kickafter": "Kick after **{{amount}}** blacklisted Words",
@@ -1378,9 +1385,10 @@
             "disboard": {
                 "category": ["Automation"],
                 "role": "Ping Role",
+                "channelid": "The Channel in which Bump Reminders will be sent",
                 "type": "DISBOARD",
                 "edit": {
-                    "enabled": {
+                    "active": {
                         "name": "[{{trigger}}] DISBOARD",
                         "trigger": ["`active`"],
                         "answers": "`True` or `False`",
@@ -1473,10 +1481,10 @@
             "snipe": {
                 "category": ["Fun"],
                 "type": "Snipe",
-                "blchannels": "Blacklisted Channels",
-                "blroles": "Blacklisted Roles",
-                "link": "Links snipeable",
-                "invite": "Invites snipeable",
+                "blchannelid": "Blacklisted Channels",
+                "blroleid": "Blacklisted Roles",
+                "links": "Links snipeable",
+                "invites": "Invites snipeable",
                 "blwords": "Words saved as Blacklisted snipeable",
                 "bots": "Bot Messages snipeable",
                 "edit": {

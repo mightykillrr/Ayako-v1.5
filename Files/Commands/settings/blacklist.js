@@ -31,17 +31,17 @@ module.exports = {
 					inline: false
 				},
 				{
-					name: msg.lan.bpchannels,
+					name: msg.lan.bpchannelid,
 					value: `${r.bpchannelid && r.bpchannelid.length > 0 ? r.bpchannelid.map(id => ` <#${id}>`) : msg.language.none}`, 
 					inline: false
 				},
 				{
-					name: msg.lan.bpusers, 
+					name: msg.lan.bpuserid, 
 					value: `${r.bpuserid && r.bpuserid.length > 0 ? r.bpuserid.map(id => ` <@${id}>`) : msg.language.none}`, 
 					inline: false
 				},
 				{
-					name: msg.lan.bproles,
+					name: msg.lan.bproleid,
 					value: `${r.bproleid && r.bproleid.length > 0 ? r.bproleid.map(id => ` <@&${id}>`) : msg.language.none}`, 
 					inline: false
 				},
@@ -210,15 +210,15 @@ module.exports = {
 			.setStyle(r.bantof ? 'SUCCESS' : 'DANGER');
 		const channel = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.bpchannelid.trigger[1] ? msg.lan.edit.bpchannelid.trigger[1].replace(/`/g, '') : msg.lan.edit.bpchannelid.trigger[0].replace(/`/g, '')}`)
-			.setLabel(msg.lan.bpchannels)
+			.setLabel(msg.lan.bpchannelid)
 			.setStyle('PRIMARY');
 		const user = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.bpuserid.trigger[1] ? msg.lan.edit.bpuserid.trigger[1].replace(/`/g, '') : msg.lan.edit.bpuserid.trigger[0].replace(/`/g, '')}`)
-			.setLabel(msg.lan.bpusers)
+			.setLabel(msg.lan.bpuserid)
 			.setStyle('PRIMARY');
 		const role = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.bproleid.trigger[1] ? msg.lan.edit.bproleid.trigger[1].replace(/`/g, '') : msg.lan.edit.bproleid.trigger[0].replace(/`/g, '')}`)
-			.setLabel(msg.lan.bproles)
+			.setLabel(msg.lan.bproleid)
 			.setStyle('PRIMARY');
 		const maw = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.muteafter.trigger[1] ? msg.lan.edit.muteafter.trigger[1].replace(/`/g, '') : msg.lan.edit.muteafter.trigger[0].replace(/`/g, '')}`)

@@ -208,7 +208,13 @@ async function edit(msg, file, answer) {
 					messageCollector.stop();
 					if (buttonClick.customId == 'true') newSetting = true;
 					else if (buttonClick.customId == 'false') newSetting = false;
-					else if (buttonClick.customId == 'back') return edit(msg, file, buttonClick);
+					else if (buttonClick.customId == 'back') {
+						compatibilityType = undefined;
+						msg.property = undefined;
+						messageCollector.stop();
+						buttonsCollector.stop();
+						return edit(msg, msg.file, buttonClick);
+					}
 					gotNewSettings(newSetting, null, buttonClick);
 				} else msg.client.ch.notYours(buttonClick, msg);
 			});
@@ -232,7 +238,7 @@ async function edit(msg, file, answer) {
 				const options = [];
 				req.forEach(r => {
 					if (compatibilityType == 'channels') {
-						if (r.type == 'text' || r.type == 'news' || r.type == 'news_thread' || r.type == 'public_thread' || r.type == 'private_thread') options.push({label: r.name.length > 25 ? `${r.name.slice(0, 24)}\u2026` : r.name, value: r.id, description: r.parent ? `${r.parent.name}` : null});
+						if (r.type == 'GUILD_TEXT' || r.type == 'GUILD_NEWS' || r.type == 'GUILD_NEWS_THREAD' || r.type == 'GUILD_PUBLIC_THREAD' || r.type == 'GUILD_PRIVATE_THREAD') options.push({label: r.name.length > 25 ? `${r.name.slice(0, 24)}\u2026` : r.name, value: r.id, description: r.parent ? `${r.parent.name}` : null});
 					} else  if (compatibilityType == 'roles') options.push({label: r.name.length > 25 ? `${r.name.slice(0, 24)}\u2026` : r.name, value: r.id});
 				});
 				const take = [];
@@ -300,6 +306,7 @@ async function edit(msg, file, answer) {
 							const prev = new Discord.MessageButton()
 								.setCustomId('prev')
 								.setLabel(msg.language.prev)
+								.setDisabled(page == 1 ? true : false)
 								.setStyle('DANGER');
 							const done = new Discord.MessageButton()
 								.setCustomId('done')
@@ -330,21 +337,25 @@ async function edit(msg, file, answer) {
 							if (compatibilityType == 'channels' || compatibilityType == 'roles') {
 								if (answered.length > 0) {
 									answered.forEach(id => { 
-										if (r[msg.property] && r[msg.property].includes(id)) {
-											const index = r[msg.property].indexOf(id);
-											r[msg.property].splice(index, 1);
-										} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(id);
-										else r[msg.property] = [id];
+										if (Array.isArray(r[msg.property])) {
+											if (r[msg.property] && r[msg.property].includes(id)) {
+												const index = r[msg.property].indexOf(id);
+												r[msg.property].splice(index, 1);
+											} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(id);
+											else r[msg.property] = [id];
+										} else r[msg.property] = id;							
 									});
 								}
 							} else if (compatibilityType == 'number') {
 								if (answered.length > 0) {
 									answered.forEach(id => { 
-										if (r[msg.property] && r[msg.property].includes(id)) {
-											const index = r[msg.property].indexOf(id);
-											r[msg.property].splice(index, 1);
-										} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(id);
-										else r[msg.property] = [id];
+										if (Array.isArray(r[msg.property])) {
+											if (r[msg.property] && r[msg.property].includes(id)) {
+												const index = r[msg.property].indexOf(id);
+												r[msg.property].splice(index, 1);
+											} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(id);
+											else r[msg.property] = [id];
+										} else r[msg.property] = id;							
 									});
 								}
 							}
@@ -356,6 +367,7 @@ async function edit(msg, file, answer) {
 								if (!answered.includes(val)) msg.guild[settings].cache.get(val) ? answered.push(msg.guild[settings].cache.get(val).id) : '';
 								else answered.splice(answered.indexOf(val), 1);
 							});
+							let page = clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0];
 							const menu = new Discord.MessageSelectMenu()
 								.setCustomId(msg.property)
 								.addOptions(take)
@@ -369,6 +381,7 @@ async function edit(msg, file, answer) {
 							const prev = new Discord.MessageButton()
 								.setCustomId('prev')
 								.setLabel(msg.language.prev)
+								.setDisabled(page == 1 ? true : false)
 								.setStyle('DANGER');
 							const done = new Discord.MessageButton()
 								.setCustomId('done')
@@ -381,7 +394,6 @@ async function edit(msg, file, answer) {
 								.setStyle('DANGER');
 							if (answered.length > 0) done.setDisabled(false);
 							else done.setDisabled(true);
-							let page = clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0];
 							const embed = new Discord.MessageEmbed()
 								.setAuthor(
 									msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
@@ -392,7 +404,13 @@ async function edit(msg, file, answer) {
 								.addField(msg.language.selected, `${answered.map(c => settings == 'channels' ? `<#${c}>` : settings == 'roles' ? `<@&${c}>` : ` ${c}`)} `);
 							const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
 							clickButton.update({embeds: [embed], components: rows}).catch(() => {});
-						} else if (clickButton.customId == 'back') return edit(msg, msg.file, clickButton);
+						} else if (clickButton.customId == 'back') {
+							compatibilityType = undefined;
+							msg.property = undefined;
+							messageCollector.stop();
+							buttonsCollector.stop();
+							return edit(msg, msg.file, clickButton);
+						}
 					} else msg.client.ch.notYours(clickButton, msg);
 				});
 				messageCollector.on('collect', async (message) => {
@@ -414,10 +432,13 @@ async function edit(msg, file, answer) {
 							}));
 							if (answered.length > 0) {
 								answered.forEach(id => { 
-									if (r[msg.property] && r[msg.property].includes(id)) {
-										r[msg.property].splice(r[msg.property].indexOf(id), 1);
-									} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(id);
-									else r[msg.property] = [id];
+									if (Array.isArray(r[msg.property])) {
+										if (r[msg.property] && r[msg.property].includes(id)) {
+											const index = r[msg.property].indexOf(id);
+											r[msg.property].splice(index, 1);
+										} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(id);
+										else r[msg.property] = [id];
+									} else r[msg.property] = id;							
 								});
 							}
 							answered = r[msg.property];
@@ -511,6 +532,7 @@ async function edit(msg, file, answer) {
 							const prev = new Discord.MessageButton()
 								.setCustomId('prev')
 								.setLabel(msg.language.prev)
+								.setDisabled(page == 1 ? true : false)
 								.setStyle('DANGER');
 							const done = new Discord.MessageButton()
 								.setCustomId('done')
@@ -543,6 +565,7 @@ async function edit(msg, file, answer) {
 							buttonsCollector.stop('finished');
 							gotNewSettings(r[msg.property], null, clickButton);
 						} else if (clickButton.customId == msg.property) {
+							let page = clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0];
 							answered = clickButton.values[0];
 							const menu = new Discord.MessageSelectMenu()
 								.setCustomId(msg.property)
@@ -557,6 +580,7 @@ async function edit(msg, file, answer) {
 							const prev = new Discord.MessageButton()
 								.setCustomId('prev')
 								.setLabel(msg.language.prev)
+								.setDisabled(page == 1 ? true : false)
 								.setStyle('DANGER');
 							const done = new Discord.MessageButton()
 								.setCustomId('done')
@@ -569,7 +593,7 @@ async function edit(msg, file, answer) {
 								.setStyle('DANGER');
 							if (answered.length > 0) done.setDisabled(false);
 							else done.setDisabled(true);
-							let page = clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0];
+							page = clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0];
 							const embed = new Discord.MessageEmbed()
 								.setAuthor(
 									msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
@@ -580,7 +604,13 @@ async function edit(msg, file, answer) {
 								.addField(msg.language.selected, `${answered} `);
 							const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
 							clickButton.update({embeds: [embed], components: rows}).catch(() => {});
-						} else if (clickButton.customId == 'back') return edit(msg, msg.file, clickButton);
+						} else if (clickButton.customId == 'back') {
+							compatibilityType = undefined;
+							msg.property = undefined;
+							messageCollector.stop();
+							buttonsCollector.stop();
+							return edit(msg, msg.file, clickButton);
+						}
 					} else msg.client.ch.notYours(clickButton, msg);
 				});
 				messageCollector.on('collect', async (message) => {
@@ -591,11 +621,13 @@ async function edit(msg, file, answer) {
 						answered = message.content.replace(/\D+/g, '').split(/ +/);
 						if (answered.length > 0) {
 							answered.forEach(id => { 
-								if (r[msg.property] && r[msg.property].includes(id)) {
-									const index = r[msg.property].indexOf(id);
-									r[msg.property].splice(index, 1);
-								} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(id);
-								else r[msg.property] = [id];
+								if (Array.isArray(r[msg.property])) {
+									if (r[msg.property] && r[msg.property].includes(id)) {
+										const index = r[msg.property].indexOf(id);
+										r[msg.property].splice(index, 1);
+									} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(id);
+									else r[msg.property] = [id];
+								} else r[msg.property] = id;
 							});
 						}
 						messageCollector.stop();
@@ -651,11 +683,13 @@ async function edit(msg, file, answer) {
 						if (answered.length > 0) {
 							answered.forEach(id => { 
 								id = id.replace(/\D+/g, '');
-								if (r[msg.property] && r[msg.property].includes(id)) {
-									const index = r[msg.property].indexOf(id);
-									r[msg.property].splice(index, 1);
-								} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(id);
-								else r[msg.property] = [id];
+								if (Array.isArray(r[msg.property])) {
+									if (r[msg.property] && r[msg.property].includes(id)) {
+										const index = r[msg.property].indexOf(id);
+										r[msg.property].splice(index, 1);
+									} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(id);
+									else r[msg.property] = [id];
+								} else r[msg.property] = id;				
 							});
 						}
 						messageCollector.stop();
@@ -684,6 +718,8 @@ async function edit(msg, file, answer) {
 						msg.m.edit({embeds: [embed]}).catch(() => {});
 					}
 				});
+			} else if (settings == 'string') {
+				//strings manager
 			}
 		}
 	}
@@ -705,9 +741,9 @@ async function edit(msg, file, answer) {
 		if (Array.isArray(oldSettings) && oldSettings.length > 0) embed.addField(msg.lanSettings.oldValue, `${oldSettings.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
 		else if (oldSettings !== null && oldSettings !== undefined) embed.addField(msg.lanSettings.oldValue, `${oldSettings}`);
 		else embed.addField(msg.lanSettings.oldValue, msg.language.none);
-		if (Array.isArray(answered) && answered.length > 0) embed.addField(msg.lanSettings.oldValue, `${answered.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
-		else if (answered !== null && answered !== undefined) embed.addField(msg.lanSettings.oldValue, `${answered}`);
-		else embed.addField(msg.lanSettings.oldValue, msg.language.none);		
+		if (Array.isArray(answered) && answered.length > 0) embed.addField(msg.lanSettings.newValue, `${answered.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
+		else if (answered !== null && answered !== undefined) embed.addField(msg.lanSettings.newValue, `${Array.isArray(answered) ? msg.language.none : answered}`);
+		else embed.addField(msg.lanSettings.newValue, msg.language.none);		
 		if (fail && fail.length > 0) {
 			if (Array.isArray(fail)) embed.addField(msg.language.error, `${fail.map(f => ` ${f}`)}`);
 			else embed.addField(msg.language.error, fail);
@@ -747,10 +783,10 @@ async function log(oldRow, msg) {
 		changed.forEach(change => {
 			embed.addFields(
 				{
-					name: `${msg.lan[change[1][0] == 'active' ? 'type' : change[1][0]]}`, 
+					name: `${msg.lan[change[1][0] == 'active' ? 'type' : change[1][0]].includes('{{amount}}') ? msg.client.ch.stp(msg.lan[change[1][0] == 'active' ? 'type' : change[1][0]], {amount: '--'}) : msg.lan[change[1][0] == 'active' ? 'type' : change[1][0]]}`, 
 					value: 
-						`__${msg.lanSettings.oldValue}__: ${Array.isArray(change[0][1]) ? change[0][1].map(c => change[0][0].includes('role') ? ` <@&${c}>` : change[0][0].includes('channel') ? ` <#${c}>` : change[0][0].includes('user') ? ` <@${c}>` : ` ${c}`) : change[0][1]}\n`+
-						`__${msg.lanSettings.newValue}__: ${Array.isArray(change[1][1]) ? change[1][1].map(c => change[1][0].includes('role') ? ` <@&${c}>` : change[1][0].includes('channel') ? ` <#${c}>` : change[1][0].includes('user') ? ` <@${c}>` : ` ${c}`) : change[1][1]}`,
+						`__${msg.lanSettings.oldValue}__: ${Array.isArray(change[0][1]) ? change[0][1].map(c => change[0][0].includes('role') ? ` <@&${c}>` : change[0][0].includes('channel') ? ` <#${c}>` : change[0][0].includes('user') ? ` <@${c}>` : ` ${c}`) : change[0][1] == null ? msg.language.none : change[0][1]}\n`+
+						`__${msg.lanSettings.newValue}__: ${Array.isArray(change[1][1]) ? change[1][1].map(c => change[1][0].includes('role') ? ` <@&${c}>` : change[1][0].includes('channel') ? ` <#${c}>` : change[1][0].includes('user') ? ` <@${c}>` : ` ${c}`) : change[1][1] == null ? msg.language.none : change[1][1]}`,
 					inline: false
 				}
 			);
