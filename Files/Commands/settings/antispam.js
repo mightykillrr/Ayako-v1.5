@@ -13,12 +13,12 @@ module.exports = {
 				},
 				{
 					name: msg.lan.bpchannels, 
-					value: `${r.bpchannelid && r.bpchannelid.length > 0 ? r.bpchannelid.map(id => ` <@&${id}>`) : msg.language.none}`, 
+					value: `${r.bpchannelid && r.bpchannelid.length > 0 ? r.bpchannelid.map(id => ` <#${id}>`) : msg.language.none}`, 
 					inline: false
 				},
 				{
 					name: msg.lan.bpusers, 
-					value: `${r.bpuserid && r.bpuserid.length > 0 ? r.bpuserid.map(id => ` <@&${id}>`) : msg.language.none}`, 
+					value: `${r.bpuserid && r.bpuserid.length > 0 ? r.bpuserid.map(id => ` <@${id}>`) : msg.language.none}`, 
 					inline: false
 				},
 				{
@@ -32,12 +32,12 @@ module.exports = {
 					inline: false
 				},
 				{
-					name: '\u200b', 
+					name: msg.language.punishments, 
 					value: 
 					`${msg.lan.readWarns}\n${r.readofwarnstof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}\n\n`+
-					`${msg.client.ch.stp(msg.lan.muteAfter, {amount: r.muteafterwarnsamount})}\n`+
-					`${msg.client.ch.stp(msg.lan.kickAfter, {amount: r.kickafterwarnsamount})}\n`+
-					`${msg.client.ch.stp(msg.lan.banAfter, {amount: r.banafterwarnsamount})}`, 
+					`${msg.client.ch.stp(msg.lan.muteAfter, {amount: r.muteafterwarnsamount ? r.muteafterwarnsamount : '--'})}\n`+
+					`${msg.client.ch.stp(msg.lan.kickAfter, {amount: r.kickafterwarnsamount ? r.kickafterwarnsamount : '--'})}\n`+
+					`${msg.client.ch.stp(msg.lan.banAfter, {amount: r.banafterwarnsamount ? r.banafterwarnsamount : '--'})}`, 
 					inline: false
 				},
 				{
@@ -78,12 +78,12 @@ module.exports = {
 				},
 				{
 					name: msg.client.ch.stp(msg.lan.edit.bpchannelid.name, {trigger: msg.lan.edit.bpchannelid.trigger}), 
-					value: `${r.bpchannelid && r.bpchannelid.length > 0 ? r.bpchannelid.map(id => ` <@&${id}>`) : msg.language.none}`, 
+					value: `${r.bpchannelid && r.bpchannelid.length > 0 ? r.bpchannelid.map(id => ` <#${id}>`) : msg.language.none}`, 
 					inline: false
 				},
 				{
 					name: msg.client.ch.stp(msg.lan.edit.bpuserid.name, {trigger: msg.lan.edit.bpuserid.trigger}), 
-					value: `${r.bpuserid  && r.bpuserid.length > 0 ? r.bpuserid.map(id => ` <@&${id}>`) : msg.language.none}`, 
+					value: `${r.bpuserid  && r.bpuserid.length > 0 ? r.bpuserid.map(id => ` <@${id}>`) : msg.language.none}`, 
 					inline: false
 				},
 				{
@@ -97,13 +97,13 @@ module.exports = {
 					inline: false
 				},
 				{
-					name: '\u200b', 
+					name: msg.language.punishments, 
 					value: 
 					`${msg.client.ch.stp(msg.lan.edit.readofwarnstof.name, {trigger: msg.lan.edit.readofwarnstof.trigger})}\n`+
 					`${r.readofwarnstof ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}\n\n`+
-					`${msg.client.ch.stp(msg.lan.edit.muteafterwarnsamount.name, {amount: r.muteafterwarnsamount, trigger: msg.lan.edit.muteafterwarnsamount.trigger})}\n`+
-					`${msg.client.ch.stp(msg.lan.edit.kickafterwarnsamount.name, {amount: r.kickafterwarnsamount, trigger: msg.lan.edit.kickafterwarnsamount.trigger})}\n`+
-					`${msg.client.ch.stp(msg.lan.edit.banafterwarnsamount.name, {amount: r.banafterwarnsamount, trigger: msg.lan.edit.banafterwarnsamount.trigger})}`, 
+					`${msg.client.ch.stp(msg.lan.edit.muteafterwarnsamount.name, {amount: r.muteafterwarnsamount ? r.muteafterwarnsamount : '--', trigger: msg.lan.edit.muteafterwarnsamount.trigger})}\n`+
+					`${msg.client.ch.stp(msg.lan.edit.kickafterwarnsamount.name, {amount: r.kickafterwarnsamount ? r.kickafterwarnsamount : '--', trigger: msg.lan.edit.kickafterwarnsamount.trigger})}\n`+
+					`${msg.client.ch.stp(msg.lan.edit.banafterwarnsamount.name, {amount: r.banafterwarnsamount ? r.banafterwarnsamount : '--', trigger: msg.lan.edit.banafterwarnsamount.trigger})}`, 
 					inline: false
 				},
 				{
@@ -173,15 +173,15 @@ module.exports = {
 			.setStyle('PRIMARY');
 		const maw = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.muteafterwarnsamount.trigger[1] ? msg.lan.edit.muteafterwarnsamount.trigger[1].replace(/`/g, '') : msg.lan.edit.muteafterwarnsamount.trigger[0].replace(/`/g, '')}`)
-			.setLabel(msg.client.ch.stp(msg.lan.muteAfter.replace(/\*/g, ''), {amount: r.muteafterwarnsamount}))
+			.setLabel(msg.client.ch.stp(msg.lan.muteAfter.replace(/\*/g, ''), {amount: r.muteafterwarnsamount ? r.muteafterwarnsamount : '--'}))
 			.setStyle(!r.readofwarnstof ? 'DANGER' : 'SECONDARY');
 		const kaw = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.kickafterwarnsamount.trigger[1] ? msg.lan.edit.kickafterwarnsamount.trigger[1].replace(/`/g, '') : msg.lan.edit.kickafterwarnsamount.trigger[0].replace(/`/g, '')}`)
-			.setLabel(msg.client.ch.stp(msg.lan.kickAfter.replace(/\*/g, ''), {amount: r.kickafterwarnsamount}))
+			.setLabel(msg.client.ch.stp(msg.lan.kickAfter.replace(/\*/g, ''), {amount: r.kickafterwarnsamount ? r.kickafterwarnsamount : '--'}))
 			.setStyle(!r.readofwarnstof ? 'DANGER' : 'SECONDARY');
 		const baw = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.banafterwarnsamount.trigger[1] ? msg.lan.edit.banafterwarnsamount.trigger[1].replace(/`/g, '') : msg.lan.edit.banafterwarnsamount.trigger[0].replace(/`/g, '')}`)
-			.setLabel(msg.client.ch.stp(msg.lan.banAfter.replace(/\*/g, ''), {amount: r.banafterwarnsamount}))
+			.setLabel(msg.client.ch.stp(msg.lan.banAfter.replace(/\*/g, ''), {amount: r.banafterwarnsamount ? r.banafterwarnsamount : '--'}))
 			.setStyle(!r.readofwarnstof ? 'DANGER' : 'SECONDARY');
 		return [[active], [channel,user,role], [rw,maw,kaw,baw], [wm,mm,km,bm]];
 	}

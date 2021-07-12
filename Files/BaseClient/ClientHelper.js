@@ -420,6 +420,16 @@ module.exports = {
 			.setDescription(msg.language.timeError)
 			.setColor(msg.client.constants.error);
 		msg.m.edit({embeds: [embed], components: []}).catch(() => {});
+	},
+	buttonRower(buttonArrays) {
+		const actionRows = [];
+		buttonArrays.forEach(buttonRow => {
+			const row = new Discord.MessageActionRow();
+			if (Array.isArray(buttonRow)) for (const button of buttonRow) row.addComponents(button);
+			else row.addComponents(buttonRow);
+			actionRows.push(row);
+		});
+		return actionRows;
 	}
 
 };

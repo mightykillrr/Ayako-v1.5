@@ -76,13 +76,26 @@ async function display(msg, file) {
 	)
 		.setDescription(`${msg.client.ch.stp(msg.lanSettings.howToEdit, {prefix: msg.client.constants.standard.prefix, type: file.name})}\n\n${embed.description ? embed.description : ''}`)
 		.setColor(msg.client.constants.commands.settings.color);
-	msg.client.ch.reply(msg, {embeds: [embed]});
-	const collected = await msg.channel.awaitMessages({filter: (m) => m.author.id == msg.author.id, max: 1, time: 30000});
-	if (!collected) return;
-	if (collected.first() && collected.first().content == msg.language.edit) {
-		if (file.perm && !msg.member.permissions.has(new Discord.Permissions(file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
-		else edit(msg, file);
-	}
+	const button = new Discord.MessageButton()
+		.setCustomId('edit')
+		.setStyle('PRIMARY')
+		.setLabel(msg.language.edit);
+	const rows = msg.client.ch.buttonRower([button]);
+	const m = await msg.client.ch.reply(msg, {embeds: [embed], components: rows});
+	msg.m = m;
+	const buttonsCollector = m.createMessageComponentCollector({time: 60000});
+	const messageCollector = msg.channel.createMessageCollector({time: 60000});
+	buttonsCollector.on('collect', (clickButton) => {
+		if (clickButton.user.id == msg.author.id) {
+			if (clickButton.customId == 'edit') edit(msg, file, clickButton);
+		} else msg.client.ch.notYours(clickButton);
+	});
+	buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') m.edit({embeds: [embed], components: []});});
+	messageCollector.on('collect', (message) => {
+		if (message.author.id == msg.author.id && msg.content == msg.language.edit) {
+			edit(msg, file);
+		}
+	});
 }
 
 async function edit(msg, file, answer) {
@@ -118,9 +131,10 @@ async function edit(msg, file, answer) {
 	let buttons = [];
 	if (typeof(file.buttons) == 'function') buttons = file.buttons(msg, r);
 	else for (i = 0, j = rows.length; i < j; i += 5) {buttons.push(rows.slice(i, i+5));}
-	if (answer) answer.update({embeds: [editEmbed], components: buttons}).catch(() => {});
-	else if (msg.m) msg.m.edit({embeds: [editEmbed], components: buttons}).catch(() => {});
-	else msg.m = await msg.client.ch.reply(msg, {embeds: [editEmbed], components: buttons});
+	const actionRows = msg.client.ch.buttonRower(buttons);
+	if (answer) answer.update({embeds: [editEmbed], components: actionRows}).catch(() => {});
+	else if (msg.m) msg.m.edit({embeds: [editEmbed], components: actionRows}).catch(() => {});
+	else msg.m = await msg.client.ch.reply(msg, {embeds: [editEmbed], components: actionRows});
 	const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 	const messageCollector = msg.channel.createMessageCollector({time: 60000});
 	buttonsCollector.on('collect', (clickButton) => {
@@ -181,8 +195,9 @@ async function edit(msg, file, answer) {
 					.setLabel(msg.language.back)
 					.setEmoji(msg.client.constants.emotes.back)
 					.setStyle('DANGER');
-				if (answer) answer.update({embeds: [embed], components: [[DANGER],[PRIMARY],[SECONDARY]]}).catch(() => {});
-				else msg.m.edit({embeds: [embed], components: [[DANGER],[PRIMARY],[SECONDARY]]}).catch(() => {});
+				const actionRows = msg.client.ch.buttonRower([PRIMARY, SECONDARY, DANGER]);
+				if (answer) answer.update({embeds: [embed], components: actionRows}).catch(() => {});
+				else msg.m.edit({embeds: [embed], components: actionRows}).catch(() => {});
 			}
 			const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 			const messageCollector = msg.channel.createMessageCollector({time: 60000});
@@ -254,8 +269,9 @@ async function edit(msg, file, answer) {
 						msg.client.constants.standard.invite
 					)
 					.setDescription(`${msg.language.select[settings].desc}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
-				if (answer) answer.update({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
-				else msg.m.edit({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
+				const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
+				if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
+				else msg.m.edit({embeds: [embed], components: rows}).catch(() => {});
 				const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 				const messageCollector = msg.channel.createMessageCollector({time: 60000});
 				buttonsCollector.on('collect', (clickButton) => {
@@ -308,7 +324,8 @@ async function edit(msg, file, answer) {
 							else next.setDisabled(false);
 							if (page > 1) prev.setDisabled(false);
 							else prev.setDisabled(true);
-							clickButton.update({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
+							const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
+							clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 						} else if (clickButton.customId == 'done') {
 							if (compatibilityType == 'channels' || compatibilityType == 'roles') {
 								if (answered.length > 0) {
@@ -373,7 +390,8 @@ async function edit(msg, file, answer) {
 								)
 								.setDescription(`${msg.language.select[settings].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``)
 								.addField(msg.language.selected, `${answered.map(c => settings == 'channels' ? `<#${c}>` : settings == 'roles' ? `<@&${c}>` : ` ${c}`)} `);
-							clickButton.update({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
+							const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
+							clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 						} else if (clickButton.customId == 'back') return edit(msg, msg.file, clickButton);
 					} else msg.client.ch.notYours(clickButton, msg);
 				});
@@ -462,8 +480,9 @@ async function edit(msg, file, answer) {
 						msg.client.constants.standard.invite
 					)
 					.setDescription(`${msg.language.select[settings].desc}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
-				if (answer) answer.update({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
-				else msg.m.edit({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
+				const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
+				if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
+				else msg.m.edit({embeds: [embed], components: rows}).catch(() => {});
 				const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 				const messageCollector = msg.channel.createMessageCollector({time: 60000});
 				buttonsCollector.on('collect', (clickButton) => {
@@ -516,7 +535,8 @@ async function edit(msg, file, answer) {
 							else next.setDisabled(false);
 							if (page > 1) prev.setDisabled(false);
 							else prev.setDisabled(true);
-							clickButton.update({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
+							const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
+							clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 						} else if (clickButton.customId == 'done') {
 							if (answered.length > 0) r[msg.property] = answered;
 							messageCollector.stop('finished');
@@ -558,7 +578,8 @@ async function edit(msg, file, answer) {
 								)
 								.setDescription(`${msg.language.select[settings].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``)
 								.addField(msg.language.selected, `${answered} `);
-							clickButton.update({embeds: [embed], components: [[menu],[prev,next],[back,done]]}).catch(() => {});
+							const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
+							clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 						} else if (clickButton.customId == 'back') return edit(msg, msg.file, clickButton);
 					} else msg.client.ch.notYours(clickButton, msg);
 				});
@@ -609,12 +630,12 @@ async function edit(msg, file, answer) {
 					.setLabel(msg.language.back)
 					.setEmoji(msg.client.constants.emotes.back)
 					.setStyle('DANGER');
-				if (answer) answer.update({embeds: [embed], components: [[DANGER]]}).catch(() => {});
-				else msg.m.edit({embeds: [embed], components: [[DANGER]]}).catch(() => {});
+				const rows = msg.client.ch.buttonRower([DANGER]);
+				if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
+				else msg.m.edit({embeds: [embed], components: rows}).catch(() => {});
 				const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 				const messageCollector = msg.channel.createMessageCollector({time: 60000});
 				messageCollector.on('collect', async (message) => {
-					console.log(1);
 					if (message.author.id == msg.author.id) {
 						if (message.content == msg.language.cancel) return aborted(msg, [messageCollector, buttonsCollector]);
 						message.delete().catch(() => {});
@@ -668,8 +689,12 @@ async function edit(msg, file, answer) {
 	}
 	async function gotNewSettings(answered, fail, answer) {
 		let oldSettings;
-		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = $1;`, [msg.guild.id]);
-		if (res && res.rowCount > 0) oldSettings = res.rows[0];
+		let oldRow;
+		const oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = $1;`, [msg.guild.id]);
+		if (oldRes && oldRes.rowCount > 0) {
+			oldSettings = oldRes.rows[0][msg.property]; 
+			oldRow = oldRes.rows[0];
+		}
 		const embed = new Discord.MessageEmbed()
 			.setAuthor(
 				msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), 
@@ -683,9 +708,6 @@ async function edit(msg, file, answer) {
 		if (Array.isArray(answered) && answered.length > 0) embed.addField(msg.lanSettings.oldValue, `${answered.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
 		else if (answered !== null && answered !== undefined) embed.addField(msg.lanSettings.oldValue, `${answered}`);
 		else embed.addField(msg.lanSettings.oldValue, msg.language.none);		
-		if (oldSettings && (answered !== undefined && answered !== null) || (answered !== undefined && answered !== null && answered.length > 0 && Array.isArray(answered))) log(oldSettings[msg.property], answered);
-		else if ((answered !== undefined && answered !== null) || (answered.length > 0 && Array.isArray(answered))) log(null, answered);
-		else if (oldSettings) log(oldSettings[msg.property], null);
 		if (fail && fail.length > 0) {
 			if (Array.isArray(fail)) embed.addField(msg.language.error, `${fail.map(f => ` ${f}`)}`);
 			else embed.addField(msg.language.error, fail);
@@ -695,26 +717,44 @@ async function edit(msg, file, answer) {
 		r[msg.property] = answered;
 		if (r[msg.property] !== undefined && r[msg.property] !== null) {
 			if (Array.isArray(r[msg.property])) {
-				if (r[msg.property].length > 0) msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[file.name]} SET ${msg.property} = $1 WHERE guildid = $2${additionalIdentifiers ? ` ${additionalIdentifiers}` : ''};`, [r[msg.property], msg.guild.id]); //`
-				else msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[file.name]} SET ${msg.property} = $1 WHERE guildid = $2${additionalIdentifiers ? ` ${additionalIdentifiers}` : ''};`, [null, msg.guild.id]); //`
-			} else msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[file.name]} SET ${msg.property} = $1 WHERE guildid = $2${additionalIdentifiers ? ` ${additionalIdentifiers}` : ''};`, [r[msg.property], msg.guild.id]); //`
+				if (r[msg.property].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[file.name]} SET ${msg.property} = $1 WHERE guildid = $2${additionalIdentifiers ? ` ${additionalIdentifiers}` : ''};`, [r[msg.property], msg.guild.id]); //`
+				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[file.name]} SET ${msg.property} = $1 WHERE guildid = $2${additionalIdentifiers ? ` ${additionalIdentifiers}` : ''};`, [null, msg.guild.id]); //`
+			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[file.name]} SET ${msg.property} = $1 WHERE guildid = $2${additionalIdentifiers ? ` ${additionalIdentifiers}` : ''};`, [r[msg.property], msg.guild.id]); //`
 			setTimeout(() => {edit(msg, file);}, 3000);
 		}
+		if (oldSettings && (answered !== undefined && answered !== null) || (answered !== undefined && answered !== null && answered.length > 0 && Array.isArray(answered))) log(oldRow, msg);
+		else if ((answered !== undefined && answered !== null) || (answered.length > 0 && Array.isArray(answered))) log(oldRow, msg);
+		else if (oldSettings) log(oldRow, msg);
 	}
-	async function log(before, after) {
-		if (before == null || before == undefined) before = msg.language.none;
-		if (after == null || after == undefined) after = msg.language.none;
-		const embed = new Discord.MessageEmbed()
-			.setColor(msg.client.constants.commands.settings.log.color)
-			.setTimestamp()
-			.setAuthor(msg.client.ch.stp(msg.language.selfLog.author, {setting: msg.lan.type}))
-			.setDescription(msg.client.ch.stp(msg.language.selfLog.description, {msg: msg, setting: msg.file.name}));
-		if (Array.isArray(before) && before.length > 0) embed.addField(msg.lanSettings.oldValue, `${before.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
-		else if (before !== null && before !== undefined) embed.addField(msg.lanSettings.oldValue, `${before}`);
-		else embed.addField(msg.lanSettings.oldValue, msg.language.none);
-		if (Array.isArray(after) && after.length > 0) embed.addField(msg.lanSettings.oldValue, `${after.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
-		else if (after !== null && after !== undefined) embed.addField(msg.lanSettings.oldValue, `${after}`);
-		else embed.addField(msg.lanSettings.oldValue, msg.language.none);		
+}
+
+async function log(oldRow, msg) {
+	let newRow;
+	const newRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
+	if (newRes && newRes.rowCount > 0) newRow = newRes.rows[0];
+	if (!newRow || !oldRow) return;
+	if (newRow == oldRow) return;
+	const changed = [];
+	for (let i = 0; i < Object.entries(newRow).length; i++) {
+		if (Object.entries(oldRow)[i][1] !== Object.entries(newRow)[i][1]) changed.push([[Object.entries(oldRow)[i][0], Object.entries(oldRow)[i][1]], [Object.entries(newRow)[i][0], Object.entries(newRow)[i][1]]]);
+	}
+	const embed = new Discord.MessageEmbed()
+		.setColor(msg.client.constants.commands.settings.log.color)
+		.setTimestamp()
+		.setAuthor(msg.client.ch.stp(msg.language.selfLog.author, {setting: msg.lan.type}))
+		.setDescription(msg.client.ch.stp(msg.language.selfLog.description, {msg: msg, setting: msg.file.name}));
+	if (changed.length > 0) {
+		changed.forEach(change => {
+			embed.addFields(
+				{
+					name: `${msg.lan[change[1][0] == 'active' ? 'type' : change[1][0]]}`, 
+					value: 
+						`__${msg.lanSettings.oldValue}__: ${Array.isArray(change[0][1]) ? change[0][1].map(c => change[0][0].includes('role') ? ` <@&${c}>` : change[0][0].includes('channel') ? ` <#${c}>` : change[0][0].includes('user') ? ` <@${c}>` : ` ${c}`) : change[0][1]}\n`+
+						`__${msg.lanSettings.newValue}__: ${Array.isArray(change[1][1]) ? change[1][1].map(c => change[1][0].includes('role') ? ` <@&${c}>` : change[1][0].includes('channel') ? ` <#${c}>` : change[1][0].includes('user') ? ` <@${c}>` : ` ${c}`) : change[1][1]}`,
+					inline: false
+				}
+			);
+		});
 		const res = await msg.client.ch.query('SELECT * FROM logchannels WHERE guildid = $1;', [msg.guild.id]);
 		if (res && res.rowCount > 0 && res.rows[0].verbositylog) {
 			const channel = msg.client.channels.cache.get(res.rows[0].verbositylog);
@@ -743,7 +783,8 @@ async function setup(msg) {
 		.setCustomId('no')
 		.setLabel(msg.language.no)
 		.setStyle('DANGER');
-	msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: [[yes,no]]});
+	const rows = msg.client.ch.buttonRower([yes,no]);
+	msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: rows});
 	const messageCollector = msg.channel.createMessageCollector({time: 60000});
 	const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 	messageCollector.on('collect', (message) => {
