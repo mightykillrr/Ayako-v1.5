@@ -21,6 +21,6 @@ module.exports = {
 		const commandName = args.shift().toLowerCase();
 		const command = newMsg.client.commands.get(commandName) || newMsg.client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 		if (!command) return;
-		client.emit('message', newMsg);
+		client.emit('messageCreate', newMsg);
 	}
 };
