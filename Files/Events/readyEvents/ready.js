@@ -18,7 +18,7 @@ module.exports = {
 				client.guilds.cache.forEach(g => {require('../guildEvents/guildCreate/nitro').execute(g);});
 				require('./nitro').execute();
 				ch.query('DELETE FROM toxicitycheck;');
-				require('../messageEvents/message/antispam').resetData();
+				require('../messageEvents/messageCreate/antispam').resetData();
 			}
 		}, 3600000);
 		setInterval(() => {require('./TimedManagers/timedManagerSplitter').execute();}, 2000);

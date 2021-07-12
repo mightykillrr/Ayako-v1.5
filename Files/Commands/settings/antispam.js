@@ -28,7 +28,7 @@ module.exports = {
 				},
 				{
 					name: '\u200b', 
-					'\u200b', 
+					value: '\u200b', 
 					inline: false
 				},
 				{
