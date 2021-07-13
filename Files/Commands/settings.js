@@ -87,12 +87,19 @@ async function display(msg, file) {
 	const messageCollector = msg.channel.createMessageCollector({time: 60000});
 	buttonsCollector.on('collect', (clickButton) => {
 		if (clickButton.user.id == msg.author.id) {
-			if (clickButton.customId == 'edit') edit(msg, file, clickButton);
+			if (clickButton.customId == 'edit') {
+				buttonsCollector.stop();
+				messageCollector.stop();
+				edit(msg, file, clickButton);
+			}
 		} else msg.client.ch.notYours(clickButton);
 	});
 	buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') m.edit({embeds: [embed], components: []});});
 	messageCollector.on('collect', (message) => {
-		if (message.author.id == msg.author.id && msg.content == msg.language.edit) {
+		if (message.author.id == msg.author.id && message.content == msg.language.edit) {
+			buttonsCollector.stop();
+			messageCollector.stop();
+			message.delete().catch(() => {});
 			edit(msg, file);
 		}
 	});
@@ -719,7 +726,59 @@ async function edit(msg, file, answer) {
 					}
 				});
 			} else if (settings == 'string') {
-				//strings manager
+				const button = new Discord.MessageButton()
+					.setCustomId('back')
+					.setLabel(msg.language.back)
+					.setStyle('DANGER');
+				const rows = msg.client.ch.buttonRower([button]);
+				if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
+				else msg.m.edit({embeds: [embed], components: rows}).catch(() => {});				
+				const messageCollector = msg.channel.createMessageCollector({time: 60000});
+				const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
+				messageCollector.on('collect', (message) => {
+					if (message.author.id == msg.author.id) {
+						if (message.content == msg.language.cancel) return aborted(msg, [messageCollector, buttonsCollector]);
+						messageCollector.stop();
+						buttonsCollector.stop();
+						message.delete().catch(() => {});
+						const answer = message.content.toLowerCase().split(/#+/);
+						if (answer.length > 0) {
+							answer.forEach(word => {
+								if (word.endsWith(' ')) word = word.slice(0, word.length-1);
+								if (word.startsWith(' ')) word = word.slice(1, word.length);
+								if (Array.isArray(answer)) {
+									if (r[msg.property] && r[msg.property].includes(word)) {
+										const index = r[msg.property].indexOf(word);
+										r[msg.property].splice(index, 1);
+									} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(word);
+									else r[msg.property] = [word];
+								} else r[msg.property] = word;		
+							});
+							gotNewSettings(r[msg.property]);
+						}
+					}
+				});
+				buttonsCollector.on('collect', (clickButton) => {
+					if (clickButton.user.id == msg.author.id) {
+						if (clickButton.customId == 'back') {
+							buttonsCollector.stop();
+							messageCollector.stop();
+							return edit(msg, msg.file, clickButton);
+						}
+					} else msg.client.ch.notYours(clickButton);
+				});
+				buttonsCollector.on('end', (collected, reason) => {
+					if (reason == 'time') {
+						const embed = new Discord.MessageEmbed()
+							.setAuthor(
+								msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+								msg.client.constants.emotes.settingsLink, 
+								msg.client.constants.standard.invite
+							)
+							.setDescription(msg.language.timeError);
+						msg.m.edit({embeds: [embed], components: []}).catch(() => {});
+					}
+				});
 			}
 		}
 	}
@@ -781,6 +840,7 @@ async function log(oldRow, msg) {
 		.setDescription(msg.client.ch.stp(msg.language.selfLog.description, {msg: msg, setting: msg.file.name}));
 	if (changed.length > 0) {
 		changed.forEach(change => {
+			if ((Array.isArray(change[0][1]) && Array.isArray(change[1][1])) && change[0][1].equals(change[1][1])) return;
 			embed.addFields(
 				{
 					name: `${msg.lan[change[1][0] == 'active' ? 'type' : change[1][0]].includes('{{amount}}') ? msg.client.ch.stp(msg.lan[change[1][0] == 'active' ? 'type' : change[1][0]], {amount: '--'}) : msg.lan[change[1][0] == 'active' ? 'type' : change[1][0]]}`, 

@@ -149,15 +149,15 @@ module.exports = {
 			.setStyle(r.giveofficialwarnstof ? 'SUCCESS' : 'DANGER');
 		const mm = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.muteenabledtof.trigger[1] ? msg.lan.edit.muteenabledtof.trigger[1].replace(/`/g, '') : msg.lan.edit.muteenabledtof.trigger[0].replace(/`/g, '')}`)
-			.setLabel(msg.lan.mute)
+			.setLabel(msg.lan.muteenabledtof)
 			.setStyle(r.muteenabledtof ? 'SUCCESS' : 'DANGER');
 		const km = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.kickenabledtof.trigger[1] ? msg.lan.edit.kickenabledtof.trigger[1].replace(/`/g, '') : msg.lan.edit.kickenabledtof.trigger[0].replace(/`/g, '')}`)
-			.setLabel(msg.lan.kick)
+			.setLabel(msg.lan.kickenabledtof)
 			.setStyle(r.kickenabledtof ? 'SUCCESS' : 'DANGER');
 		const bm = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.banenabledtof.trigger[1] ? msg.lan.edit.banenabledtof.trigger[1].replace(/`/g, '') : msg.lan.edit.banenabledtof.trigger[0].replace(/`/g, '')}`)
-			.setLabel(msg.lan.ban)
+			.setLabel(msg.lan.banenabledtof)
 			.setStyle(r.banenabledtof ? 'SUCCESS' : 'DANGER');
 		const channel = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.bpchannelid.trigger[1] ? msg.lan.edit.bpchannelid.trigger[1].replace(/`/g, '') : msg.lan.edit.bpchannelid.trigger[0].replace(/`/g, '')}`)

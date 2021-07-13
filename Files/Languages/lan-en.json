@@ -1287,7 +1287,7 @@
                     "words": {
                         "name": "[{{trigger}}] Blacklisted Words",
                         "trigger": ["`words`"],
-                        "answers": "`words`",
+                        "answers": "any words or sentences",
                         "recommended": "If you enter Multiple Words or Sentences, split them with `#`"
                     },
                     "warntof": {

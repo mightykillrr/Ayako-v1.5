@@ -17,6 +17,9 @@ const regexes = {
 	// eslint-disable-next-line no-control-regex
 	tester: /[^\u0000-\u00ff]/
 };
+Array.prototype.equals = function(arr2) {
+	return (this.length === arr2.length && this.every((value, index) => value === arr2[index]));
+};
 
 module.exports = { 
 	pathCheck() {
