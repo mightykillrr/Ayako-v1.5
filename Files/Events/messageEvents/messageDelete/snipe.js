@@ -9,7 +9,7 @@ module.exports = {
 			const args = msg.content.split(/ +/);
 			let words = [];
 			if (res.rows[0].words !== null) {
-				const blwords = res.rows[0].words.split(/, +/g);
+				const blwords = res.rows[0].words;
 				for (let i = 0; i < args.length; i++) {
 					const argr = `${args[i]}`.replace(/'/g, '').replace(/`/g, '\\`').replace(/\?/g, '').replace(/!/g, '').replace(/./g, '').replace(/,/g, '').replace(/-/g, '').replace(/~/g, '').replace(/;/g, '').replace(/ /g, '');
 					if (blwords.includes(argr.toLowerCase())) {

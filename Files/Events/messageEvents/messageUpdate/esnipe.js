@@ -16,7 +16,7 @@ module.exports = {
 			const args = newMsg.content.split(/ +/);
 			let words = [];
 			if (r.words !== null) {
-				const blwords = r.words.split(/, +/g);
+				const blwords = r.words;
 				for (let i = 0; i < args.length; i++) {
 					const argr = `${args[i]}`.replace(/'/g, '').replace(/`/g, '\\`').replace(/\?/g, '').replace(/!/g, '').replace(/./g, '').replace(/,/g, '').replace(/-/g, '').replace(/~/g, '').replace(/;/g, '').replace(/ /g, '');
 					if (argr.includes(blwords[i])) {
