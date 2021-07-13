@@ -343,27 +343,27 @@ async function edit(msg, file, answer) {
 						} else if (clickButton.customId == 'done') {
 							if (compatibilityType == 'channels' || compatibilityType == 'roles') {
 								if (answered.length > 0) {
-									answered.forEach(id => { 
-										if (Array.isArray(r[msg.property])) {
+									if (Array.isArray(answered)) {
+										answered.forEach(id => { 
 											if (r[msg.property] && r[msg.property].includes(id)) {
 												const index = r[msg.property].indexOf(id);
 												r[msg.property].splice(index, 1);
 											} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(id);
 											else r[msg.property] = [id];
-										} else r[msg.property] = id;							
-									});
+										});
+									} else r[msg.property] = answered;	
 								}
 							} else if (compatibilityType == 'number') {
 								if (answered.length > 0) {
-									answered.forEach(id => { 
-										if (Array.isArray(r[msg.property])) {
+									if (Array.isArray(answered)) {
+										answered.forEach(id => { 
 											if (r[msg.property] && r[msg.property].includes(id)) {
 												const index = r[msg.property].indexOf(id);
 												r[msg.property].splice(index, 1);
 											} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(id);
 											else r[msg.property] = [id];
-										} else r[msg.property] = id;							
-									});
+										});
+									} else r[msg.property] = answered;	
 								}
 							}
 							messageCollector.stop('finished');
@@ -438,15 +438,15 @@ async function edit(msg, file, answer) {
 								else answered.push(id);
 							}));
 							if (answered.length > 0) {
-								answered.forEach(id => { 
-									if (Array.isArray(r[msg.property])) {
+								if (Array.isArray(answered)) {
+									answered.forEach(id => { 
 										if (r[msg.property] && r[msg.property].includes(id)) {
 											const index = r[msg.property].indexOf(id);
 											r[msg.property].splice(index, 1);
 										} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(id);
 										else r[msg.property] = [id];
-									} else r[msg.property] = id;							
-								});
+									});
+								} else r[msg.property] = answered;							
 							}
 							answered = r[msg.property];
 						} else return notValid(msg);
@@ -627,15 +627,15 @@ async function edit(msg, file, answer) {
 						if (isNaN(parseInt(message.content))) return notValid(msg);
 						answered = message.content.replace(/\D+/g, '').split(/ +/);
 						if (answered.length > 0) {
-							answered.forEach(id => { 
-								if (Array.isArray(r[msg.property])) {
+							if (Array.isArray(answered)) {
+								answered.forEach(id => { 
 									if (r[msg.property] && r[msg.property].includes(id)) {
 										const index = r[msg.property].indexOf(id);
 										r[msg.property].splice(index, 1);
 									} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(id);
 									else r[msg.property] = [id];
-								} else r[msg.property] = id;
-							});
+								});
+							} else r[msg.property] = answered;	
 						}
 						messageCollector.stop();
 						buttonsCollector.stop();
@@ -688,16 +688,15 @@ async function edit(msg, file, answer) {
 						}));
 						message.delete().catch(() => {});
 						if (answered.length > 0) {
-							answered.forEach(id => { 
-								id = id.replace(/\D+/g, '');
-								if (Array.isArray(r[msg.property])) {
+							if (Array.isArray(answered)) {
+								answered.forEach(id => { 
 									if (r[msg.property] && r[msg.property].includes(id)) {
 										const index = r[msg.property].indexOf(id);
 										r[msg.property].splice(index, 1);
 									} else if (r[msg.property] && r[msg.property].length > 0) r[msg.property].push(id);
 									else r[msg.property] = [id];
-								} else r[msg.property] = id;				
-							});
+								});
+							} else r[msg.property] = answered;	
 						}
 						messageCollector.stop();
 						buttonsCollector.stop();
@@ -729,6 +728,7 @@ async function edit(msg, file, answer) {
 				const button = new Discord.MessageButton()
 					.setCustomId('back')
 					.setLabel(msg.language.back)
+					.setEmoji(msg.client.constants.emotes.back)
 					.setStyle('DANGER');
 				const rows = msg.client.ch.buttonRower([button]);
 				if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});

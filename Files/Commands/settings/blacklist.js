@@ -1,5 +1,4 @@
 const Discord = require('discord.js');
-const ms = require('ms');
 
 module.exports = {
 	perm: 8192n,
@@ -84,15 +83,6 @@ module.exports = {
 					`${msg.client.ch.stp(msg.lan.banafter, {amount: r.banafter ? r.banafter : '--'})}`, 
 					inline: false
 				},
-				{
-					name: '\u200b', 
-					value: '\u200b', 
-					inline: false
-				},
-				{
-					name: msg.lan.clearint, 
-					value: `${msg.lan.clearint2+`\`${ms(parseInt(r.clearint))}\``}`, inline: false
-				},
 			);
 		return embed;
 	},
@@ -174,16 +164,6 @@ module.exports = {
 					`${msg.client.ch.stp(msg.lan.edit.banafter.name, {amount: r.banafter ? r.banafter : '--', trigger: msg.lan.edit.banafter.trigger})}`, 
 					inline: false
 				},
-				{
-					name: '\u200b', 
-					value: '\u200b', 
-					inline: false
-				},
-				{
-					name: msg.client.ch.stp(msg.lan.edit.clearint.name, {trigger: msg.lan.edit.clearint.trigger}),
-					value: `\`${ms(parseInt(r.clearint))}\``, 
-					inline: false
-				},
 			);
 		return embed;
 	},
@@ -240,10 +220,6 @@ module.exports = {
 			.setCustomId(`${msg.lan.edit.warnafter.trigger[1] ? msg.lan.edit.warnafter.trigger[1].replace(/`/g, '') : msg.lan.edit.warnafter.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.client.ch.stp(msg.lan.warnafter.replace(/\*/g, ''), {amount: r.warnafter ? r.warnafter : '--'}))
 			.setStyle('SECONDARY');
-		const ci = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.clearint.trigger[1] ? msg.lan.edit.clearint.trigger[1].replace(/`/g, '') : msg.lan.edit.clearint.trigger[0].replace(/`/g, '')}`)
-			.setLabel(msg.lan.clearint.replace(/\*/g, ''))
-			.setStyle('SECONDARY');
-		return [[active, words], [channel,user,role], [wm,mm,km,bm], [waw, maw,kaw,baw], [ci]];
+		return [[active, words], [channel,user,role], [wm,mm,km,bm], [waw, maw,kaw,baw]];
 	}
 };
