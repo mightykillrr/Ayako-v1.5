@@ -1,8 +1,15 @@
-module.exports = {
-    exe() {
+const Discord = require('discord.js');
 
-    },
-	display() {
+module.exports = {
+	exe(msg, answer) {
+		edit(msg, answer);
+	},
+	async display(msg) {
+        let r;
+        const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
+        if (res && res.rowCount > 0) r = res.rows;
+        if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
+        msg.lanSettings = msg.language.commands.settings;
 
 	},
 	edit() {
@@ -12,11 +19,7 @@ module.exports = {
 
 
 async function manyRowsManager(msg, answer) {
-	let r;
-	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
-	if (res && res.rowCount > 0) r = res.rows;
-	if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
-	msg.lanSettings = msg.language.commands.settings;
+
 	const editEmbed = typeof(msg.file.editEmbed) == 'function' ? msg.file.editEmbed(msg, r) : noEmbed(msg);
 	editEmbed.setDescription(`${msg.client.ch.stp(msg.lanSettings.howToEdit2, {prefix: msg.client.constants.standard.prefix, type: file.name})}\n\n${editEmbed.description ? editEmbed.description : ''}`);
 	editEmbed.setColor(msg.client.constants.commands.settings.color);

@@ -42,11 +42,9 @@ async function edit(msg, answer, file) {
 	if (typeof(msg.file.buttons) == 'function') buttons = msg.file.buttons(msg, r);
 	else for (i = 0, j = rows.length; i < j; i += 5) {buttons.push(rows.slice(i, i+5));}
 	const actionRows = msg.client.ch.buttonRower(buttons);
-	console.log(5);
 	if (answer) answer.update({embeds: [editEmbed], components: actionRows}).catch((e) => {console.log(e);});
 	else if (msg.m) msg.m.edit({embeds: [editEmbed], components: actionRows}).catch((e) => {console.log(e);});
 	else msg.m = await msg.client.ch.reply(msg, {embeds: [editEmbed], components: actionRows});
-	console.log(4);
 	const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 	const messageCollector = msg.channel.createMessageCollector({time: 60000});
 	buttonsCollector.on('collect', (clickButton) => {
