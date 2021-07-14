@@ -430,6 +430,11 @@
                     "bpuserid": "users",
                     "words": "string"
                 },
+                "cooldowns": {
+                    "command": "command",
+                    "length": "number",
+                    "channel": "channels"
+                },
                 "disboard": {
                     "enabled": "boolean",
                     "channelid": "channel",
@@ -458,6 +463,7 @@
                 }
             },
             "tablenames": {
+                "cooldowns": "cooldowns",
                 "antispam": "antispamsettings",
                 "blacklist": "blacklists",
                 "autorole": "autorole",
