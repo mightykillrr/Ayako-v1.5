@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const fs = require('fs');
+const misc = require('./settings/misc');
 
 module.exports = {
 	name: 'settings',
@@ -55,8 +56,8 @@ module.exports = {
 		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 		let embed;
 		if (msg.file.setupRequired == false) return require('./settings/multiRowManager').display(msg);
-		else if (res && res.rowCount > 0) embed = typeof(file.displayEmbed) == 'function' ? file.displayEmbed(msg, res.rows[0]) : this.noEmbed(msg);
-		else embed = this.noEmbed(msg);
+		else if (res && res.rowCount > 0) embed = typeof(file.displayEmbed) == 'function' ? file.displayEmbed(msg, res.rows[0]) : misc.noEmbed(msg);
+		else embed = misc.noEmbed(msg);
 		embed.setAuthor(
 			msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
 			msg.client.constants.emotes.settingsLink,

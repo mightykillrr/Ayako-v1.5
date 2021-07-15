@@ -433,7 +433,11 @@
                 "cooldowns": {
                     "command": "command",
                     "length": "number",
-                    "channel": "channels"
+                    "activechannelid": "channels",
+                    "bpchannelid": "channels",
+                    "bproleid": "roles",
+                    "bpuserid": "users",
+                    "active": "boolean"
                 },
                 "disboard": {
                     "enabled": "boolean",

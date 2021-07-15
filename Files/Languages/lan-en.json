@@ -764,6 +764,9 @@
     "true": "True",
     "false": "False",
     "back": "Back",
+    "cooldown": "Cooldown",
+    "add": "Add",
+    "remove": "Remove",
     "select": {
         "roles": {
             "select": "Select 1 or more Roles",
@@ -787,6 +790,10 @@
         "number": {
             "select": "Select the Number",
             "desc": "Select the new Number below"
+        },
+        "command": {
+            "select": "Select a Command",
+            "desc": "Select the Command below"
         }
     },
     "mod": {
@@ -1078,6 +1085,7 @@
             "notValid": "This Answer was not valid",
             "howToEdit": "Edit by typing \n`edit` in the next 30 Seconds or\n`{{prefix}}settings {{type}} edit`",
             "howToEdit2": "Edit by typing one of the triggers shown in the `[box]`\nor press the according Button",
+            "howToEdit3": "Respond with:\n`add` to create a new Entry\n`remove` to remove an existing Entry\n`edit` to edit an existing Entry\nor press the according Button",
             "categoy": "Info",
             "description": "Display the Ayako Server Settings",
             "pleaseRestart": "Please try again or type |cancel|",
@@ -1377,7 +1385,38 @@
                 }
             },
             "cooldowns": {
-                "category": ["Automation"]
+                "category": ["Automation"],
+                "type": "Blacklist",
+                "triggers": ["activechannelid", "length", "command", "active", "bpchannelid", "bpuserid", "bproleid"],
+                "required": ["command", "length"],
+                "edit": {
+                    "add": {
+                        "name": "Add a Cooldown",
+                        "process": {
+                            "0": "Respond with a Ayako Command or Command Alias",
+                            "1": "Respond with the Length of this Cooldown **in seconds**"
+                        }
+                    },
+                    "remove": {
+                        "name": "Remove a Cooldown",
+                        "process": {
+                            "0": "Respond with the ID of the Cooldown you want to delete"
+                        }
+                    },
+                    "edit": {
+                        "name": "Edit a Cooldown",
+                        "activechannelid": "The Channels this Cooldown will only be applied in, if none is set the Cooldown will apply in the whole Server\n(If both `Bypassed Channels` and `Active Channels` contain the same Channel, Bypassed Channels win)",
+                        "bpuserid": "Users immune to this Cooldown",
+                        "bproleid": "Roles immune to this Cooldown",
+                        "bpchannelid": "Channels immune to this Cooldown\n(If both `Bypassed Channels` and `Active Channels` contain the same Channel, Bypassed Channels win)",
+                        "active": "Whether the Cooldown is enabled or not",
+                        "command": "The Command this Cooldown applies to",
+                        "length": "The Length of the Cooldown in Seconds",
+                        "process": {
+                            "0": "What would you like to edit?\nRespond with one of these:\n{{triggers}}"
+                        }
+                    }
+                }
             },
             "disabled": {
                 "category": ["Automation", "None"]
