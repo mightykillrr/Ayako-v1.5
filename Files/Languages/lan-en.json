@@ -794,6 +794,10 @@
         "command": {
             "select": "Select a Command",
             "desc": "Select the Command below"
+        },
+        "cooldown": {
+            "select": "Select a Cooldown (in Seconds)",
+            "desc": "Select the Cooldown (in Seconds)"
         }
     },
     "mod": {
@@ -1386,7 +1390,7 @@
             },
             "cooldowns": {
                 "category": ["Automation"],
-                "type": "Blacklist",
+                "type": "Cooldown",
                 "triggers": ["activechannelid", "length", "command", "active", "bpchannelid", "bpuserid", "bproleid"],
                 "required": ["command", "length"],
                 "edit": {

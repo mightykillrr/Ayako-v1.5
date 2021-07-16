@@ -162,6 +162,7 @@ async function edit(msg, answer, file) {
 				const next = new Discord.MessageButton()
 					.setCustomId('next')
 					.setLabel(msg.language.next)
+					.setDisabled(options.length < 26 ? true : false)
 					.setStyle('SUCCESS');
 				const prev = new Discord.MessageButton()
 					.setCustomId('prev')
@@ -388,6 +389,7 @@ async function edit(msg, answer, file) {
 				const next = new Discord.MessageButton()
 					.setCustomId('next')
 					.setLabel(msg.language.next)
+					.setDisabled(options.length < 26 ? true : false)
 					.setStyle('SUCCESS');
 				const prev = new Discord.MessageButton()
 					.setCustomId('prev')
