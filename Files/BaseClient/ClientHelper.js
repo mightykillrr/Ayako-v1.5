@@ -65,21 +65,47 @@ module.exports = {
 		return await msg.reply(options).catch((e) => {this.logger('Reply Error', e);});
 	},
 	stp(expression, Object) {
-		let text = expression.replace(regexes.templateMatcher, (substring, value) => {
-			const newValue = value.split('.');
-			let decided;
-			const Result = Object[newValue[0]];
-			if (Result) {
-				if (newValue.length > 1) {
-					for (let i = 1; i < newValue.length; i++) {
-						if (i == 1) decided = Result[newValue[i]];
-						if (i > 1) decided = decided[newValue[i]];
+		if (Array.isArray(expression)) {
+			const returned = [];
+			expression.forEach(e => {
+				e = `${e}`;
+				let text = e.replace(regexes.templateMatcher, (substring, value) => {
+					const newValue = value.split('.');
+					let decided;
+					const Result = Object[newValue[0]];
+					if (Result) {
+						if (newValue.length > 1) {
+							for (let i = 1; i < newValue.length; i++) {
+								if (i == 1) decided = Result[newValue[i]];
+								if (i > 1) decided = decided[newValue[i]];
+							}
+							return decided;
+						} else return Result;
 					}
-					return decided;
-				} else return Result;
-			}
-		});
-		return text;
+				});
+				if (text == 'true') text = true;
+				if (text == 'false') text = false;
+				if (`${text}`.replace(/\D+/g, '') == text && Number.MAX_SAFE_INTEGER > parseInt(text)) text = Number(text);
+				returned.push(text);
+			});
+			return returned;
+		} else {
+			let text = expression.replace(regexes.templateMatcher, (substring, value) => {
+				const newValue = value.split('.');
+				let decided;
+				const Result = Object[newValue[0]];
+				if (Result) {
+					if (newValue.length > 1) {
+						for (let i = 1; i < newValue.length; i++) {
+							if (i == 1) decided = Result[newValue[i]];
+							if (i > 1) decided = decided[newValue[i]];
+						}
+						return decided;
+					} else return Result;
+				}
+			});
+			return text;
+		}
 	},
 	async query(query, arr) {
 		const res = await pool.query(query, arr).catch((err) =>{
