@@ -432,12 +432,13 @@
                 },
                 "cooldowns": {
                     "command": "command",
-                    "length": "cooldown",
+                    "cooldown": "cooldown",
                     "activechannelid": "channels",
                     "bpchannelid": "channels",
                     "bproleid": "roles",
                     "bpuserid": "users",
-                    "active": "boolean"
+                    "active": "boolean",
+                    "id": "id"
                 },
                 "disboard": {
                     "enabled": "boolean",
@@ -515,6 +516,13 @@
                 "disboard": {
                     "cols": "guildid, active",
                     "vals": ["{{msg.guild.id}}", true]
+                },
+                "cooldowns": {
+                    "cols": "guildid, active, command, cooldown, id",
+                    "vals": ["{{values.guild.id}}", true, "{{values.command}}", "{{values.cooldown}}", "{{values.id}}"],
+                    "add": ["command", "cooldown"],
+                    "remove": ["id"],
+                    "edit": []
                 },
                 "forcecooldowns": {
                     "cols": null,

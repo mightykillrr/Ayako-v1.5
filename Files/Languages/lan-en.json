@@ -654,6 +654,7 @@
     "tooManyRoles": "Too many Roles to be displayed",
     "roles": "Roles",
     "edit": "edit",
+    "Edit": "Edit",
     "nickname": "Nickname",
     "permission_overwrites": "Permission Overwrites",
     "rtc_region": "Region",
@@ -1391,8 +1392,7 @@
             "cooldowns": {
                 "category": ["Automation"],
                 "type": "Cooldown",
-                "triggers": ["activechannelid", "length", "command", "active", "bpchannelid", "bpuserid", "bproleid"],
-                "required": ["command", "length"],
+                "triggers": ["activechannelid", "cooldown", "command", "active", "bpchannelid", "bpuserid", "bproleid"],
                 "edit": {
                     "add": {
                         "name": "Add a Cooldown",
@@ -1415,7 +1415,7 @@
                         "bpchannelid": "Channels immune to this Cooldown\n(If both `Bypassed Channels` and `Active Channels` contain the same Channel, Bypassed Channels win)",
                         "active": "Whether the Cooldown is enabled or not",
                         "command": "The Command this Cooldown applies to",
-                        "length": "The Length of the Cooldown in Seconds",
+                        "cooldown": "The Length of the Cooldown in Seconds",
                         "process": {
                             "0": "What would you like to edit?\nRespond with one of these:\n{{triggers}}"
                         }
