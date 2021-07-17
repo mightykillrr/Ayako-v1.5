@@ -7,7 +7,8 @@ module.exports = {
 		this.edit(msg, answer);
 	},
 	async display(msg) {
-		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
+		await rower(msg);
+		let res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 		if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
 		msg.lanSettings = msg.language.commands.settings;
 		msg.lan = msg.lanSettings[msg.file.name];
@@ -53,7 +54,8 @@ module.exports = {
 		msg.lanSettings = msg.language.commands.settings;
 		msg.lan = msg.lanSettings[msg.file.name];
 		let embed;
-		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
+		await rower(msg);
+		let res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 		if (res && res.rowCount > 0) embed = typeof(msg.file.displayEmbed) == 'function' ? msg.file.displayEmbed(msg, res.rows) : misc.noEmbed(msg);
 		else embed = misc.noEmbed(msg);
 		embed.setAuthor(
@@ -1057,6 +1059,17 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 
 		}
 	}
+}
+
+async function rower(msg) {
+	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]};`);
+	if (!res || res.rowCount == 0) return;
+	for (let i = 0; i < res.rowCount; i++) {
+		const oldID = res.rows[i].id;
+		res.rows[i].id = i+1;
+		await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET id = $1 WHERE id = $2;`, [res.rows[i].id, oldID]);
+	}
+	return;
 }
 
 function CollectorEnder(collectors) {
