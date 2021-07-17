@@ -6,11 +6,10 @@ module.exports = {
 	perm: 8192n,
 	type: 1,
 	setupRequired: false,
-	displayEmbed(msg, r) {
-		console.log(1)
+	displayEmbed(msg, res) {
 		const embed = new Discord.MessageEmbed();
-		for (let i = 0; i < r.length; i++) {
-			r = r[i];
+		for (let i = 0; i < res.length; i++) {
+			const r = res[i];
 			embed.addFields(
 				{
 					name: `${msg.language.number}:\`${r.id}\` | ${msg.language.command}: \`${r.command}\` | ${r.active ? `${msg.client.constants.emotes.tick} ${msg.language.enabled}` : `${msg.client.constants.emotes.cross} ${msg.language.disabled}`}`,

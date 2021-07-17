@@ -799,6 +799,10 @@
         "cooldown": {
             "select": "Select a Cooldown (in Seconds)",
             "desc": "Select the Cooldown (in Seconds)"
+        },
+        "id": {
+            "select": "Select the Entry",
+            "desc": "Select the Entry below"
         }
     },
     "mod": {

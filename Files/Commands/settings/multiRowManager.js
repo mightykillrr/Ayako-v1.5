@@ -75,7 +75,7 @@ module.exports = {
 		const edit = new Discord.MessageButton()
 			.setCustomId('edit')
 			.setStyle('SECONDARY')
-			.setLabel(msg.language.edit)
+			.setLabel(msg.language.Edit)
 			.setDisabled(embed.fields.length > 0 ? false : true);
 		const row = msg.client.ch.buttonRower([add, remove, edit]);
 		if (answer) answer.update({embeds: [embed], components: row}).catch(() => {});
@@ -137,7 +137,7 @@ module.exports = {
 
 async function repeater(msg, i, embed, values, answer, fail, identifier) {
 	const property = msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier][i]];
-	if (i < msg.client.constants.commands.settings.setupQueries[msg.file.name].required.length) {
+	if (i < msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier].length) {
 		let answered = [];
 		if (property == 'command') {
 			let req = msg.client.commands;
@@ -820,22 +820,20 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 			});
 
 		} else if (property == 'id') {
-			const req = [];
-			let r;
-			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.cconstants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
-			if (res && res.rowCount > 0) r = res.rows;
-			for (let j = 1; j < 9999; j++) {req.push(j);}
+			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
+			if (res && res.rowCount > 0) fail = res.rows;
+			else return misc.aborted(msg);
 			const options = [];
-			req.forEach(r => {
-				options.push({label: `${r}`, value: `${r}`});
-			});
+			for (let j = 0; j < fail.length; j++) {
+				options.push({label: `${msg.language.number}: ${fail[j].id} | ${fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]}`, value: `${fail[j].id}`});
+			}
 			const take = [];
-			for(let j = 0; j < 25; j++) {take.push(options[j]);}
+			for(let j = 0; j < options.length; j++) {take.push(options[j]);}
 			const menu = new Discord.MessageSelectMenu()
 				.setCustomId(property)
 				.addOptions(take)
 				.setMinValues(1)
-				.setMaxValues(1)
+				.setMaxValues(take.length)
 				.setPlaceholder(msg.language.select[property].select);
 			const next = new Discord.MessageButton()
 				.setCustomId('next')
@@ -886,7 +884,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 							.setCustomId(property)
 							.addOptions(take)
 							.setMinValues(1)
-							.setMaxValues(1)
+							.setMaxValues(take.length)
 							.setPlaceholder(msg.language.select[property].select);
 						const next = new Discord.MessageButton()
 							.setCustomId('next')
@@ -916,7 +914,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 								msg.client.constants.standard.invite
 							)
 							.setDescription(`${msg.language.select[property].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``);
-						if (answered.length > 0) embed.addField(msg.language.selected, `${answered} `);
+						if (answered.length > 0) embed.addField(msg.language.selected, `${answered.map(c => ` ${c}`)} `);
 						if (page >= Math.ceil(+options.length / 25)) next.setDisabled(true);
 						else next.setDisabled(false);
 						if (page > 1) prev.setDisabled(false);
@@ -927,15 +925,18 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 						messageCollector.stop('finished');
 						buttonsCollector.stop('finished');
 						values[property] = answered;
-						repeater(msg, i+1, embed, values, clickButton, null, identifier);
+						repeater(msg, i+1, embed, values, clickButton, fail, identifier);
 					} else if (clickButton.customId == property) {
 						let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
-						answered = clickButton.values[0];
+						clickButton.values.forEach(v => {
+							if (answered.includes(v)) answered.splice(answered.indexOf(v), 1);
+							else answered.push(v);
+						});
 						const menu = new Discord.MessageSelectMenu()
 							.setCustomId(property)
 							.addOptions(take)
 							.setMinValues(1)
-							.setMaxValues(1)
+							.setMaxValues(take.length)
 							.setPlaceholder(msg.language.select[property].select);
 						const next = new Discord.MessageButton()
 							.setCustomId('next')
@@ -966,7 +967,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 								msg.client.constants.standard.invite
 							)
 							.setDescription(`${msg.language.select[property].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``)
-							.addField(msg.language.selected, `${answered} `);
+							.addField(msg.language.selected, `${answered.map(c => ` ${c}`)} `);
 						const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
 						clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 					} else if (clickButton.customId == 'back') {
@@ -981,11 +982,11 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 					if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
 					message.delete().catch(() => {});
 					if (isNaN(parseInt(message.content))) return misc.notValid(msg);
-					answered = message.content.replace(/\D+/g, '').split(/ +/);
+					answered.push(fail[message.content]);
 					messageCollector.stop();
 					buttonsCollector.stop();
-					values[property] = message.content;
-					repeater(msg, i+1, embed, values, null, null, identifier);
+					values[property] = answered;
+					repeater(msg, i+1, embed, values, null, fail, identifier);
 				}
 			});
 			buttonsCollector.on('end', (collected, reason) => {
@@ -1023,7 +1024,35 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 			else msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: []});
 			setTimeout(() => {module.exports.edit(msg, null);}, 3000);
 		} else if (identifier == 'remove') {
-
+			values.id.forEach(async (id) => {
+				const names = [];
+				const arr = fail.find(f => f.id == id);
+				const entries = Object.entries(arr);
+				const vals = [];
+				entries.forEach(e => {
+					if (e[1] !== null) {
+						vals.push(e[1]);
+						names.push(e[0]);
+					} 
+				});
+				let nameText = '';
+				for (let j = 0; j < names.length; j++) {
+					if (nameText !== '') nameText += ` AND ${names[j]} = $${j+1}`;
+					else nameText += `${names[j]} = $${j+1}`;
+				}
+				msg.client.ch.query(`DELETE FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE ${nameText};`, vals);
+			});
+			const embed = new Discord.MessageEmbed()
+				.setAuthor(
+					msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), 
+					msg.client.constants.standard.image, msg.client.constants.standard.invite
+				)
+				.setColor(msg.client.constants.commands.settings.color)
+				.setDescription(msg.client.ch.stp(msg.lanSettings.done, {loading: msg.client.constants.emotes.loading}));
+			if (answer) answer.update({embeds: [embed], components: []}).catch(() => {});
+			else if (msg.m) msg.m.edit({embeds: [embed], components: []}).catch(() => {});
+			else msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: []});
+			setTimeout(() => {module.exports.edit(msg, null);}, 3000);
 		} else if (identifier == 'edit') {
 
 		}

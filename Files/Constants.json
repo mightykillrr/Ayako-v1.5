@@ -522,6 +522,7 @@
                     "vals": ["{{values.guild.id}}", true, "{{values.command}}", "{{values.cooldown}}", "{{values.id}}"],
                     "add": ["command", "cooldown"],
                     "remove": ["id"],
+                    "removeIdent": "command",
                     "edit": []
                 },
                 "forcecooldowns": {
