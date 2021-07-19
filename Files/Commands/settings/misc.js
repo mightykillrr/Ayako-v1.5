@@ -56,6 +56,7 @@ module.exports = {
 		}
 	},
 	async aborted(msg, collectors) {
+		msg.client.constants.commands.settings.editRequire.splice(2, 1);
 		collectors.forEach(collector => collector.stop());
 		msg.m.delete().catch(() => {});
 		msg.reply({content: msg.language.aborted});

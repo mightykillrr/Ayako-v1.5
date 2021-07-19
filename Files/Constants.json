@@ -438,7 +438,8 @@
                     "bproleid": "roles",
                     "bpuserid": "users",
                     "active": "boolean",
-                    "id": "id"
+                    "id": "id",
+                    "column": "column"
                 },
                 "disboard": {
                     "enabled": "boolean",
@@ -496,6 +497,7 @@
                 "modroles": "modrolesnew",
                 "muterole": "muterole"
             },
+            "editRequire": ["id", "column"],
             "setupQueries": {
                 "antispam": {
                     "cols": "active, giveofficialwarnstof, muteafterwarnsamount, kickafterwarnsamount, banafterwarnsamount, readofwarnstof, muteenabledtof, kickenabledtof, banenabledtof, guildid",
@@ -518,12 +520,11 @@
                     "vals": ["{{msg.guild.id}}", true]
                 },
                 "cooldowns": {
-                    "cols": "guildid, active, command, cooldown, id",
-                    "vals": ["{{values.guild.id}}", true, "{{values.command}}", "{{values.cooldown}}", "{{values.id}}"],
+                    "cols": "guildid, active, command, cooldown, id, uniquetimestamp",
+                    "vals": ["{{values.guild.id}}", true, "{{values.command}}", "{{values.cooldown}}", "{{values.id}}", "{{values.date}}"],
                     "add": ["command", "cooldown"],
                     "remove": ["id"],
-                    "removeIdent": "command",
-                    "edit": []
+                    "removeIdent": "command"
                 },
                 "forcecooldowns": {
                     "cols": null,

@@ -8,6 +8,7 @@ module.exports = {
 	},
 	async display(msg) {
 		await rower(msg);
+		msg.client.constants.commands.settings.editRequire.splice(2, 1);
 		let res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 		if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
 		msg.lanSettings = msg.language.commands.settings;
@@ -51,6 +52,7 @@ module.exports = {
 		});
 	},
 	async edit(msg, answer) {
+		msg.client.constants.commands.settings.editRequire.splice(2, 1);
 		msg.lanSettings = msg.language.commands.settings;
 		msg.lan = msg.lanSettings[msg.file.name];
 		let embed;
@@ -79,7 +81,7 @@ module.exports = {
 			.setStyle('SECONDARY')
 			.setLabel(msg.language.Edit)
 			.setDisabled(embed.fields.length > 0 ? false : true);
-		const row = msg.client.ch.buttonRower([add, remove, edit]);
+		const row = msg.client.ch.buttonRower([[add, remove, edit]]);
 		if (answer) answer.update({embeds: [embed], components: row}).catch(() => {});
 		else if (msg.m) msg.m.edit({embeds: [embed], components: row}).catch(() => {});
 		else msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: row});
@@ -89,57 +91,49 @@ module.exports = {
 			if (clickButton.user.id == msg.author.id) {
 				if (clickButton.customId == 'add') {
 					CollectorEnder([buttonsCollector, messageCollector]);
-					this.add(msg, clickButton);
+					repeater(msg, 0, null, {}, clickButton, [], 'add');
 				} else if (clickButton.customId == 'remove') {
 					CollectorEnder([buttonsCollector, messageCollector]);
-					this.remove(msg, clickButton);
+					repeater(msg, 0, null, {}, clickButton, [], 'remove');
 				} else if (clickButton.customId == 'edit') {
 					CollectorEnder([buttonsCollector, messageCollector]);
-					this.edit(msg, clickButton);
+					repeater(msg, 0, null, {}, clickButton, [], 'edit');
 				}
 			} else msg.client.ch.notYours(clickButton, msg);
 		});
 		messageCollector.on('collect', (message) => {
 			if (msg.author.id == message.author.id) {
-				message.delete().catch(() => {});
 				if (message.content.toLowerCase() == msg.language.cancel) misc.aborted(msg, [messageCollector, buttonsCollector]);
 				else if (message.content.toLowerCase() == msg.language.add.toLowerCase()) {
 					CollectorEnder([buttonsCollector, messageCollector]);
-					this.add(msg);
+					message.delete().catch(() => {});
+					repeater(msg, 0, null, {}, null, [], 'add');
 				} else if (message.content.toLowerCase() == msg.language.remove.toLowerCase()) {
 					CollectorEnder([buttonsCollector, messageCollector]);
-					this.remove(msg);
+					message.delete().catch(() => {});
+					repeater(msg, 0, null, {}, null, [], 'remove');
 				} else if (message.content.toLowerCase() == msg.language.edit.toLowerCase()) {
 					CollectorEnder([buttonsCollector, messageCollector]);
-					this.edit(msg);
+					message.delete().catch(() => {});
+					repeater(msg, 0, null, {}, null, [], 'edit');
 				} 
 			}
 		});
 		buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') msg.client.ch.collectorEnd(msg);});
 	},
-	async add(msg, answer) {
-		const embed = new Discord.MessageEmbed()
-			.setAuthor(
-				msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}),
-				msg.client.constants.emotes.settingsLink,
-				msg.client.constants.standard.invite
-			);
-		repeater(msg, 0, embed, {}, answer, [], 'add');
-	},
-	async remove(msg, answer) {
-		const embed = new Discord.MessageEmbed()
-			.setAuthor(
-				msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}),
-				msg.client.constants.emotes.settingsLink,
-				msg.client.constants.standard.invite
-			);
-		repeater(msg, 0, embed, {}, answer, [], 'remove');
-	}
 };
 
 async function repeater(msg, i, embed, values, answer, fail, identifier) {
-	const property = msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier][i]];
-	if (i < msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier].length) {
+	if (i == 0) {
+		embed = new Discord.MessageEmbed()
+			.setAuthor(
+				msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}),
+				msg.client.constants.emotes.settingsLink,
+				msg.client.constants.standard.invite
+			);
+	}
+	const property = identifier == 'edit' ? msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.editRequire[i]] : msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier][i]];
+	if (identifier == 'edit' ? i < msg.client.constants.commands.settings.editRequire.length : i < msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier].length) {
 		let answered = [];
 		if (property == 'command') {
 			let req = msg.client.commands;
@@ -152,7 +146,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 			});
 			const take = [];
 			for(let j = 0; j < 25 && j < options.length; j++) {take.push(options[j]);}
-			embed.setDescription(`${msg.lan.edit[identifier].name}\n${msg.lan.edit[identifier].process[i]}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
+			embed.setDescription(`${identifier !== 'edit' ? msg.lan.edit[identifier].name : msg.lan.edit.edit[property]}\n${identifier !== 'edit' ? msg.lan.edit[identifier].process[i] : ''}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
 			const menu = new Discord.MessageSelectMenu()
 				.setCustomId('cmdmenu')
 				.addOptions(take)
@@ -789,7 +783,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 				.setLabel(msg.language.back)
 				.setEmoji(msg.client.constants.emotes.back)
 				.setStyle('DANGER');
-			const actionRows = msg.client.ch.buttonRower([PRIMARY, SECONDARY, DANGER]);
+			const actionRows = msg.client.ch.buttonRower([[PRIMARY, SECONDARY], DANGER]);
 			if (answer) answer.update({embeds: [embed], components: actionRows}).catch(() => {});
 			else msg.m.edit({embeds: [embed], components: actionRows}).catch(() => {});
 			const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
@@ -820,7 +814,6 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 					repeater(msg, i+1, embed, values, null, null, identifier);
 				}
 			});
-
 		} else if (property == 'id') {
 			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 			if (res && res.rowCount > 0) fail = res.rows;
@@ -1003,13 +996,191 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 					msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 				}
 			});
-		} 
+		} else if (property == 'column') {
+			const req = msg.lan.edit.names;
+			const options = [];
+			for (let j = 0; j < Object.entries(req).length; j++) {
+				const r = Object.entries(req)[j];
+				options.push({label: r[1] > 25 ? `${r[1].slice(0, 24)}\u2026` : r[1], value: r[0]});
+			}
+			const take = [];
+			for(let j = 0; j < 25 && j < options.length; j++) {take.push(options[j]);}
+			const menu = new Discord.MessageSelectMenu()
+				.setCustomId(property)
+				.addOptions(take)
+				.setMinValues(1)
+				.setMaxValues(1)
+				.setPlaceholder(msg.language.select[property].select);
+			const next = new Discord.MessageButton()
+				.setCustomId('next')
+				.setLabel(msg.language.next)
+				.setDisabled(options.length < 26 ? true : false)
+				.setStyle('SUCCESS');
+			const prev = new Discord.MessageButton()
+				.setCustomId('prev')
+				.setLabel(msg.language.prev)
+				.setDisabled(true)
+				.setStyle('DANGER');
+			const done = new Discord.MessageButton()
+				.setCustomId('done')
+				.setLabel(msg.language.done)
+				.setDisabled(true)
+				.setStyle('PRIMARY');
+			const back = new Discord.MessageButton()
+				.setCustomId('back')
+				.setLabel(msg.language.back)
+				.setEmoji(msg.client.constants.emotes.back)
+				.setStyle('DANGER');
+			const embed = new Discord.MessageEmbed()
+				.setAuthor(
+					msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}),
+					msg.client.constants.emotes.settingsLink, 
+					msg.client.constants.standard.invite
+				)
+				.setDescription(`${msg.language.select[property].desc}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
+			const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
+			if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
+			else msg.m.edit({embeds: [embed], components: rows}).catch(() => {});
+			const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
+			const messageCollector = msg.channel.createMessageCollector({time: 60000});
+			buttonsCollector.on('collect', (clickButton) => {
+				if (clickButton.user.id == msg.author.id) {
+					if (clickButton.customId == 'next' || clickButton.customId == 'prev') {
+						let indexLast; let indexFirst;
+						for (let j = 0; options.length > j; j++) {
+							if (options[j] && options[j].value == clickButton.message.components[0].components[0].options[(clickButton.message.components[0].components[0].options.length-1)].value) indexLast = j;
+							if (options[j] && options[j].value == clickButton.message.components[0].components[0].options[0].value) indexFirst = j;
+						}
+						take.splice(0, take.length);
+						if (clickButton.customId == 'next') for (let j = indexLast+1; j < indexLast+26; j++) {if (options[j]) {take.push(options[j]);}}
+						if (clickButton.customId == 'prev') for (let j = indexFirst-25; j < indexFirst; j++) {if (options[j]) {take.push(options[j]);}}
+						let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
+						clickButton.customId == 'next' ? page++ : page--;
+						const menu = new Discord.MessageSelectMenu()
+							.setCustomId(property)
+							.addOptions(take)
+							.setMinValues(1)
+							.setMaxValues(1)
+							.setPlaceholder(msg.language.select[property].select);
+						const next = new Discord.MessageButton()
+							.setCustomId('next')
+							.setLabel(msg.language.next)
+							.setDisabled(options.length < page*25+26 ? true : false)
+							.setStyle('SUCCESS');
+						const prev = new Discord.MessageButton()
+							.setCustomId('prev')
+							.setLabel(msg.language.prev)
+							.setDisabled(page == 1 ? true : false)
+							.setStyle('DANGER');
+						const done = new Discord.MessageButton()
+							.setCustomId('done')
+							.setLabel(msg.language.done)
+							.setStyle('PRIMARY');
+						const back = new Discord.MessageButton()
+							.setCustomId('back')
+							.setLabel(msg.language.back)
+							.setEmoji(msg.client.constants.emotes.back)
+							.setStyle('DANGER');
+						if (answered.length > 0) done.setDisabled(false);
+						else done.setDisabled(true);
+						const embed = new Discord.MessageEmbed()
+							.setAuthor(
+								msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+								msg.client.constants.emotes.settingsLink, 
+								msg.client.constants.standard.invite
+							)
+							.setDescription(`${msg.language.select[property].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``);
+						if (answered.length > 0) embed.addField(msg.language.selected, `${answered}`);
+						if (page >= Math.ceil(+options.length / 25)) next.setDisabled(true);
+						else next.setDisabled(false);
+						if (page > 1) prev.setDisabled(false);
+						else prev.setDisabled(true);
+						const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
+						clickButton.update({embeds: [embed], components: rows}).catch(() => {});
+					} else if (clickButton.customId == 'done') {
+						if (answered.length > 0) values[property] = answered;
+						msg.client.constants.commands.settings.editRequire.push(answered);
+						messageCollector.stop('finished');
+						buttonsCollector.stop('finished');
+						repeater(msg, i+1, embed, values, clickButton, null, identifier);
+					} else if (clickButton.customId == property) {
+						answered = clickButton.values[0];
+						let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
+						const menu = new Discord.MessageSelectMenu()
+							.setCustomId(property)
+							.addOptions(take)
+							.setMinValues(1)
+							.setMaxValues(1)
+							.setPlaceholder(msg.language.select[property].select);
+						const next = new Discord.MessageButton()
+							.setCustomId('next')
+							.setLabel(msg.language.next)
+							.setDisabled(options.length < page*25+26 ? true : false)
+							.setStyle('SUCCESS');
+						const prev = new Discord.MessageButton()
+							.setCustomId('prev')
+							.setLabel(msg.language.prev)
+							.setDisabled(page == 1 ? true : false)
+							.setStyle('DANGER');
+						const done = new Discord.MessageButton()
+							.setCustomId('done')
+							.setLabel(msg.language.done)
+							.setStyle('PRIMARY');
+						const back = new Discord.MessageButton()
+							.setCustomId('back')
+							.setLabel(msg.language.back)
+							.setEmoji(msg.client.constants.emotes.back)
+							.setStyle('DANGER');
+						if (answered.length > 0) done.setDisabled(false);
+						else done.setDisabled(true);
+						const embed = new Discord.MessageEmbed()
+							.setAuthor(
+								msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+								msg.client.constants.emotes.settingsLink, 
+								msg.client.constants.standard.invite
+							)
+							.setDescription(`${msg.language.select[property].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``)
+							.addField(msg.language.selected, `${answered} `);
+						const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
+						clickButton.update({embeds: [embed], components: rows}).catch(() => {});
+					} else if (clickButton.customId == 'back') {
+						messageCollector.stop();
+						buttonsCollector.stop();
+						return module.exports.edit(msg, clickButton);
+					}
+				} else msg.client.ch.notYours(clickButton, msg);
+			});
+			messageCollector.on('collect', async (message) => {
+				if (msg.author.id == message.author.id) {
+					if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
+					message.delete().catch(() => {});
+					//values[property] = answered;							
+					buttonsCollector.stop('finished');
+					messageCollector.stop('finished');
+					repeater(msg, i+1, embed, values, null, fail, identifier);
+				}
+			});
+			buttonsCollector.on('end', (collected, reason) => {
+				if (reason == 'time') {
+					const embed = new Discord.MessageEmbed()
+						.setAuthor(
+							msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}),
+							msg.client.constants.emotes.settingsLink, 
+							msg.client.constants.standard.invite
+						)
+						.setDescription(msg.language.timeError);
+					msg.m.edit({embeds: [embed], components: []}).catch(() => {});
+				}
+			});
+
+		}
 	} else {
 		if (identifier == 'add') {
 			let valDeclaration = '';
 			for (let j = 0; j < msg.client.constants.commands.settings.setupQueries[msg.file.name].vals.length; j++) {valDeclaration += `$${j+1}, `;}
 			valDeclaration = valDeclaration.slice(0, valDeclaration.length-2);
 			values.guild = msg.guild;
+			values.date = Date.now();
 			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]};`);
 			if (res && res.rowCount > 0) values.id = res.rowCount+1;
 			else values.id = 1;
@@ -1056,7 +1227,19 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 			else msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: []});
 			setTimeout(() => {module.exports.edit(msg, null);}, 3000);
 		} else if (identifier == 'edit') {
-
+			const added = msg.client.constants.commands.settings.editRequire.splice(2, 1);
+			msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${values.column} = $1 WHERE id = $2;`, [values[added], values.id[0]]);
+			const embed = new Discord.MessageEmbed()
+				.setAuthor(
+					msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), 
+					msg.client.constants.standard.image, msg.client.constants.standard.invite
+				)
+				.setColor(msg.client.constants.commands.settings.color)
+				.setDescription(msg.client.ch.stp(msg.lanSettings.done, {loading: msg.client.constants.emotes.loading}));
+			if (answer) answer.update({embeds: [embed], components: []}).catch(() => {});
+			else if (msg.m) msg.m.edit({embeds: [embed], components: []}).catch(() => {});
+			else msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: []});
+			setTimeout(() => {module.exports.edit(msg, null);}, 3000);
 		}
 	}
 }
@@ -1065,9 +1248,8 @@ async function rower(msg) {
 	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]};`);
 	if (!res || res.rowCount == 0) return;
 	for (let i = 0; i < res.rowCount; i++) {
-		const oldID = res.rows[i].id;
 		res.rows[i].id = i+1;
-		await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET id = $1 WHERE id = $2;`, [res.rows[i].id, oldID]);
+		msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET id = $1 WHERE uniquetimestamp = $2;`, [res.rows[i].id, res.rows[i].uniquetimestamp]);
 	}
 	return;
 }

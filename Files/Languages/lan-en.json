@@ -803,6 +803,10 @@
         "id": {
             "select": "Select the Entry",
             "desc": "Select the Entry below"
+        },
+        "column": {
+            "select": "Select the Column you want to edit",
+            "desc": "Select the Column you want to edit below"
         }
     },
     "mod": {
@@ -1396,7 +1400,6 @@
             "cooldowns": {
                 "category": ["Automation"],
                 "type": "Cooldown",
-                "triggers": ["activechannelid", "cooldown", "command", "active", "bpchannelid", "bpuserid", "bproleid"],
                 "edit": {
                     "add": {
                         "name": "Add a Cooldown",
@@ -1412,7 +1415,6 @@
                         }
                     },
                     "edit": {
-                        "name": "Edit a Cooldown",
                         "activechannelid": "The Channels this Cooldown will only be applied in, if none is set the Cooldown will apply in the whole Server\n(If both `Bypassed Channels` and `Active Channels` contain the same Channel, Bypassed Channels win)",
                         "bpuserid": "Users immune to this Cooldown",
                         "bproleid": "Roles immune to this Cooldown",
@@ -1422,7 +1424,25 @@
                         "cooldown": "The Length of the Cooldown in Seconds",
                         "process": {
                             "0": "What would you like to edit?\nRespond with one of these:\n{{triggers}}"
+                        },
+                        "note": {
+                            "command": "Respond or Select a Ayako Command or Command Alias",
+                            "bpuserid": "Respond with 1 or more User IDs or Mentions",
+                            "bproleid": "Respond or Select 1 or more Role IDs or Mentions",
+                            "activechannelid": "Respond or Select 1 or more Channel IDs or Mentions",
+                            "bpchannelid": "Respond or Select 1 or more Channel IDs or Mentions)",
+                            "active": "Respond or Select `true` or `false`",
+                            "cooldown": "Respond or Select a Time in Seconds"
                         }
+                    },
+                    "names": {
+                        "command": "Command",
+                        "cooldown": "Cooldown",
+                        "active": "Active",
+                        "activechannelid": "Whitelisted Channels",
+                        "bproleid": "Blacklisted Roles",
+                        "bpchannelid": "Blacklisted Channels",
+                        "bpuserid": "Blacklisted Users"
                     }
                 }
             },
