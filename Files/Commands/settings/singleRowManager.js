@@ -5,10 +5,17 @@ const setuper = require('./setup');
 module.exports = {
 	exe(msg, answer, file) {
 		edit(msg, answer, file);
+	},
+	redirecter(msg, res, answer, origin) {
+		
 	}
 };
 
 async function edit(msg, answer, file) {
+	msg.lan.edit = {};
+	Object.entries(msg.lan.edit).forEach(e => {
+		if (e[0] !== 'add' && e[0] !== 'remove' && e[0] !== 'edit' && e[0] !== 'list') msg.lan.edit[e[0]] = e[1];
+	});
 	msg.lanSettings = msg.language.commands.settings;
 	if (!msg.file) {file.name = msg.args[0].toLowerCase(); msg.file = file;}
 	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
@@ -72,7 +79,11 @@ async function edit(msg, answer, file) {
 			}
 		}
 	});
-	async function gotEditing(e, answer) {
+	async function gotEditing(e, answer, origin) {
+		msg.lan.edit = {};
+		Object.entries(msg.lan.edit).forEach(e => {
+			if (e[0] !== 'add' && e[0] !== 'remove' && e[0] !== 'edit' && e[0] !== 'list') msg.lan.edit[e[0]] = e[1];
+		});
 		const propertyName = e[0];
 		msg.property = propertyName;
 		if (r[msg.property] && r[msg.property][0] && Array.isArray(r[msg.property][0])) r[msg.property] = r[msg.property][0];

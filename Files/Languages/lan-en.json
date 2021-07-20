@@ -736,6 +736,7 @@
     "id": "ID",
     "number": "Number",
     "list": "list",
+    "List": "List",
     "mute": "Muted",
     "camera": "Camera",
     "small": "Small",
@@ -1400,7 +1401,72 @@
             "cooldowns": {
                 "category": ["Automation"],
                 "type": "Cooldown",
+                "command": "Command",
+                "cooldown": "Cooldown",
+                "active": "Active",
+                "activechannelid": "Whitelisted Channels",
+                "bproleid": "Blacklisted Roles",
+                "bpchannelid": "Blacklisted Channels",
+                "bpuserid": "Blacklisted Users",
                 "edit": {
+                    "command": {
+                        "name": "[{{trigger}}] Command",
+                        "trigger": ["`command`", "`cmd`"],
+                        "answers": "`A Ayako Command or Command Alias`",
+                        "recommended": "Recommended: `24 hours`"
+                    },
+                    "cooldown": {
+                        "name": "[{{trigger}}] Cooldown",
+                        "trigger": ["`cooldown`", "`cd`"],
+                        "answers": "`Time in Seconds`",
+                        "recommended": "Recommended: `24 hours`"
+                    },
+                    "active": {
+                        "name": "[{{trigger}}] Active",
+                        "trigger": ["`active`"],
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `24 hours`"
+                    },
+                    "activechannelid": {
+                        "name": "[{{trigger}}] Active Channels",
+                        "trigger": ["`achannel`"],
+                        "answers": "`Mention(s) or ID(s)`",
+                        "recommended": "This is a switch.\nIf the entered Channel is already added it will be removed.",
+                        "fail": {
+                            "no": "I couldn't find this Channel\n",
+                            "wrongGuild": "This Channel is not Part of this Server\n"
+                        }
+                    },
+                    "bproleid": {
+                        "name": "[{{trigger}}] Bypassed Roles",
+                        "trigger": ["`role`"],
+                        "answers": "`Mention(s) or ID(s)`",
+                        "recommended": "This is a switch.\nIf the entered Role is already added it will be removed.",
+                        "fail": {
+                            "no": "I couldn't find this Role\n",
+                            "wrongGuild": "This Role is not Part of this Server\n"
+                        }
+                    },
+                    "bpchannelid": {
+                        "name": "[{{trigger}}] Bypassed Channels",
+                        "trigger": ["`bchannel`"],
+                        "answers": "`Mention(s) or ID(s)`",
+                        "recommended": "This is a switch.\nIf the entered Channel is already added it will be removed.",
+                        "fail": {
+                            "no": "I couldn't find this Channel\n",
+                            "wrongGuild": "This Channel is not Part of this Server\n"
+                        }
+                    },
+                    "bpuserid": {
+                        "name": "[{{trigger}}] Bypassed Users",
+                        "trigger": ["`user`"],
+                        "answers": "`Mention(s) or ID(s)`",
+                        "recommended": "This is a switch.\nIf the entered User is already added it will be removed.",
+                        "fail": {
+                            "no": "I couldn't find this User\n",
+                            "wrongGuild": "This User is not Part of this Server\n"
+                        }
+                    },
                     "add": {
                         "name": "Add a Cooldown",
                         "process": {
@@ -1434,15 +1500,6 @@
                             "active": "Respond or Select `true` or `false`",
                             "cooldown": "Respond or Select a Time in Seconds"
                         }
-                    },
-                    "names": {
-                        "command": "Command",
-                        "cooldown": "Cooldown",
-                        "active": "Active",
-                        "activechannelid": "Whitelisted Channels",
-                        "bproleid": "Blacklisted Roles",
-                        "bpchannelid": "Blacklisted Channels",
-                        "bpuserid": "Blacklisted Users"
                     }
                 }
             },
