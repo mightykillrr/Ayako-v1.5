@@ -6,23 +6,25 @@ module.exports = {
 	exe(msg, answer, file) {
 		edit(msg, answer, file);
 	},
-	redirecter(msg, res, answer, origin) {
-		
+	redirecter(msg, r, answer, origin) {
+		edit(msg, answer, msg.file, origin, r);
 	}
 };
 
-async function edit(msg, answer, file) {
+async function edit(msg, answer, file, origin, r) {
+	const tempLan = msg.lan.edit;
 	msg.lan.edit = {};
-	Object.entries(msg.lan.edit).forEach(e => {
+	Object.entries(tempLan).forEach(e => {
 		if (e[0] !== 'add' && e[0] !== 'remove' && e[0] !== 'edit' && e[0] !== 'list') msg.lan.edit[e[0]] = e[1];
 	});
 	msg.lanSettings = msg.language.commands.settings;
 	if (!msg.file) {file.name = msg.args[0].toLowerCase(); msg.file = file;}
-	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
-	let r;
-	if (msg.file.setupRequired == false) return require('./multiRowManager').exe(msg, answer);
-	else if (!res || res.rowCount == 0) return setuper.execute(msg);
-	else r = res.rows[0];
+	if (!origin) {
+		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
+		if (msg.file.setupRequired == false) return require('./multiRowManager').exe(msg, answer);
+		else if (!res || res.rowCount == 0) return setuper.execute(msg);
+		else r = res.rows[0];
+	}
 	let compatibilityType;
 	if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
 	msg.lanSettings = msg.language.commands.settings;
@@ -59,7 +61,7 @@ async function edit(msg, answer, file) {
 			let editing;
 			Object.entries(msg.lan.edit).forEach(e => {e[1].trigger.forEach(trigger => {if (trigger.replace(/`/g, '') == clickButton.customId) editing = e;});});
 			if (editing) {
-				gotEditing(editing, clickButton);
+				gotEditing(editing, clickButton, origin);
 				buttonsCollector.stop();
 				messageCollector.stop();
 			}
@@ -72,7 +74,7 @@ async function edit(msg, answer, file) {
 			let editing;
 			Object.entries(msg.lan.edit).forEach(e => {e[1].trigger.forEach(trigger => {if (trigger.replace(/`/g, '') == message.content.toLowerCase()) editing = e;});});
 			if (editing) {
-				gotEditing(editing);
+				gotEditing(editing, null, origin);
 				message.delete().catch(() => {});
 				buttonsCollector.stop();
 				messageCollector.stop();
@@ -80,8 +82,9 @@ async function edit(msg, answer, file) {
 		}
 	});
 	async function gotEditing(e, answer, origin) {
+		const tempLan = msg.lan.edit;
 		msg.lan.edit = {};
-		Object.entries(msg.lan.edit).forEach(e => {
+		Object.entries(tempLan).forEach(e => {
 			if (e[0] !== 'add' && e[0] !== 'remove' && e[0] !== 'edit' && e[0] !== 'list') msg.lan.edit[e[0]] = e[1];
 		});
 		const propertyName = e[0];
@@ -116,7 +119,7 @@ async function edit(msg, answer, file) {
 					.setLabel(msg.language.back)
 					.setEmoji(msg.client.constants.emotes.back)
 					.setStyle('DANGER');
-				const actionRows = msg.client.ch.buttonRower([PRIMARY, SECONDARY, DANGER]);
+				const actionRows = msg.client.ch.buttonRower([[PRIMARY, SECONDARY], DANGER]);
 				if (answer) answer.update({embeds: [embed], components: actionRows}).catch(() => {});
 				else msg.m.edit({embeds: [embed], components: actionRows}).catch(() => {});
 			}
@@ -136,7 +139,7 @@ async function edit(msg, answer, file) {
 						buttonsCollector.stop();
 						return edit(msg, buttonClick);
 					}
-					gotNewSettings(newSetting, null, buttonClick);
+					gotNewSettings(newSetting, null, buttonClick, origin);
 				} else msg.client.ch.notYours(buttonClick, msg);
 			});
 			buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') {msg.client.ch.collectorEnd(msg);}});
@@ -148,7 +151,7 @@ async function edit(msg, answer, file) {
 					message.delete().catch(() => {});
 					buttonsCollector.stop();
 					messageCollector.stop();
-					gotNewSettings(newSetting);
+					gotNewSettings(newSetting, null, null, origin);
 				}
 			});
 		} else if (type == 'select') {
@@ -283,7 +286,7 @@ async function edit(msg, answer, file) {
 							}
 							messageCollector.stop('finished');
 							buttonsCollector.stop('finished');
-							gotNewSettings(r[msg.property], null, clickButton);
+							gotNewSettings(r[msg.property], null, clickButton, origin);
 						} else if (clickButton.customId == msg.property) {
 							clickButton.values.forEach(val => {
 								if (!answered.includes(val)) msg.guild[settings].cache.get(val) ? answered.push(msg.guild[settings].cache.get(val).id) : '';
@@ -367,7 +370,7 @@ async function edit(msg, answer, file) {
 						} else return misc.notValid(msg);
 						buttonsCollector.stop('finished');
 						messageCollector.stop('finished');
-						gotNewSettings(answered, fail);
+						gotNewSettings(answered, fail, null, origin);
 					}
 				});
 				buttonsCollector.on('end', (collected, reason) => {
@@ -486,7 +489,7 @@ async function edit(msg, answer, file) {
 							if (answered.length > 0) r[msg.property] = answered;
 							messageCollector.stop('finished');
 							buttonsCollector.stop('finished');
-							gotNewSettings(r[msg.property], null, clickButton);
+							gotNewSettings(r[msg.property], null, clickButton, origin);
 						} else if (clickButton.customId == msg.property) {
 							let page = clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0];
 							answered = clickButton.values[0];
@@ -555,7 +558,7 @@ async function edit(msg, answer, file) {
 						}
 						messageCollector.stop();
 						buttonsCollector.stop();
-						gotNewSettings(r[msg.property], fail);
+						gotNewSettings(r[msg.property], fail, null, origin);
 					}
 				});
 				buttonsCollector.on('end', (collected, reason) => {
@@ -616,7 +619,7 @@ async function edit(msg, answer, file) {
 						}
 						messageCollector.stop();
 						buttonsCollector.stop();
-						gotNewSettings(r[msg.property], fail);
+						gotNewSettings(r[msg.property], fail, null, origin);
 					}
 				});
 				buttonsCollector.on('collect', (clickButton) => {
@@ -670,7 +673,7 @@ async function edit(msg, answer, file) {
 									else r[msg.property] = [word];
 								} else r[msg.property] = word;		
 							});
-							gotNewSettings(r[msg.property]);
+							gotNewSettings(r[msg.property], null, null, origin);
 						}
 					}
 				});
@@ -698,10 +701,12 @@ async function edit(msg, answer, file) {
 			}
 		}
 	}
-	async function gotNewSettings(answered, fail, answer) {
+	async function gotNewSettings(answered, fail, answer, origin) {
 		let oldSettings;
 		let oldRow;
-		const oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
+		let oldRes;
+		if (!origin) oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
+		else oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [origin]);
 		if (oldRes && oldRes.rowCount > 0) {
 			oldSettings = oldRes.rows[0][msg.property]; 
 			oldRow = oldRes.rows[0];
@@ -727,11 +732,19 @@ async function edit(msg, answer, file) {
 		else msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 		r[msg.property] = answered;
 		if (r[msg.property] !== undefined && r[msg.property] !== null) {
-			if (Array.isArray(r[msg.property])) {
-				if (r[msg.property].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE guildid = $2;`, [r[msg.property], msg.guild.id]); 
-				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE guildid = $2;`, [null, msg.guild.id]); 
-			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE guildid = $2;`, [r[msg.property], msg.guild.id]); 
-			setTimeout(() => {edit(msg, null, file);}, 3000);
+			if (!origin) {
+				if (Array.isArray(r[msg.property])) {
+					if (r[msg.property].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE guildid = $2;`, [r[msg.property], msg.guild.id]); 
+					else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE guildid = $2;`, [null, msg.guild.id]); 
+				} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE guildid = $2;`, [r[msg.property], msg.guild.id]); 
+				setTimeout(() => {edit(msg, null, file);}, 3000);
+			} else {
+				if (Array.isArray(r[msg.property])) {
+					if (r[msg.property].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE id = $2;`, [r[msg.property], origin]); 
+					else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE id = $2;`, [null, origin]); 
+				} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE id = $2;`, [r[msg.property], origin]); 
+				setTimeout(() => {edit(msg, null, file, origin, r);}, 3000);
+			}
 		}
 		if (oldSettings && (answered !== undefined && answered !== null) || (answered !== undefined && answered !== null && answered.length > 0 && Array.isArray(answered))) misc.log(oldRow, msg);
 		else if ((answered !== undefined && answered !== null) || (answered.length > 0 && Array.isArray(answered))) misc.log(oldRow, msg);

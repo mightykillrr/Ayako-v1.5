@@ -20,8 +20,147 @@ module.exports = {
 		}
 		return embed;
 	},
-	displayEmbed(msg, res) {
-
+	displayEmbed(msg, r) {
+		const embed = new Discord.MessageEmbed()
+			.addFields(
+				{
+					name: msg.lan.type, 
+					value: r.active ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled, 
+					inline: false
+				},
+				{
+					name: '\u200b', 
+					value: '\u200b', 
+					inline: false
+				},
+				{
+					name: msg.lan.command, 
+					value: r.command ? `\`${r.command}\`` : msg.language.none, 
+					inline: true
+				},
+				{
+					name: msg.lan.cooldown, 
+					value: r.cooldown ? `\`${r.cooldown} ${msg.language.time.seconds}\`` : msg.language.none, 
+					inline: true
+				},
+				{
+					name: msg.language.number, 
+					value: r.id ? `\`${r.id}\`` : msg.language.none, 
+					inline: true
+				},
+				{
+					name: '\u200b', 
+					value: '\u200b', 
+					inline: false
+				},
+				{
+					name: msg.lan.activechannelid, 
+					value: `${r.activechannelid && r.activechannelid.length > 0 ? r.activechannelid.map(id => ` <#${id}>`) : msg.language.none}`, 
+					inline: false
+				},
+				{
+					name: msg.lan.bpchannelid, 
+					value: `${r.bpchannelid && r.bpchannelid.length > 0 ? r.bpchannelid.map(id => ` <#${id}>`) : msg.language.none}`, 
+					inline: false
+				},
+				{
+					name: msg.lan.bpuserid, 
+					value: `${r.bpuserid && r.bpuserid.length > 0 ? r.bpuserid.map(id => ` <@${id}>`) : msg.language.none}`, 
+					inline: false
+				},
+				{
+					name: msg.lan.bproleid, 
+					value: `${r.bproleid && r.bproleid.length > 0 ? r.bproleid.map(id => ` <@&${id}>`) : msg.language.none}`, 
+					inline: false
+				},
+			);
+		return embed;
+	},
+	editEmbed(msg, r) {
+		const embed = new Discord.MessageEmbed()
+			.addFields(
+				{
+					name: msg.client.ch.stp(msg.lan.edit.active.name, {trigger: msg.lan.edit.active.trigger}), 
+					value: `${r.active ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled}`, 
+					inline: false
+				},
+				{
+					name: '\u200b', 
+					value: '\u200b', 
+					inline: false
+				},
+				{
+					name: msg.client.ch.stp(msg.lan.edit.command.name, {trigger: msg.lan.edit.command.trigger}), 
+					value: r.command ? `\`${r.command}\`` : msg.language.none, 
+					inline: true
+				},
+				{
+					name: msg.client.ch.stp(msg.lan.edit.cooldown.name, {trigger: msg.lan.edit.cooldown.trigger}), 
+					value: r.cooldown ? `\`${r.cooldown} ${msg.language.time.seconds}\`` : msg.language.none, 
+					inline: true
+				},
+				{
+					name: msg.language.number, 
+					value: r.id ? `\`${r.id}\`` : msg.language.none, 
+					inline: true
+				},
+				{
+					name: '\u200b', 
+					value: '\u200b', 
+					inline: false
+				},
+				{
+					name: msg.client.ch.stp(msg.lan.edit.activechannelid.name, {trigger: msg.lan.edit.activechannelid.trigger}), 
+					value: `${r.activechannelid && r.activechannelid.length > 0 ? r.activechannelid.map(id => ` <#${id}>`) : msg.language.none}`, 
+					inline: false
+				},
+				{
+					name: msg.client.ch.stp(msg.lan.edit.bpchannelid.name, {trigger: msg.lan.edit.bpchannelid.trigger}), 
+					value: `${r.bpchannelid && r.bpchannelid.length > 0 ? r.bpchannelid.map(id => ` <#${id}>`) : msg.language.none}`, 
+					inline: false
+				},
+				{
+					name: msg.client.ch.stp(msg.lan.edit.bpuserid.name, {trigger: msg.lan.edit.bpuserid.trigger}), 
+					value: `${r.bpuserid  && r.bpuserid.length > 0 ? r.bpuserid.map(id => ` <@${id}>`) : msg.language.none}`, 
+					inline: false
+				},
+				{
+					name: msg.client.ch.stp(msg.lan.edit.bproleid.name, {trigger: msg.lan.edit.bproleid.trigger}), 
+					value: `${r.bproleid && r.bproleid.length > 0 ? r.bproleid.map(id => ` <@&${id}>`) : msg.language.none}`, 
+					inline: false
+				},
+			);
+		return embed;
+	},
+	buttons(msg, r) {
+		const active = new Discord.MessageButton()
+			.setCustomId(`${msg.lan.edit.active.trigger[1] ? msg.lan.edit.active.trigger[1].replace(/`/g, '') : msg.lan.edit.active.trigger[0].replace(/`/g, '')}`)
+			.setLabel(msg.lan.type)
+			.setStyle(r.active ? 'SUCCESS' : 'DANGER');
+		const command = new Discord.MessageButton()
+			.setCustomId(`${msg.lan.edit.command.trigger[1] ? msg.lan.edit.command.trigger[1].replace(/`/g, '') : msg.lan.edit.command.trigger[0].replace(/`/g, '')}`)
+			.setLabel(msg.client.ch.stp(msg.lan.command.replace(/\*/g, ''), {amount: r.command ? `\`${r.command}\`` : '--'}))
+			.setStyle('SECONDARY');
+		const cooldown = new Discord.MessageButton()
+			.setCustomId(`${msg.lan.edit.cooldown.trigger[1] ? msg.lan.edit.cooldown.trigger[1].replace(/`/g, '') : msg.lan.edit.cooldown.trigger[0].replace(/`/g, '')}`)
+			.setLabel(msg.client.ch.stp(msg.lan.cooldown.replace(/\*/g, ''), {amount: r.cooldown ? `${r.cooldown} ${msg.language.time.seconds}` : '--'}))
+			.setStyle('SECONDARY');
+		const achannel = new Discord.MessageButton()
+			.setCustomId(`${msg.lan.edit.activechannelid.trigger[1] ? msg.lan.edit.activechannelid.trigger[1].replace(/`/g, '') : msg.lan.edit.activechannelid.trigger[0].replace(/`/g, '')}`)
+			.setLabel(msg.lan.activechannelid)
+			.setStyle('PRIMARY');
+		const bchannel = new Discord.MessageButton()
+			.setCustomId(`${msg.lan.edit.bpchannelid.trigger[1] ? msg.lan.edit.bpchannelid.trigger[1].replace(/`/g, '') : msg.lan.edit.bpchannelid.trigger[0].replace(/`/g, '')}`)
+			.setLabel(msg.lan.bpchannelid)
+			.setStyle('PRIMARY');
+		const user = new Discord.MessageButton()
+			.setCustomId(`${msg.lan.edit.bpuserid.trigger[1] ? msg.lan.edit.bpuserid.trigger[1].replace(/`/g, '') : msg.lan.edit.bpuserid.trigger[0].replace(/`/g, '')}`)
+			.setLabel(msg.lan.bpuserid)
+			.setStyle('PRIMARY');
+		const role = new Discord.MessageButton()
+			.setCustomId(`${msg.lan.edit.bproleid.trigger[1] ? msg.lan.edit.bproleid.trigger[1].replace(/`/g, '') : msg.lan.edit.bproleid.trigger[0].replace(/`/g, '')}`)
+			.setLabel(msg.lan.bproleid)
+			.setStyle('PRIMARY');
+		return [[active], [command, cooldown], [achannel,bchannel,user,role]];
 	}
-
 };

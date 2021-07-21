@@ -1422,10 +1422,10 @@
                         "recommended": "Recommended: `24 hours`"
                     },
                     "active": {
-                        "name": "[{{trigger}}] Active",
+                        "name": "[{{trigger}}] This Cooldown",
                         "trigger": ["`active`"],
                         "answers": "`True` or `False`",
-                        "recommended": "Recommended: `24 hours`"
+                        "recommended": "Recommended: `True`"
                     },
                     "activechannelid": {
                         "name": "[{{trigger}}] Active Channels",

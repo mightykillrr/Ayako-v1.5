@@ -159,7 +159,7 @@ module.exports = {
 			.setCustomId('id')
 			.addOptions(take)
 			.setMinValues(1)
-			.setMaxValues(take.length)
+			.setMaxValues(1)
 			.setPlaceholder(msg.language.select.id.select);
 		const next = new Discord.MessageButton()
 			.setCustomId('next')
@@ -210,7 +210,7 @@ module.exports = {
 						.setCustomId('id')
 						.addOptions(take)
 						.setMinValues(1)
-						.setMaxValues(take.length)
+						.setMaxValues(1)
 						.setPlaceholder(msg.language.select.id.select);
 					const next = new Discord.MessageButton()
 						.setCustomId('next')
@@ -250,7 +250,7 @@ module.exports = {
 				} else if (clickButton.customId == 'done') {
 					messageCollector.stop('finished');
 					buttonsCollector.stop('finished');
-					values.id = answered;
+					values.id = answered[0];
 					gotID(values.id, clickButton, origin);
 				} else if (clickButton.customId == 'id') {
 					let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
@@ -262,7 +262,7 @@ module.exports = {
 						.setCustomId('id')
 						.addOptions(take)
 						.setMinValues(1)
-						.setMaxValues(take.length)
+						.setMaxValues(1)
 						.setPlaceholder(msg.language.select.id.select);
 					const next = new Discord.MessageButton()
 						.setCustomId('next')
@@ -328,10 +328,52 @@ module.exports = {
 			}
 		});
 		async function gotID(id, answer, origin) {
-			
+			const res = await msg.client.ch.query(`SELECT * FROM ${msg.file.name} WHERE id = $1 AND guildid = $2;`, [id, msg.guild.id]);
+			if (res && res.rowCount > 0) {
+				if (origin == 'edit') require('./singleRowManager').redirecter(msg, res.rows[0], answer, id);
+				else if (origin == 'view') listdisplay(msg, res.rows[0], answer, id);
+			}
 		}
-	}
+	},
 };
+
+async function listdisplay(msg, r, answer, id) {
+	let embed = typeof(msg.file.displayEmbed) == 'function' ? msg.file.displayEmbed(msg, r) : misc.noEmbed(msg);
+	embed.setAuthor(
+		msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+		msg.client.constants.emotes.settingsLink,
+		msg.client.constants.standard.invite
+	)
+		.setDescription(`${msg.client.ch.stp(msg.lanSettings.howToEdit, {prefix: msg.client.constants.standard.prefix, type: msg.file.name})}\n\n${embed.description ? embed.description : ''}`)
+		.setColor(msg.client.constants.commands.settings.color);
+	const button = new Discord.MessageButton()
+		.setCustomId('edit')
+		.setStyle('PRIMARY')
+		.setLabel(msg.language.Edit);
+	const rows = msg.client.ch.buttonRower([button]);
+	if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
+	else msg.m.edit({embeds: [embed], components: rows}).catch(() => {});
+	const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
+	const messageCollector = msg.channel.createMessageCollector({time: 60000});
+	buttonsCollector.on('collect', (clickButton) => {
+		if (clickButton.user.id == msg.author.id) {
+			if (clickButton.customId == 'edit') {
+				buttonsCollector.stop();
+				messageCollector.stop();
+				require('./singleRowManager').redirecter(msg, r, clickButton, id);
+			}
+		} else msg.client.ch.notYours(clickButton);
+	});
+	buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') msg.m.edit({embeds: [embed], components: []});});
+	messageCollector.on('collect', (message) => {
+		if (message.author.id == msg.author.id && message.content == msg.language.edit) {
+			buttonsCollector.stop();
+			messageCollector.stop();
+			message.delete().catch(() => {});
+			require('./singleRowManager').redirecter(msg, r, null, id);
+		}
+	});
+}
 
 async function repeater(msg, i, embed, values, answer, fail, identifier) {
 	if (i == 0) {
