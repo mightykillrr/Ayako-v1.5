@@ -702,52 +702,6 @@ async function edit(msg, answer, file, origin, r) {
 		}
 	}
 	async function gotNewSettings(answered, fail, answer, origin) {
-		let oldSettings;
-		let oldRow;
-		let oldRes;
-		if (!origin) oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
-		else oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [origin]);
-		if (oldRes && oldRes.rowCount > 0) {
-			oldSettings = oldRes.rows[0][msg.property]; 
-			oldRow = oldRes.rows[0];
-		}
-		const embed = new Discord.MessageEmbed()
-			.setAuthor(
-				msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), 
-				msg.client.constants.standard.image, msg.client.constants.standard.invite
-			)
-			.setColor(msg.client.constants.commands.settings.color)
-			.setDescription(msg.client.ch.stp(msg.lanSettings.done, {loading: msg.client.constants.emotes.loading}));
-		if (Array.isArray(oldSettings) && oldSettings.length > 0) embed.addField(msg.lanSettings.oldValue, `${oldSettings.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
-		else if (oldSettings !== null && oldSettings !== undefined) embed.addField(msg.lanSettings.oldValue, `${oldSettings}`);
-		else embed.addField(msg.lanSettings.oldValue, msg.language.none);
-		if (Array.isArray(answered) && answered.length > 0) embed.addField(msg.lanSettings.newValue, `${answered.map(f => compatibilityType == 'channels' ? ` <#${f}>` : compatibilityType == 'roles' ? ` <@&${f}>` : compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
-		else if (answered !== null && answered !== undefined) embed.addField(msg.lanSettings.newValue, `${Array.isArray(answered) ? msg.language.none : answered}`);
-		else embed.addField(msg.lanSettings.newValue, msg.language.none);		
-		if (fail && fail.length > 0) {
-			if (Array.isArray(fail)) embed.addField(msg.language.error, `${fail.map(f => ` ${f}`)}`);
-			else embed.addField(msg.language.error, fail);
-		}
-		if (answer) answer.update({embeds: [embed], components: []}).catch(() => {});
-		else msg.m.edit({embeds: [embed], components: []}).catch(() => {});
-		r[msg.property] = answered;
-		if (r[msg.property] !== undefined && r[msg.property] !== null) {
-			if (!origin) {
-				if (Array.isArray(r[msg.property])) {
-					if (r[msg.property].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE guildid = $2;`, [r[msg.property], msg.guild.id]); 
-					else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE guildid = $2;`, [null, msg.guild.id]); 
-				} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE guildid = $2;`, [r[msg.property], msg.guild.id]); 
-				setTimeout(() => {edit(msg, null, file);}, 3000);
-			} else {
-				if (Array.isArray(r[msg.property])) {
-					if (r[msg.property].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE id = $2;`, [r[msg.property], origin]); 
-					else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE id = $2;`, [null, origin]); 
-				} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE id = $2;`, [r[msg.property], origin]); 
-				setTimeout(() => {edit(msg, null, file, origin, r);}, 3000);
-			}
-		}
-		if (oldSettings && (answered !== undefined && answered !== null) || (answered !== undefined && answered !== null && answered.length > 0 && Array.isArray(answered))) misc.log(oldRow, msg);
-		else if ((answered !== undefined && answered !== null) || (answered.length > 0 && Array.isArray(answered))) misc.log(oldRow, msg);
-		else if (oldSettings) misc.log(oldRow, msg);
+		require('./multiRowManager').redirect(msg, answered, fail, answer, 'srm');
 	}
 }
