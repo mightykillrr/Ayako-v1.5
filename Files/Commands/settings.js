@@ -68,7 +68,7 @@ module.exports = {
 		const button = new Discord.MessageButton()
 			.setCustomId('edit')
 			.setStyle('PRIMARY')
-			.setLabel(msg.language.edit);
+			.setLabel(msg.language.Edit);
 		const rows = msg.client.ch.buttonRower([button]);
 		const m = await msg.client.ch.reply(msg, {embeds: [embed], components: rows});
 		msg.m = m;
@@ -85,7 +85,7 @@ module.exports = {
 		});
 		buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') m.edit({embeds: [embed], components: []});});
 		messageCollector.on('collect', (message) => {
-			if (message.author.id == msg.author.id && message.content == msg.language.edit) {
+			if (message.author.id == msg.author.id && message.content.toLowerCase() == msg.language.edit) {
 				buttonsCollector.stop();
 				messageCollector.stop();
 				message.delete().catch(() => {});

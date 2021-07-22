@@ -6,8 +6,8 @@ module.exports = {
 	exe(msg, answer) {
 		this.edit(msg, answer);
 	},
-	redirect(msg, answered, fail, answer, origin) {
-		editing(msg, answered, fail, answer, origin);
+	redirect(msg, fail, answer, origin, editing) {
+		repeater(msg, 0, null, {}, answer, fail, null, origin, editing);
 	},
 	async display(msg) {
 		await rower(msg);
@@ -58,7 +58,7 @@ module.exports = {
 		});
 		buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') m.edit({embeds: [embed], components: []});});
 		messageCollector.on('collect', (message) => {
-			if (message.author.id == msg.author.id && message.content == msg.language.edit) {
+			if (message.author.id == msg.author.id && message.content == msg.language.Edit) {
 				buttonsCollector.stop();
 				messageCollector.stop();
 				message.delete().catch(() => {});
@@ -66,7 +66,11 @@ module.exports = {
 			}
 		});
 	},
-	async edit(msg, answer) {
+	async edit(msg, answer, vals) {
+		if (vals && vals.id) {
+			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [vals.id]);
+			if (res && res.rowCount > 0) return require('./singleRowManager').redirecter(msg, res.rows[0], answer, 'mrm');
+		}
 		msg.client.constants.commands.settings.editRequire.splice(2, 1);
 		msg.lanSettings = msg.language.commands.settings;
 		msg.lan = msg.lanSettings[msg.file.name];
@@ -138,7 +142,7 @@ module.exports = {
 					CollectorEnder([buttonsCollector, messageCollector]);
 					message.delete().catch(() => {});
 					repeater(msg, 0, null, {}, null, [], 'remove');
-				} else if (message.content.toLowerCase() == msg.language.edit.toLowerCase()) {
+				} else if (message.content.toLowerCase() == msg.language.Edit.toLowerCase()) {
 					CollectorEnder([buttonsCollector, messageCollector]);
 					message.delete().catch(() => {});
 					repeater(msg, 0, null, {}, null, [], 'edit');
@@ -302,7 +306,7 @@ module.exports = {
 				} else if (clickButton.customId == 'back') {
 					messageCollector.stop();
 					buttonsCollector.stop();
-					return module.exports.edit(msg, clickButton);
+					module.exports.edit(msg, clickButton, values);
 				}
 			} else msg.client.ch.notYours(clickButton, msg);
 		});
@@ -369,7 +373,7 @@ async function listdisplay(msg, r, answer, id) {
 	});
 	buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') msg.m.edit({embeds: [embed], components: []});});
 	messageCollector.on('collect', (message) => {
-		if (message.author.id == msg.author.id && message.content == msg.language.edit) {
+		if (message.author.id == msg.author.id && message.content.toLowerCase() == msg.language.Edit.toLowerCase()) {
 			buttonsCollector.stop();
 			messageCollector.stop();
 			message.delete().catch(() => {});
@@ -378,7 +382,7 @@ async function listdisplay(msg, r, answer, id) {
 	});
 }
 
-async function repeater(msg, i, embed, values, answer, fail, identifier) {
+async function repeater(msg, i, embed, values, answer, fail, identifier, origin, editing) {
 	if (i == 0) {
 		embed = new Discord.MessageEmbed()
 			.setAuthor(
@@ -387,10 +391,11 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 				msg.client.constants.standard.invite
 			);
 	}
-	msg.property = identifier == 'edit' ? msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.editRequire[i]] : msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier][i]];
+	if (editing) msg.property = Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == editing[0])[1];
+	else msg.property = identifier == 'edit' ? msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.editRequire[i]] : msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier][i]];
 	msg.compatibilityType = msg.property.includes('s') ? msg.property : msg.property+'s';
-	if (identifier == 'edit' ? i < msg.client.constants.commands.settings.editRequire.length : i < msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier].length) {
-		const assinger = Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.editRequire[i] || a[0] == msg.client.constants.commands.settings.editRequire[i])[0];
+	if ((editing && i == 0) || (!editing && (identifier == 'edit' ? i < msg.client.constants.commands.settings.editRequire.length : i < msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier].length))) {
+		msg.assinger = origin == 'srm' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == editing[0])[0] : Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.editRequire[i] || a[0] == msg.client.constants.commands.settings.editRequire[i])[0];
 		let answered = [];
 		if (msg.property == 'command') {
 			let req = msg.client.commands;
@@ -489,11 +494,11 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 						clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 					} else if (clickButton.customId == 'back') {
 						CollectorEnder([messageCollector, buttonsCollector]);
-						return module.exports.edit(msg, clickButton);
+						module.exports.edit(msg, clickButton, values);
 					} else if (clickButton.customId == 'done') {
 						CollectorEnder([messageCollector, buttonsCollector]);
 						values.command = answered;
-						repeater(msg, i+1, embed, values, clickButton, null, identifier);
+						repeater(msg, i+1, embed, values, clickButton, null, identifier, origin, editing);
 					} else if (clickButton.customId == 'next' || clickButton.customId == 'prev') {
 						let indexLast; let indexFirst;
 						for (let j = 0; options.length > j; j++) {
@@ -653,8 +658,8 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 					} else if (clickButton.customId == 'done') {
 						messageCollector.stop('finished');
 						buttonsCollector.stop('finished');
-						values[assinger] = answered;
-						repeater(msg, i+1, embed, values, clickButton, null, identifier);
+						values[msg.assinger] = answered;
+						repeater(msg, i+1, embed, values, clickButton, null, identifier, origin, editing);
 					} else if (clickButton.customId == msg.property) {
 						let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
 						answered = clickButton.values[0];
@@ -699,7 +704,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 					} else if (clickButton.customId == 'back') {
 						messageCollector.stop();
 						buttonsCollector.stop();
-						return module.exports.edit(msg, clickButton);
+						module.exports.edit(msg, clickButton, values);
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
@@ -711,8 +716,8 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 					answered = message.content.replace(/\D+/g, '').split(/ +/);
 					messageCollector.stop();
 					buttonsCollector.stop();
-					values[assinger] = message.content;
-					repeater(msg, i+1, embed, values, null, null, identifier);
+					values[msg.assinger] = message.content;
+					repeater(msg, i+1, embed, values, null, null, identifier, origin, editing);
 				}
 			});
 			buttonsCollector.on('end', (collected, reason) => {
@@ -835,30 +840,30 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 							if (answered.length > 0) {
 								if (Array.isArray(answered)) {
 									answered.forEach(id => { 
-										if (values[assinger] && values[assinger].includes(id)) {
-											const index = values[assinger].indexOf(id);
-											values[assinger].splice(index, 1);
-										} else if (values[assinger] && values[assinger].length > 0) values[assinger].push(id);
-										else values[assinger] = [id];
+										if (values[msg.assinger] && values[msg.assinger].includes(id)) {
+											const index = values[msg.assinger].indexOf(id);
+											values[msg.assinger].splice(index, 1);
+										} else if (values[msg.assinger] && values[msg.assinger].length > 0) values[msg.assinger].push(id);
+										else values[msg.assinger] = [id];
 									});
-								} else values[assinger] = answered;	
+								} else values[msg.assinger] = answered;	
 							}
 						} else if (msg.compatibilityType == 'number') {
 							if (answered.length > 0) {
 								if (Array.isArray(answered)) {
 									answered.forEach(id => { 
-										if (values[assinger] && values[assinger].includes(id)) {
-											const index = values[assinger].indexOf(id);
-											values[assinger].splice(index, 1);
-										} else if (values[assinger] && values[assinger].length > 0) values[assinger].push(id);
-										else values[assinger] = [id];
+										if (values[msg.assinger] && values[msg.assinger].includes(id)) {
+											const index = values[msg.assinger].indexOf(id);
+											values[msg.assinger].splice(index, 1);
+										} else if (values[msg.assinger] && values[msg.assinger].length > 0) values[msg.assinger].push(id);
+										else values[msg.assinger] = [id];
 									});
-								} else values[assinger] = answered;	
+								} else values[msg.assinger] = answered;	
 							}
 						}
 						messageCollector.stop('finished');
 						buttonsCollector.stop('finished');
-						repeater(msg, i+1, embed, values, clickButton, null, identifier);
+						repeater(msg, i+1, embed, values, clickButton, null, identifier, origin, editing);
 					} else if (clickButton.customId == msg.property) {
 						clickButton.values.forEach(val => {
 							if (!answered.includes(val)) msg.guild[msg.property].cache.get(val) ? answered.push(msg.guild[msg.property].cache.get(val).id) : '';
@@ -905,7 +910,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 					} else if (clickButton.customId == 'back') {
 						messageCollector.stop();
 						buttonsCollector.stop();
-						return module.exports.edit(msg, clickButton);
+						module.exports.edit(msg, clickButton, values);
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
@@ -916,32 +921,32 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 					if (msg.property == 'role' || msg.property == 'channel') {
 						const answerContent = msg.content.replace(/\D+/g, '');
 						const result = msg.guild[msg.compatibilityType].cache.get(answerContent);
-						if (result) answered = values[assinger];
+						if (result) answered = values[msg.assinger];
 						else misc.notValid(msg);
 					} else if (msg.property == 'roles' || msg.property == 'channels') {
 						const args = message.content.split(/ +/);
 						Promise.all(args.map(async raw => {
 							const id = raw.replace(/\D+/g, '');
 							const request = msg.guild[msg.compatibilityType].cache.get(id);
-							if ((!request || !request.id) && (!values[assinger] || (values[assinger] && !values[assinger].includes(id)))) fail.push(`\`${raw}\` ${msg.lan.edit[msg.property].fail.no}`);
+							if ((!request || !request.id) && (!values[msg.assinger] || (values[msg.assinger] && !values[msg.assinger].includes(id)))) fail.push(`\`${raw}\` ${msg.lan.edit[msg.property].fail.no}`);
 							else answered.push(id);
 						}));
 						if (answered.length > 0) {
 							if (Array.isArray(answered)) {
 								answered.forEach(id => { 
-									if (values[assinger] && values[assinger].includes(id)) {
-										const index = values[assinger].indexOf(id);
-										values[assinger].splice(index, 1);
-									} else if (values[assinger] && values[assinger].length > 0) values[assinger].push(id);
-									else values[assinger] = [id];
+									if (values[msg.assinger] && values[msg.assinger].includes(id)) {
+										const index = values[msg.assinger].indexOf(id);
+										values[msg.assinger].splice(index, 1);
+									} else if (values[msg.assinger] && values[msg.assinger].length > 0) values[msg.assinger].push(id);
+									else values[msg.assinger] = [id];
 								});
-							} else values[assinger] = answered;							
+							} else values[msg.assinger] = answered;							
 						}
-						answered = values[assinger];
+						answered = values[msg.assinger];
 					} else return misc.notValid(msg);
 					buttonsCollector.stop('finished');
 					messageCollector.stop('finished');
-					repeater(msg, i+1, embed, values, null, fail, identifier);
+					repeater(msg, i+1, embed, values, null, fail, identifier, origin, editing);
 				}
 			});
 			buttonsCollector.on('end', (collected, reason) => {
@@ -983,24 +988,24 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 					await Promise.all(args.map(async raw => {
 						const id = raw.replace(/\D+/g, '');
 						const request = await msg.client.users.fetch(id).catch(() => {});
-						if ((!request || !request.id) && (!values[assinger] || (values[assinger] && !values[assinger].includes(id)))) fail.push(`\`${raw}\` ${msg.lan.edit[msg.property].fail.no}`);
+						if ((!request || !request.id) && (!values[msg.assinger] || (values[msg.assinger] && !values[msg.assinger].includes(id)))) fail.push(`\`${raw}\` ${msg.lan.edit[msg.property].fail.no}`);
 						else answered.push(id);
 					}));
 					message.delete().catch(() => {});
 					if (answered.length > 0) {
 						if (Array.isArray(answered)) {
 							answered.forEach(id => { 
-								if (values[assinger] && values[assinger].includes(id)) {
-									const index = values[assinger].indexOf(id);
-									values[assinger].splice(index, 1);
-								} else if (values[assinger] && values[assinger].length > 0) values[assinger].push(id);
-								else values[assinger] = [id];
+								if (values[msg.assinger] && values[msg.assinger].includes(id)) {
+									const index = values[msg.assinger].indexOf(id);
+									values[msg.assinger].splice(index, 1);
+								} else if (values[msg.assinger] && values[msg.assinger].length > 0) values[msg.assinger].push(id);
+								else values[msg.assinger] = [id];
 							});
-						} else values[assinger] = answered;	
+						} else values[msg.assinger] = answered;	
 					}
 					messageCollector.stop();
 					buttonsCollector.stop();
-					repeater(msg, i+1, embed, values, null, fail, identifier);
+					repeater(msg, i+1, embed, values, null, fail, identifier, origin, editing);
 				}
 			});
 			buttonsCollector.on('collect', (clickButton) => {
@@ -1008,7 +1013,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 					if (clickButton.customId == 'back') {
 						buttonsCollector.stop();
 						messageCollector.stop();
-						return module.exports.edit(msg, clickButton);
+						module.exports.edit(msg, clickButton, values);
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
@@ -1043,30 +1048,30 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 			else msg.m.edit({embeds: [embed], components: actionRows}).catch(() => {});
 			const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 			const messageCollector = msg.channel.createMessageCollector({time: 60000});
-			buttonsCollector.on('collect', (buttonClick) => {
-				if (buttonClick.user.id == msg.author.id) {
+			buttonsCollector.on('collect', (clickButton) => {
+				if (clickButton.user.id == msg.author.id) {
 					buttonsCollector.stop();
 					messageCollector.stop();
-					if (buttonClick.customId == 'true') values[assinger] = true;
-					else if (buttonClick.customId == 'false') values[assinger] = false;
-					else if (buttonClick.customId == 'back') {
+					if (clickButton.customId == 'true') values[msg.assinger] = true;
+					else if (clickButton.customId == 'false') values[msg.assinger] = false;
+					else if (clickButton.customId == 'back') {
 						messageCollector.stop();
 						buttonsCollector.stop();
-						return module.exports.edit(msg, buttonClick);
+						module.exports.edit(msg, clickButton, values);
 					}
-					repeater(msg, i+1, embed, values, buttonClick, null, identifier);
-				} else msg.client.ch.notYours(buttonClick, msg);
+					repeater(msg, i+1, embed, values, clickButton, null, identifier, origin, editing);
+				} else msg.client.ch.notYours(clickButton, msg);
 			});
 			buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') {msg.client.ch.collectorEnd(msg);}});
 			messageCollector.on('collect', (message) => {
 				if (message.author.id == msg.author.id) {
 					if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
-					values[assinger] = message.content.toLowerCase() == msg.language.true.toLowerCase() ? true : message.content.toLowerCase() == msg.language.false.toLowerCase() ? false : null;
-					if (values[assinger] == null) return misc.notValid(msg);
+					values[msg.assinger] = message.content.toLowerCase() == msg.language.true.toLowerCase() ? true : message.content.toLowerCase() == msg.language.false.toLowerCase() ? false : null;
+					if (values[msg.assinger] == null) return misc.notValid(msg);
 					message.delete().catch(() => {});
 					buttonsCollector.stop();
 					messageCollector.stop();
-					repeater(msg, i+1, embed, values, null, null, identifier);
+					repeater(msg, i+1, embed, values, null, null, identifier, origin, editing);
 				}
 			});
 		} else if (msg.property == 'id') {
@@ -1175,8 +1180,8 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 					} else if (clickButton.customId == 'done') {
 						messageCollector.stop('finished');
 						buttonsCollector.stop('finished');
-						values[assinger] = answered;
-						repeater(msg, i+1, embed, values, clickButton, fail, identifier);
+						values[msg.assinger] = answered;
+						repeater(msg, i+1, embed, values, clickButton, fail, identifier, origin, editing);
 					} else if (clickButton.customId == msg.property) {
 						let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
 						clickButton.values.forEach(v => {
@@ -1224,7 +1229,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 					} else if (clickButton.customId == 'back') {
 						messageCollector.stop();
 						buttonsCollector.stop();
-						return module.exports.edit(msg, clickButton);
+						module.exports.edit(msg, clickButton, values);
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
@@ -1236,8 +1241,8 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 					answered.push(fail[message.content]);
 					messageCollector.stop();
 					buttonsCollector.stop();
-					values[assinger] = answered;
-					repeater(msg, i+1, embed, values, null, fail, identifier);
+					values[msg.assinger] = answered;
+					repeater(msg, i+1, embed, values, null, fail, identifier, origin, editing);
 				}
 			});
 			buttonsCollector.on('end', (collected, reason) => {
@@ -1259,8 +1264,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 			});
 			const options = [];
 			for (let j = 0; j < Object.entries(req).length; j++) {
-				const r = Object.entries(req)[j];
-				options.push({label: r[1] > 25 ? `${r[1].slice(0, 24)}\u2026` : r[1], value: r[0]});
+				options.push({label: values[1] > 25 ? `${values[1].slice(0, 24)}\u2026` : values[1], value: values[0]});
 			}
 			const take = [];
 			for(let j = 0; j < 25 && j < options.length; j++) {take.push(options[j]);}
@@ -1357,11 +1361,11 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 						const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
 						clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 					} else if (clickButton.customId == 'done') {
-						if (answered.length > 0) values[assinger] = answered;
+						if (answered.length > 0) values[msg.assinger] = answered;
 						msg.client.constants.commands.settings.editRequire.push(answered);
 						messageCollector.stop('finished');
 						buttonsCollector.stop('finished');
-						repeater(msg, i+1, embed, values, clickButton, null, identifier);
+						repeater(msg, i+1, embed, values, clickButton, null, identifier, origin, editing);
 					} else if (clickButton.customId == msg.property) {
 						answered = clickButton.values[0];
 						let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
@@ -1405,7 +1409,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 					} else if (clickButton.customId == 'back') {
 						messageCollector.stop();
 						buttonsCollector.stop();
-						return module.exports.edit(msg, clickButton);
+						module.exports.edit(msg, clickButton, values);
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
@@ -1413,10 +1417,10 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 				if (msg.author.id == message.author.id) {
 					if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
 					message.delete().catch(() => {});
-					//values[assinger] = answered;							
+					//values[msg.assinger] = answered;							
 					buttonsCollector.stop('finished');
 					messageCollector.stop('finished');
-					repeater(msg, i+1, embed, values, null, fail, identifier);
+					repeater(msg, i+1, embed, values, null, fail, identifier, origin, editing);
 				}
 			});
 			buttonsCollector.on('end', (collected, reason) => {
@@ -1535,7 +1539,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 						if (answered.length > 0) values[msg.property] = answered;
 						messageCollector.stop('finished');
 						buttonsCollector.stop('finished');
-						repeater(msg, i+1, embed, values, clickButton, fail, identifier);
+						repeater(msg, i+1, embed, values, clickButton, fail, identifier, origin, editing);
 					} else if (clickButton.customId == msg.property) {
 						let page = clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0];
 						answered = clickButton.values[0];
@@ -1580,7 +1584,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 						msg.property = undefined;
 						messageCollector.stop();
 						buttonsCollector.stop();
-						repeater(msg, i+1, embed, values, clickButton, fail, identifier);
+						module.exports.edit(msg, clickButton, values);
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
@@ -1593,17 +1597,17 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 					if (answered.length > 0) {
 						if (Array.isArray(answered)) {
 							answered.forEach(id => { 
-								if (values[assinger] && values[assinger].includes(id)) {
-									const index = values[assinger].indexOf(id);
-									values[assinger].splice(index, 1);
-								} else if (values[assinger] && values[assinger].length > 0) values[assinger].push(id);
-								else values[assinger] = [id];
+								if (values[msg.assinger] && values[msg.assinger].includes(id)) {
+									const index = values[msg.assinger].indexOf(id);
+									values[msg.assinger].splice(index, 1);
+								} else if (values[msg.assinger] && values[msg.assinger].length > 0) values[msg.assinger].push(id);
+								else values[msg.assinger] = [id];
 							});
-						} else values[assinger] = answered;	
+						} else values[msg.assinger] = answered;	
 					}
 					messageCollector.stop();
 					buttonsCollector.stop();
-					repeater(msg, i+1, embed, values, null, fail, identifier);
+					repeater(msg, i+1, embed, values, null, fail, identifier, origin, editing);
 				}
 			});
 			buttonsCollector.on('end', (collected, reason) => {
@@ -1618,6 +1622,60 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 					msg.m.edit({embeds: [embed]}).catch(() => {});
 				}
 			});
+		} else if (msg.property == 'string') {
+			const button = new Discord.MessageButton()
+				.setCustomId('back')
+				.setLabel(msg.language.back)
+				.setEmoji(msg.client.constants.emotes.back)
+				.setStyle('DANGER');
+			const rows = msg.client.ch.buttonRower([button]);
+			if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
+			else msg.m.edit({embeds: [embed], components: rows}).catch(() => {});				
+			const messageCollector = msg.channel.createMessageCollector({time: 60000});
+			const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
+			messageCollector.on('collect', (message) => {
+				if (message.author.id == msg.author.id) {
+					if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
+					messageCollector.stop();
+					buttonsCollector.stop();
+					message.delete().catch(() => {});
+					const answered = message.content.toLowerCase().split(/#+/);
+					if (answered.length > 0) {
+						if (Array.isArray(answered)) {
+							answered.forEach(id => { 
+								if (values[msg.assinger] && values[msg.assinger].includes(id)) {
+									const index = values[msg.assinger].indexOf(id);
+									values[msg.assinger].splice(index, 1);
+								} else if (values[msg.assinger] && values[msg.assinger].length > 0) values[msg.assinger].push(id);
+								else values[msg.assinger] = [id];
+							});
+						} else values[msg.assinger] = answered;	
+						repeater(msg, i+1, embed, values, null, fail, identifier, origin, editing);
+					}
+				}
+			});
+			buttonsCollector.on('collect', (clickButton) => {
+				if (clickButton.user.id == msg.author.id) {
+					if (clickButton.customId == 'back') {
+						buttonsCollector.stop();
+						messageCollector.stop();
+						module.exports.edit(msg, clickButton, values);
+					}
+				} else msg.client.ch.notYours(clickButton);
+			});
+			buttonsCollector.on('end', (collected, reason) => {
+				if (reason == 'time') {
+					const embed = new Discord.MessageEmbed()
+						.setAuthor(
+							msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+							msg.client.constants.emotes.settingsLink, 
+							msg.client.constants.standard.invite
+						)
+						.setDescription(msg.language.timeError);
+					msg.m.edit({embeds: [embed], components: []}).catch(() => {});
+				}
+			});
+
 		}
 	} else {
 		if (identifier == 'add') {
@@ -1685,19 +1743,25 @@ async function repeater(msg, i, embed, values, answer, fail, identifier) {
 			else if (msg.m) msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 			else msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: []});
 			setTimeout(() => {module.exports.edit(msg, null);}, 3000);
-		}
+		} else editer(msg, fail, answer, origin, values);
 	}
 }
 
-async function editing(msg, answered, fail, answer, origin) {
+async function editer(msg, fail, answer, origin, values) {
 	let oldSettings;
 	let oldRow;
 	let oldRes;
 	if (origin == 'srm') oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 	else oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [origin]);
 	if (oldRes && oldRes.rowCount > 0) {
-		oldSettings = oldRes.rows[0][msg.property]; 
 		oldRow = oldRes.rows[0];
+		oldSettings = oldRow[msg.assinger]; 
+	}
+	if (Array.isArray(oldSettings) && oldSettings.length > 0) {
+		oldSettings.forEach(id => {
+			if (values[msg.assinger].includes(id)) values[msg.assinger].splice(values[msg.assinger].indexOf(id), 1);
+			else values[msg.assinger].push(id);
+		});
 	}
 	const embed = new Discord.MessageEmbed()
 		.setAuthor(
@@ -1709,8 +1773,8 @@ async function editing(msg, answered, fail, answer, origin) {
 	if (Array.isArray(oldSettings) && oldSettings.length > 0) embed.addField(msg.lanSettings.oldValue, `${oldSettings.map(f => msg.compatibilityType == 'channels' ? ` <#${f}>` : msg.compatibilityType == 'roles' ? ` <@&${f}>` : msg.compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
 	else if (oldSettings !== null && oldSettings !== undefined) embed.addField(msg.lanSettings.oldValue, `${oldSettings}`);
 	else embed.addField(msg.lanSettings.oldValue, msg.language.none);
-	if (Array.isArray(answered) && answered.length > 0) embed.addField(msg.lanSettings.newValue, `${answered.map(f => msg.compatibilityType == 'channels' ? ` <#${f}>` : msg.compatibilityType == 'roles' ? ` <@&${f}>` : msg.compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
-	else if (answered !== null && answered !== undefined) embed.addField(msg.lanSettings.newValue, `${Array.isArray(answered) ? msg.language.none : answered}`);
+	if (Array.isArray(values[msg.assinger]) && values[msg.assinger].length > 0) embed.addField(msg.lanSettings.newValue, `${values[msg.assinger].map(f => msg.compatibilityType == 'channels' ? ` <#${f}>` : msg.compatibilityType == 'roles' ? ` <@&${f}>` : msg.compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
+	else if (values[msg.assinger] !== null && values[msg.assinger] !== undefined) embed.addField(msg.lanSettings.newValue, `${Array.isArray(values[msg.assinger]) ? msg.language.none : values[msg.assinger]}`);
 	else embed.addField(msg.lanSettings.newValue, msg.language.none);		
 	if (fail && fail.length > 0) {
 		if (Array.isArray(fail)) embed.addField(msg.language.error, `${fail.map(f => ` ${f}`)}`);
@@ -1718,23 +1782,24 @@ async function editing(msg, answered, fail, answer, origin) {
 	}
 	if (answer) answer.update({embeds: [embed], components: []}).catch(() => {});
 	else msg.m.edit({embeds: [embed], components: []}).catch(() => {});
-	r[msg.property] = answered;
-	if (r[msg.property] !== undefined && r[msg.property] !== null) {
+	if (values[msg.assinger] !== undefined && values[msg.assinger] !== null) {
 		if (origin == 'srm') {
-			if (Array.isArray(r[msg.property])) {
-				if (r[msg.property].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE guildid = $2;`, [r[msg.property], msg.guild.id]); 
-				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE guildid = $2;`, [null, msg.guild.id]); 
-			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE guildid = $2;`, [r[msg.property], msg.guild.id]); 
-			setTimeout(() => {require('./singleRowManager').redirect(msg, r, answer, origin);}, 3000);
+			if (Array.isArray(values[msg.assinger])) {
+				if (values[msg.assinger].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assinger} = $1 WHERE guildid = $2;`, [values[msg.assinger], msg.guild.id]); 
+				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assinger} = $1 WHERE guildid = $2;`, [null, msg.guild.id]); 
+			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assinger} = $1 WHERE guildid = $2;`, [values[msg.assinger], msg.guild.id]); 
 		} else {
-			if (Array.isArray(r[msg.property])) {
-				if (r[msg.property].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE id = $2;`, [r[msg.property], origin]); 
-				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE id = $2;`, [null, origin]); 
-			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.property} = $1 WHERE id = $2;`, [r[msg.property], origin]); 
-			setTimeout(() => {require('./singleRowManager').redirect(msg, r, answer, origin);}, 3000);
+			if (Array.isArray(values[msg.assinger])) {
+				if (values[msg.assinger].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assinger} = $1 WHERE id = $2;`, [values[msg.assinger], origin]); 
+				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assinger} = $1 WHERE id = $2;`, [null, origin]); 
+			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assinger} = $1 WHERE id = $2;`, [values[msg.assinger], origin]); 
 		}
+		const newSettings = oldRow;
+		newSettings[msg.assinger] = values[msg.assinger];
+		setTimeout(() => {require('./singleRowManager').redirecter(msg, newSettings, null, origin);}, 3000);
+
 	}
-	logger();
+	logger(oldSettings, values, oldRow, msg);
 }
 
 async function logger(oldSettings, values, oldRow, msg) {
