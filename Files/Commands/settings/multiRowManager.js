@@ -1,7 +1,6 @@
 const Discord = require('discord.js');
 const misc = require('./misc.js');
 
-
 module.exports = {
 	exe(msg, answer) {
 		this.edit(msg, answer);
@@ -1748,9 +1747,17 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 }
 
 async function editer(msg, fail, answer, origin, values) {
+
+
+
+
+	
+
+	return;
 	let oldSettings;
 	let oldRow;
 	let oldRes;
+	console.log(values[msg.assinger]);
 	if (origin == 'srm') oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 	else oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [origin]);
 	if (oldRes && oldRes.rowCount > 0) {
@@ -1758,10 +1765,10 @@ async function editer(msg, fail, answer, origin, values) {
 		oldSettings = oldRow[msg.assinger]; 
 	}
 	if (Array.isArray(oldSettings) && oldSettings.length > 0) {
-		oldSettings.forEach(id => {
+		Promise.all(oldSettings.map(id => {
 			if (values[msg.assinger].includes(id)) values[msg.assinger].splice(values[msg.assinger].indexOf(id), 1);
 			else values[msg.assinger].push(id);
-		});
+		}));
 	}
 	const embed = new Discord.MessageEmbed()
 		.setAuthor(
@@ -1782,6 +1789,7 @@ async function editer(msg, fail, answer, origin, values) {
 	}
 	if (answer) answer.update({embeds: [embed], components: []}).catch(() => {});
 	else msg.m.edit({embeds: [embed], components: []}).catch(() => {});
+	const newSettings = oldRow;
 	if (values[msg.assinger] !== undefined && values[msg.assinger] !== null) {
 		if (origin == 'srm') {
 			if (Array.isArray(values[msg.assinger])) {
@@ -1794,18 +1802,15 @@ async function editer(msg, fail, answer, origin, values) {
 				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assinger} = $1 WHERE id = $2;`, [null, origin]); 
 			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assinger} = $1 WHERE id = $2;`, [values[msg.assinger], origin]); 
 		}
-		const newSettings = oldRow;
 		newSettings[msg.assinger] = values[msg.assinger];
 		setTimeout(() => {require('./singleRowManager').redirecter(msg, newSettings, null, origin);}, 3000);
-
 	}
-	logger(oldSettings, values, oldRow, msg);
+	logger(oldSettings, newSettings, msg);
 }
 
-async function logger(oldSettings, values, oldRow, msg) {
-	if (oldSettings && (values !== undefined && values !== null) || (values !== undefined && values !== null && values.length > 0 && Array.isArray(values))) misc.log(oldRow, msg);
-	else if ((values !== undefined && values !== null) || (values.length > 0 && Array.isArray(values))) misc.log(oldRow, msg);
-	else if (oldSettings) misc.log(oldRow, msg);
+async function logger(oldSettings, newSettings, msg) {
+	if (oldSettings && (newSettings !== undefined && newSettings !== null) || (newSettings !== undefined && newSettings !== null && newSettings.length > 0 && Array.isArray(newSettings))) misc.log(oldSettings, msg, newSettings);
+	else if ((newSettings !== undefined && newSettings !== null) || (newSettings.length > 0 && Array.isArray(newSettings))) misc.log(oldSettings, msg, newSettings);
 }
 
 async function rower(msg) {

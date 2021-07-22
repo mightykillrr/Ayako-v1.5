@@ -20,16 +20,16 @@ module.exports = {
 			.setColor(msg.client.constants.commands.settings.color);
 		return embed;
 	},
-	async log(oldRow, msg) {
-		let newRow;
-		const newRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
-		if (newRes && newRes.rowCount > 0) newRow = newRes.rows[0];
-		if (!newRow || !oldRow) return;
-		if (newRow == oldRow) return;
+	async log(olds, msg, newSettings) {
+		console.log(1, olds);
+		const oldSettings = newSettings;
+		oldSettings[msg.assinger] = olds;
+		if (!newSettings || !oldSettings) return;
 		const changed = [];
-		for (let i = 0; i < Object.entries(newRow).length; i++) {
-			if (Object.entries(oldRow)[i][1] !== Object.entries(newRow)[i][1]) changed.push([[Object.entries(oldRow)[i][0], Object.entries(oldRow)[i][1]], [Object.entries(newRow)[i][0], Object.entries(newRow)[i][1]]]);
+		for (let i = 0; i < Object.entries(oldSettings).length; i++) {
+			if (Object.entries(oldSettings)[i][1] !== Object.entries(newSettings)[i][1]) changed.push([[Object.entries(oldSettings)[i][0], Object.entries(oldSettings)[i][1]], [Object.entries(newSettings)[i][0], Object.entries(newSettings)[i][1]]]);
 		}
+		console.log(changed, newSettings, oldSettings)
 		const embed = new Discord.MessageEmbed()
 			.setColor(msg.client.constants.commands.settings.log.color)
 			.setTimestamp()
