@@ -20,16 +20,13 @@ module.exports = {
 			.setColor(msg.client.constants.commands.settings.color);
 		return embed;
 	},
-	async log(olds, msg, newSettings) {
-		console.log(1, olds);
-		const oldSettings = newSettings;
-		oldSettings[msg.assinger] = olds;
+	async log(oldSettings, msg, newSettings) {
+		console.log(oldSettings, newSettings)
 		if (!newSettings || !oldSettings) return;
 		const changed = [];
 		for (let i = 0; i < Object.entries(oldSettings).length; i++) {
 			if (Object.entries(oldSettings)[i][1] !== Object.entries(newSettings)[i][1]) changed.push([[Object.entries(oldSettings)[i][0], Object.entries(oldSettings)[i][1]], [Object.entries(newSettings)[i][0], Object.entries(newSettings)[i][1]]]);
 		}
-		console.log(changed, newSettings, oldSettings)
 		const embed = new Discord.MessageEmbed()
 			.setColor(msg.client.constants.commands.settings.log.color)
 			.setTimestamp()

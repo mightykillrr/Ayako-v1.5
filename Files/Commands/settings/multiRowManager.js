@@ -394,7 +394,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 	else msg.property = identifier == 'edit' ? msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.editRequire[i]] : msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier][i]];
 	msg.compatibilityType = msg.property.includes('s') ? msg.property : msg.property+'s';
 	if ((editing && i == 0) || (!editing && (identifier == 'edit' ? i < msg.client.constants.commands.settings.editRequire.length : i < msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier].length))) {
-		msg.assinger = origin == 'srm' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == editing[0])[0] : Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.editRequire[i] || a[0] == msg.client.constants.commands.settings.editRequire[i])[0];
+		msg.assigner = origin == 'srm' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == editing[0])[0] : Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.editRequire[i] || a[0] == msg.client.constants.commands.settings.editRequire[i])[0];
 		let answered = [];
 		if (msg.property == 'command') {
 			let req = msg.client.commands;
@@ -657,7 +657,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					} else if (clickButton.customId == 'done') {
 						messageCollector.stop('finished');
 						buttonsCollector.stop('finished');
-						values[msg.assinger] = answered;
+						values[msg.assigner] = answered;
 						repeater(msg, i+1, embed, values, clickButton, null, identifier, origin, editing);
 					} else if (clickButton.customId == msg.property) {
 						let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
@@ -715,7 +715,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					answered = message.content.replace(/\D+/g, '').split(/ +/);
 					messageCollector.stop();
 					buttonsCollector.stop();
-					values[msg.assinger] = message.content;
+					values[msg.assigner] = message.content;
 					repeater(msg, i+1, embed, values, null, null, identifier, origin, editing);
 				}
 			});
@@ -839,25 +839,25 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 							if (answered.length > 0) {
 								if (Array.isArray(answered)) {
 									answered.forEach(id => { 
-										if (values[msg.assinger] && values[msg.assinger].includes(id)) {
-											const index = values[msg.assinger].indexOf(id);
-											values[msg.assinger].splice(index, 1);
-										} else if (values[msg.assinger] && values[msg.assinger].length > 0) values[msg.assinger].push(id);
-										else values[msg.assinger] = [id];
+										if (values[msg.assigner] && values[msg.assigner].includes(id)) {
+											const index = values[msg.assigner].indexOf(id);
+											values[msg.assigner].splice(index, 1);
+										} else if (values[msg.assigner] && values[msg.assigner].length > 0) values[msg.assigner].push(id);
+										else values[msg.assigner] = [id];
 									});
-								} else values[msg.assinger] = answered;	
+								} else values[msg.assigner] = answered;	
 							}
 						} else if (msg.compatibilityType == 'number') {
 							if (answered.length > 0) {
 								if (Array.isArray(answered)) {
 									answered.forEach(id => { 
-										if (values[msg.assinger] && values[msg.assinger].includes(id)) {
-											const index = values[msg.assinger].indexOf(id);
-											values[msg.assinger].splice(index, 1);
-										} else if (values[msg.assinger] && values[msg.assinger].length > 0) values[msg.assinger].push(id);
-										else values[msg.assinger] = [id];
+										if (values[msg.assigner] && values[msg.assigner].includes(id)) {
+											const index = values[msg.assigner].indexOf(id);
+											values[msg.assigner].splice(index, 1);
+										} else if (values[msg.assigner] && values[msg.assigner].length > 0) values[msg.assigner].push(id);
+										else values[msg.assigner] = [id];
 									});
-								} else values[msg.assinger] = answered;	
+								} else values[msg.assigner] = answered;	
 							}
 						}
 						messageCollector.stop('finished');
@@ -920,28 +920,28 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					if (msg.property == 'role' || msg.property == 'channel') {
 						const answerContent = msg.content.replace(/\D+/g, '');
 						const result = msg.guild[msg.compatibilityType].cache.get(answerContent);
-						if (result) answered = values[msg.assinger];
+						if (result) answered = values[msg.assigner];
 						else misc.notValid(msg);
 					} else if (msg.property == 'roles' || msg.property == 'channels') {
 						const args = message.content.split(/ +/);
 						Promise.all(args.map(async raw => {
 							const id = raw.replace(/\D+/g, '');
 							const request = msg.guild[msg.compatibilityType].cache.get(id);
-							if ((!request || !request.id) && (!values[msg.assinger] || (values[msg.assinger] && !values[msg.assinger].includes(id)))) fail.push(`\`${raw}\` ${msg.lan.edit[msg.property].fail.no}`);
+							if ((!request || !request.id) && (!values[msg.assigner] || (values[msg.assigner] && !values[msg.assigner].includes(id)))) fail.push(`\`${raw}\` ${msg.lan.edit[msg.property].fail.no}`);
 							else answered.push(id);
 						}));
 						if (answered.length > 0) {
 							if (Array.isArray(answered)) {
 								answered.forEach(id => { 
-									if (values[msg.assinger] && values[msg.assinger].includes(id)) {
-										const index = values[msg.assinger].indexOf(id);
-										values[msg.assinger].splice(index, 1);
-									} else if (values[msg.assinger] && values[msg.assinger].length > 0) values[msg.assinger].push(id);
-									else values[msg.assinger] = [id];
+									if (values[msg.assigner] && values[msg.assigner].includes(id)) {
+										const index = values[msg.assigner].indexOf(id);
+										values[msg.assigner].splice(index, 1);
+									} else if (values[msg.assigner] && values[msg.assigner].length > 0) values[msg.assigner].push(id);
+									else values[msg.assigner] = [id];
 								});
-							} else values[msg.assinger] = answered;							
+							} else values[msg.assigner] = answered;							
 						}
-						answered = values[msg.assinger];
+						answered = values[msg.assigner];
 					} else return misc.notValid(msg);
 					buttonsCollector.stop('finished');
 					messageCollector.stop('finished');
@@ -987,20 +987,20 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					await Promise.all(args.map(async raw => {
 						const id = raw.replace(/\D+/g, '');
 						const request = await msg.client.users.fetch(id).catch(() => {});
-						if ((!request || !request.id) && (!values[msg.assinger] || (values[msg.assinger] && !values[msg.assinger].includes(id)))) fail.push(`\`${raw}\` ${msg.lan.edit[msg.property].fail.no}`);
+						if ((!request || !request.id) && (!values[msg.assigner] || (values[msg.assigner] && !values[msg.assigner].includes(id)))) fail.push(`\`${raw}\` ${msg.lan.edit[msg.property].fail.no}`);
 						else answered.push(id);
 					}));
 					message.delete().catch(() => {});
 					if (answered.length > 0) {
 						if (Array.isArray(answered)) {
 							answered.forEach(id => { 
-								if (values[msg.assinger] && values[msg.assinger].includes(id)) {
-									const index = values[msg.assinger].indexOf(id);
-									values[msg.assinger].splice(index, 1);
-								} else if (values[msg.assinger] && values[msg.assinger].length > 0) values[msg.assinger].push(id);
-								else values[msg.assinger] = [id];
+								if (values[msg.assigner] && values[msg.assigner].includes(id)) {
+									const index = values[msg.assigner].indexOf(id);
+									values[msg.assigner].splice(index, 1);
+								} else if (values[msg.assigner] && values[msg.assigner].length > 0) values[msg.assigner].push(id);
+								else values[msg.assigner] = [id];
 							});
-						} else values[msg.assinger] = answered;	
+						} else values[msg.assigner] = answered;	
 					}
 					messageCollector.stop();
 					buttonsCollector.stop();
@@ -1051,8 +1051,8 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 				if (clickButton.user.id == msg.author.id) {
 					buttonsCollector.stop();
 					messageCollector.stop();
-					if (clickButton.customId == 'true') values[msg.assinger] = true;
-					else if (clickButton.customId == 'false') values[msg.assinger] = false;
+					if (clickButton.customId == 'true') values[msg.assigner] = true;
+					else if (clickButton.customId == 'false') values[msg.assigner] = false;
 					else if (clickButton.customId == 'back') {
 						messageCollector.stop();
 						buttonsCollector.stop();
@@ -1065,8 +1065,8 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 			messageCollector.on('collect', (message) => {
 				if (message.author.id == msg.author.id) {
 					if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
-					values[msg.assinger] = message.content.toLowerCase() == msg.language.true.toLowerCase() ? true : message.content.toLowerCase() == msg.language.false.toLowerCase() ? false : null;
-					if (values[msg.assinger] == null) return misc.notValid(msg);
+					values[msg.assigner] = message.content.toLowerCase() == msg.language.true.toLowerCase() ? true : message.content.toLowerCase() == msg.language.false.toLowerCase() ? false : null;
+					if (values[msg.assigner] == null) return misc.notValid(msg);
 					message.delete().catch(() => {});
 					buttonsCollector.stop();
 					messageCollector.stop();
@@ -1179,7 +1179,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					} else if (clickButton.customId == 'done') {
 						messageCollector.stop('finished');
 						buttonsCollector.stop('finished');
-						values[msg.assinger] = answered;
+						values[msg.assigner] = answered;
 						repeater(msg, i+1, embed, values, clickButton, fail, identifier, origin, editing);
 					} else if (clickButton.customId == msg.property) {
 						let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
@@ -1240,7 +1240,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					answered.push(fail[message.content]);
 					messageCollector.stop();
 					buttonsCollector.stop();
-					values[msg.assinger] = answered;
+					values[msg.assigner] = answered;
 					repeater(msg, i+1, embed, values, null, fail, identifier, origin, editing);
 				}
 			});
@@ -1360,7 +1360,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 						const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
 						clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 					} else if (clickButton.customId == 'done') {
-						if (answered.length > 0) values[msg.assinger] = answered;
+						if (answered.length > 0) values[msg.assigner] = answered;
 						msg.client.constants.commands.settings.editRequire.push(answered);
 						messageCollector.stop('finished');
 						buttonsCollector.stop('finished');
@@ -1416,7 +1416,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 				if (msg.author.id == message.author.id) {
 					if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
 					message.delete().catch(() => {});
-					//values[msg.assinger] = answered;							
+					//values[msg.assigner] = answered;							
 					buttonsCollector.stop('finished');
 					messageCollector.stop('finished');
 					repeater(msg, i+1, embed, values, null, fail, identifier, origin, editing);
@@ -1596,13 +1596,13 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					if (answered.length > 0) {
 						if (Array.isArray(answered)) {
 							answered.forEach(id => { 
-								if (values[msg.assinger] && values[msg.assinger].includes(id)) {
-									const index = values[msg.assinger].indexOf(id);
-									values[msg.assinger].splice(index, 1);
-								} else if (values[msg.assinger] && values[msg.assinger].length > 0) values[msg.assinger].push(id);
-								else values[msg.assinger] = [id];
+								if (values[msg.assigner] && values[msg.assigner].includes(id)) {
+									const index = values[msg.assigner].indexOf(id);
+									values[msg.assigner].splice(index, 1);
+								} else if (values[msg.assigner] && values[msg.assigner].length > 0) values[msg.assigner].push(id);
+								else values[msg.assigner] = [id];
 							});
-						} else values[msg.assinger] = answered;	
+						} else values[msg.assigner] = answered;	
 					}
 					messageCollector.stop();
 					buttonsCollector.stop();
@@ -1642,13 +1642,13 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					if (answered.length > 0) {
 						if (Array.isArray(answered)) {
 							answered.forEach(id => { 
-								if (values[msg.assinger] && values[msg.assinger].includes(id)) {
-									const index = values[msg.assinger].indexOf(id);
-									values[msg.assinger].splice(index, 1);
-								} else if (values[msg.assinger] && values[msg.assinger].length > 0) values[msg.assinger].push(id);
-								else values[msg.assinger] = [id];
+								if (values[msg.assigner] && values[msg.assigner].includes(id)) {
+									const index = values[msg.assigner].indexOf(id);
+									values[msg.assigner].splice(index, 1);
+								} else if (values[msg.assigner] && values[msg.assigner].length > 0) values[msg.assigner].push(id);
+								else values[msg.assigner] = [id];
 							});
-						} else values[msg.assinger] = answered;	
+						} else values[msg.assigner] = answered;	
 						repeater(msg, i+1, embed, values, null, fail, identifier, origin, editing);
 					}
 				}
@@ -1747,27 +1747,23 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 }
 
 async function editer(msg, fail, answer, origin, values) {
-
-
-
-
-	
-
-	return;
-	let oldSettings;
-	let oldRow;
-	let oldRes;
-	console.log(values[msg.assinger]);
+	let oldRes, oldSettings, oldRow;
 	if (origin == 'srm') oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 	else oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [origin]);
 	if (oldRes && oldRes.rowCount > 0) {
 		oldRow = oldRes.rows[0];
-		oldSettings = oldRow[msg.assinger]; 
+		oldSettings = oldRow[msg.assigner]; 
 	}
+	const newRow = {};
+	Object.entries(oldRow).forEach((arr) => {
+		const name = arr[0], value = arr[1];
+		newRow[name] = value;
+	});
+	newRow[msg.assigner] = values[msg.assigner];
 	if (Array.isArray(oldSettings) && oldSettings.length > 0) {
 		Promise.all(oldSettings.map(id => {
-			if (values[msg.assinger].includes(id)) values[msg.assinger].splice(values[msg.assinger].indexOf(id), 1);
-			else values[msg.assinger].push(id);
+			if (values[msg.assigner].includes(id)) values[msg.assigner].splice(values[msg.assigner].indexOf(id), 1);
+			else values[msg.assigner].push(id);
 		}));
 	}
 	const embed = new Discord.MessageEmbed()
@@ -1780,8 +1776,8 @@ async function editer(msg, fail, answer, origin, values) {
 	if (Array.isArray(oldSettings) && oldSettings.length > 0) embed.addField(msg.lanSettings.oldValue, `${oldSettings.map(f => msg.compatibilityType == 'channels' ? ` <#${f}>` : msg.compatibilityType == 'roles' ? ` <@&${f}>` : msg.compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
 	else if (oldSettings !== null && oldSettings !== undefined) embed.addField(msg.lanSettings.oldValue, `${oldSettings}`);
 	else embed.addField(msg.lanSettings.oldValue, msg.language.none);
-	if (Array.isArray(values[msg.assinger]) && values[msg.assinger].length > 0) embed.addField(msg.lanSettings.newValue, `${values[msg.assinger].map(f => msg.compatibilityType == 'channels' ? ` <#${f}>` : msg.compatibilityType == 'roles' ? ` <@&${f}>` : msg.compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
-	else if (values[msg.assinger] !== null && values[msg.assinger] !== undefined) embed.addField(msg.lanSettings.newValue, `${Array.isArray(values[msg.assinger]) ? msg.language.none : values[msg.assinger]}`);
+	if (Array.isArray(values[msg.assigner]) && values[msg.assigner].length > 0) embed.addField(msg.lanSettings.newValue, `${values[msg.assigner].map(f => msg.compatibilityType == 'channels' ? ` <#${f}>` : msg.compatibilityType == 'roles' ? ` <@&${f}>` : msg.compatibilityType == 'users' ? ` <@${f}>` : ` ${f}`)}`);
+	else if (values[msg.assigner] !== null && values[msg.assigner] !== undefined) embed.addField(msg.lanSettings.newValue, `${Array.isArray(values[msg.assigner]) ? msg.language.none : values[msg.assigner]}`);
 	else embed.addField(msg.lanSettings.newValue, msg.language.none);		
 	if (fail && fail.length > 0) {
 		if (Array.isArray(fail)) embed.addField(msg.language.error, `${fail.map(f => ` ${f}`)}`);
@@ -1790,22 +1786,21 @@ async function editer(msg, fail, answer, origin, values) {
 	if (answer) answer.update({embeds: [embed], components: []}).catch(() => {});
 	else msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 	const newSettings = oldRow;
-	if (values[msg.assinger] !== undefined && values[msg.assinger] !== null) {
+	if (values[msg.assigner] !== undefined && values[msg.assigner] !== null) {
 		if (origin == 'srm') {
-			if (Array.isArray(values[msg.assinger])) {
-				if (values[msg.assinger].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assinger} = $1 WHERE guildid = $2;`, [values[msg.assinger], msg.guild.id]); 
-				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assinger} = $1 WHERE guildid = $2;`, [null, msg.guild.id]); 
-			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assinger} = $1 WHERE guildid = $2;`, [values[msg.assinger], msg.guild.id]); 
+			if (Array.isArray(values[msg.assigner])) {
+				if (values[msg.assigner].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [values[msg.assigner], msg.guild.id]); 
+				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [null, msg.guild.id]); 
+			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [values[msg.assigner], msg.guild.id]); 
 		} else {
-			if (Array.isArray(values[msg.assinger])) {
-				if (values[msg.assinger].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assinger} = $1 WHERE id = $2;`, [values[msg.assinger], origin]); 
-				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assinger} = $1 WHERE id = $2;`, [null, origin]); 
-			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assinger} = $1 WHERE id = $2;`, [values[msg.assinger], origin]); 
+			if (Array.isArray(values[msg.assigner])) {
+				if (values[msg.assigner].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], origin]); 
+				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [null, origin]); 
+			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], origin]); 
 		}
-		newSettings[msg.assinger] = values[msg.assinger];
 		setTimeout(() => {require('./singleRowManager').redirecter(msg, newSettings, null, origin);}, 3000);
 	}
-	logger(oldSettings, newSettings, msg);
+	logger(oldRow, newRow, msg);
 }
 
 async function logger(oldSettings, newSettings, msg) {
