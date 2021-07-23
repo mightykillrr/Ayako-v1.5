@@ -12,11 +12,6 @@ module.exports = {
 };
 
 async function edit(msg, answer, file, origin, r) {
-	const tempLan = msg.lan.edit;
-	msg.lan.edit = {};
-	Object.entries(tempLan).forEach(e => {
-		if (e[0] !== 'add' && e[0] !== 'remove' && e[0] !== 'edit' && e[0] !== 'list') msg.lan.edit[e[0]] = e[1];
-	});
 	msg.lanSettings = msg.language.commands.settings;
 	if (!msg.file) {file.name = msg.args[0].toLowerCase(); msg.file = file;}
 	if (!origin) {
@@ -49,6 +44,12 @@ async function edit(msg, answer, file, origin, r) {
 	let buttons = [];
 	if (typeof(msg.file.buttons) == 'function') buttons = msg.file.buttons(msg, r);
 	else for (i = 0, j = rows.length; i < j; i += 5) {buttons.push(rows.slice(i, i+5));}
+	const back = new Discord.MessageButton()
+		.setLabel(msg.language.back)
+		.setEmoji(msg.client.constants.emotes.back)
+		.setCustomId('back')
+		.setStyle('DANGER');
+	if (origin) buttons.push(back);
 	const actionRows = msg.client.ch.buttonRower(buttons);
 	if (answer) answer.update({embeds: [editEmbed], components: actionRows}).catch((e) => {console.log(e);});
 	else if (msg.m) msg.m.edit({embeds: [editEmbed], components: actionRows}).catch((e) => {console.log(e);});
@@ -57,6 +58,12 @@ async function edit(msg, answer, file, origin, r) {
 	const messageCollector = msg.channel.createMessageCollector({time: 60000});
 	buttonsCollector.on('collect', (clickButton) => {
 		if (clickButton.user.id == msg.author.id) {
+			if (clickButton.customId == 'back') {
+				buttonsCollector.stop();
+				messageCollector.stop();
+				require('./multiRowManager').edit(msg, clickButton, msg.file);
+				return;
+			}
 			let editing;
 			Object.entries(msg.lan.edit).forEach(e => {e[1].trigger.forEach(trigger => {if (trigger.replace(/`/g, '') == clickButton.customId) editing = e;});});
 			if (editing) {
@@ -69,7 +76,13 @@ async function edit(msg, answer, file, origin, r) {
 	buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') {msg.client.ch.collectorEnd(msg);}});
 	messageCollector.on('collect', (message) => {
 		if (message.author.id == msg.author.id) {
-			if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
+			if (message.content.toLowerCase() == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
+			if (message.content.toLowerCase() == msg.language.back.toLowerCase()) {
+				buttonsCollector.stop();
+				messageCollector.stop();
+				require('./multiRowManager').edit(msg, null, msg.file);
+				return;
+			}
 			let editing;
 			Object.entries(msg.lan.edit).forEach(e => {e[1].trigger.forEach(trigger => {if (trigger.replace(/`/g, '') == message.content.toLowerCase()) editing = e;});});
 			if (editing) {

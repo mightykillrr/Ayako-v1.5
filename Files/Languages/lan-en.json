@@ -1466,7 +1466,9 @@
                             "no": "I couldn't find this User\n",
                             "wrongGuild": "This User is not Part of this Server\n"
                         }
-                    },
+                    }
+                },
+                "otherEdits": {
                     "add": {
                         "name": "Add a Cooldown",
                         "process": {
