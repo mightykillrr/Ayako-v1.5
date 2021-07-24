@@ -6,12 +6,13 @@ module.exports = {
 	exe(msg, answer, file) {
 		edit(msg, answer, file);
 	},
-	redirecter(msg, r, answer, origin) {
-		edit(msg, answer, msg.file, origin, r);
+	redirecter(msg, r, answer, origin, identifier) {
+	console.log(2, origin)
+		edit(msg, answer, msg.file, origin, r, identifier);
 	}
 };
 
-async function edit(msg, answer, file, origin, r) {
+async function edit(msg, answer, file, origin, r, identifier) {
 	msg.lanSettings = msg.language.commands.settings;
 	if (!msg.file) {file.name = msg.args[0].toLowerCase(); msg.file = file;}
 	if (!origin) {
@@ -67,7 +68,7 @@ async function edit(msg, answer, file, origin, r) {
 			let editing;
 			Object.entries(msg.lan.edit).forEach(e => {e[1].trigger.forEach(trigger => {if (trigger.replace(/`/g, '') == clickButton.customId) editing = e;});});
 			if (editing) {
-				require('./multiRowManager').redirect(msg, null, clickButton, 'srm', editing);
+				require('./multiRowManager').redirect(msg, null, clickButton, 'srm', editing, identifier, origin);
 				buttonsCollector.stop();
 				messageCollector.stop();
 			}
@@ -86,7 +87,7 @@ async function edit(msg, answer, file, origin, r) {
 			let editing;
 			Object.entries(msg.lan.edit).forEach(e => {e[1].trigger.forEach(trigger => {if (trigger.replace(/`/g, '') == message.content.toLowerCase()) editing = e;});});
 			if (editing) {
-				require('./multiRowManager').redirect(msg, null, null, 'srm', editing);
+				require('./multiRowManager').redirect(msg, null, null, 'srm', editing, identifier, origin);
 				message.delete().catch(() => {});
 				buttonsCollector.stop();
 				messageCollector.stop();

@@ -5,19 +5,20 @@ module.exports = {
 	exe(msg, answer) {
 		this.edit(msg, answer);
 	},
-	redirect(msg, fail, answer, origin, editing) {
-		repeater(msg, 0, null, {}, answer, fail, null, origin, editing);
+	redirect(msg, fail, answer, origin, editing, identifier, id) {
+		repeater(msg, 0, null, {id: id}, answer, fail, identifier, origin, editing);
 	},
 	async display(msg, answer) {
-		await rower(msg);
-		msg.client.constants.commands.settings.editRequire.splice(2, 1);
-		let res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
+		if (!answer) await rower(msg);
+		msg.client.constants.commands.settings.editReq.splice(2, 1);
+		let res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id], true);
 		if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
 		msg.lanSettings = msg.language.commands.settings;
 		msg.lan = msg.lanSettings[msg.file.name];
 		let embed;
 		if (res && res.rowCount > 0) {
 			res.rows = res.rows.sort((a, b) => a.id - b.id);
+			msg.rows = res.rows;
 			embed = typeof(msg.file.mmrEmbed) == 'function' ? msg.file.mmrEmbed(msg, res.rows) : misc.noEmbed(msg);
 		}
 		else embed = misc.noEmbed(msg);
@@ -56,7 +57,7 @@ module.exports = {
 				}
 			} else msg.client.ch.notYours(clickButton);
 		});
-		buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') m.edit({embeds: [embed], components: []});});
+		buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') msg.m.edit({embeds: [embed], components: []});});
 		messageCollector.on('collect', (message) => {
 			if (message.author.id == msg.author.id && message.content == msg.language.Edit) {
 				buttonsCollector.stop();
@@ -68,17 +69,18 @@ module.exports = {
 	},
 	async edit(msg, answer, vals) {
 		if (vals && vals.id) {
-			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [vals.id]);
-			if (res && res.rowCount > 0) return require('./singleRowManager').redirecter(msg, res.rows[0], answer, 'mrm');
+			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, vals.id, true);
+			if (res && res.rowCount > 0) return require('./singleRowManager').redirecter(msg, res.rows[0], answer, 'mrm', vals.id, 'edit');
 		}
-		msg.client.constants.commands.settings.editRequire.splice(2, 1);
+		msg.client.constants.commands.settings.editReq.splice(2, 1);
 		msg.lanSettings = msg.language.commands.settings;
 		msg.lan = msg.lanSettings[msg.file.name];
 		let embed;
 		await rower(msg);
-		let res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
+		let res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id], true);
 		if (res && res.rowCount > 0) {
 			res.rows = res.rows.sort((a, b) => a.id - b.id);
+			msg.rows = res.rows;
 			embed = typeof(msg.file.mmrEmbed) == 'function' ? msg.file.mmrEmbed(msg, res.rows) : misc.noEmbed(msg);
 		}
 		else embed = misc.noEmbed(msg);
@@ -154,7 +156,7 @@ module.exports = {
 	},
 	async list(msg, answer, origin) {
 		let fail = [], answered = [], values = {};
-		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
+		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id], true);
 		if (res && res.rowCount > 0) fail = res.rows;
 		else return misc.aborted(msg);
 		const options = [];
@@ -259,6 +261,7 @@ module.exports = {
 					messageCollector.stop('finished');
 					buttonsCollector.stop('finished');
 					values.id = answered[0];
+					msg.r = msg.rows.find(r => r.id == values.id);
 					gotID(values.id, clickButton, origin);
 				} else if (clickButton.customId == 'id') {
 					let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
@@ -307,7 +310,7 @@ module.exports = {
 				} else if (clickButton.customId == 'back') {
 					messageCollector.stop();
 					buttonsCollector.stop();
-					module.exports.edit(msg, clickButton, values);
+					module.exports.edit(msg, clickButton, {});
 				}
 			} else msg.client.ch.notYours(clickButton, msg);
 		});
@@ -319,7 +322,7 @@ module.exports = {
 				answered.push(fail[message.content]);
 				messageCollector.stop();
 				buttonsCollector.stop();
-				values.id = answered;
+				values.id = answered[0];
 				gotID(values.id, null, origin);
 			}
 		});
@@ -336,9 +339,9 @@ module.exports = {
 			}
 		});
 		async function gotID(id, answer, origin) {
-			const res = await msg.client.ch.query(`SELECT * FROM ${msg.file.name} WHERE id = $1 AND guildid = $2;`, [id, msg.guild.id]);
+			const res = await msg.client.ch.query(`SELECT * FROM ${msg.file.name} WHERE id = $1 AND guildid = $2;`, [id, msg.guild.id], true);
 			if (res && res.rowCount > 0) {
-				if (origin == 'edit') require('./singleRowManager').redirecter(msg, res.rows[0], answer, id);
+				if (origin == 'edit') require('./singleRowManager').redirecter(msg, res.rows[0], answer, id, 'edit');
 				else if (origin == 'view') listdisplay(msg, res.rows[0], answer, id);
 			}
 		}
@@ -377,7 +380,7 @@ async function listdisplay(msg, r, answer, id) {
 			} else if (clickButton.customId == 'edit') {
 				buttonsCollector.stop();
 				messageCollector.stop();
-				return require('./singleRowManager').redirecter(msg, r, clickButton, id);
+				return require('./singleRowManager').redirecter(msg, r, clickButton, id, null);
 			}
 		} else msg.client.ch.notYours(clickButton);
 	});
@@ -387,7 +390,7 @@ async function listdisplay(msg, r, answer, id) {
 			buttonsCollector.stop();
 			messageCollector.stop();
 			message.delete().catch(() => {});
-			return require('./singleRowManager').redirecter(msg, r, null, id);
+			return require('./singleRowManager').redirecter(msg, r, null, id, null);
 		} else if (message.content.toLowerCase() == msg.language.back.toLowerCase()) {
 			buttonsCollector.stop();
 			messageCollector.stop();
@@ -407,10 +410,10 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 			);
 	}
 	if (editing) msg.property = Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == editing[0])[1];
-	else msg.property = identifier == 'edit' ? msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.editRequire[i]] : msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier][i]];
-	msg.compatibilityType = msg.property.includes('s') ? msg.property : msg.property+'s';
-	if ((editing && i == 0) || (!editing && (identifier == 'edit' ? i < msg.client.constants.commands.settings.editRequire.length : i < msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier].length))) {
-		msg.assigner = origin == 'srm' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == editing[0])[0] : Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.editRequire[i] || a[0] == msg.client.constants.commands.settings.editRequire[i])[0];
+	else msg.property = identifier == 'edit' ? msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.editReq[i]] : msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier][i]];
+	if ((editing && i == 0) || (!editing && (identifier == 'edit' ? i < msg.client.constants.commands.settings.editReq.length : i < msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier].length))) {
+		msg.compatibilityType = msg.property.includes('s') ? msg.property : msg.property+'s';
+		msg.assigner = origin == 'srm' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == editing[0])[0] : identifier == 'edit' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.editReq[i] || a[0] == msg.client.constants.commands.settings.editReq[i])[0] : identifier == 'add' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.setupQueries[msg.file.name].add[i] || a[0] == msg.client.constants.commands.settings.setupQueries[msg.file.name].add[i])[0] : Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.removeReq[i] || a[0] == msg.client.constants.commands.settings.removeReq[i])[0];
 		let answered = [];
 		if (msg.property == 'command') {
 			let req = msg.client.commands;
@@ -423,7 +426,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 			});
 			const take = [];
 			for(let j = 0; j < 25 && j < options.length; j++) {take.push(options[j]);}
-			embed.setDescription(`${identifier !== 'edit' ? msg.lan.otherEdits[identifier].name : msg.lan.edit[msg.property]}\n${identifier !== 'edit' ? msg.lan.otherEdits[identifier].process[i] : ''}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
+			embed.setDescription(`${identifier !== 'edit' ? msg.lan.otherEdits[identifier].name : msg.language.select[msg.property].desc}\n${identifier !== 'edit' ? msg.lan.otherEdits[identifier].process[i] : ''}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
 			const menu = new Discord.MessageSelectMenu()
 				.setCustomId('cmdmenu')
 				.addOptions(take)
@@ -509,7 +512,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 						clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 					} else if (clickButton.customId == 'back') {
 						CollectorEnder([messageCollector, buttonsCollector]);
-						module.exports.edit(msg, clickButton, values);
+						module.exports.edit(msg, clickButton, {});
 					} else if (clickButton.customId == 'done') {
 						CollectorEnder([messageCollector, buttonsCollector]);
 						values.command = answered;
@@ -719,7 +722,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					} else if (clickButton.customId == 'back') {
 						messageCollector.stop();
 						buttonsCollector.stop();
-						module.exports.edit(msg, clickButton, values);
+						module.exports.edit(msg, clickButton, {});
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
@@ -925,7 +928,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					} else if (clickButton.customId == 'back') {
 						messageCollector.stop();
 						buttonsCollector.stop();
-						module.exports.edit(msg, clickButton, values);
+						module.exports.edit(msg, clickButton, {});
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
@@ -1028,7 +1031,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					if (clickButton.customId == 'back') {
 						buttonsCollector.stop();
 						messageCollector.stop();
-						module.exports.edit(msg, clickButton, values);
+						module.exports.edit(msg, clickButton, {});
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
@@ -1045,6 +1048,13 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 				}
 			});
 		} else if (msg.property == 'boolean') {
+			const embed = new Discord.MessageEmbed()
+				.setAuthor(
+					msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+					msg.client.constants.emotes.settingsLink, 
+					msg.client.constants.standard.invite
+				)
+				.setDescription(`${msg.lan.edit[msg.assigner].answers}\n${msg.lan.edit[msg.assigner].recommended}`);
 			const PRIMARY = new Discord.MessageButton()
 				.setCustomId('true')
 				.setLabel(msg.language.true)
@@ -1072,7 +1082,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					else if (clickButton.customId == 'back') {
 						messageCollector.stop();
 						buttonsCollector.stop();
-						module.exports.edit(msg, clickButton, values);
+						module.exports.edit(msg, clickButton, {});
 					}
 					repeater(msg, i+1, embed, values, clickButton, null, identifier, origin, editing);
 				} else msg.client.ch.notYours(clickButton, msg);
@@ -1195,7 +1205,8 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					} else if (clickButton.customId == 'done') {
 						messageCollector.stop('finished');
 						buttonsCollector.stop('finished');
-						values[msg.assigner] = answered;
+						values[msg.assigner] = answered[0];
+						if (msg.rows) msg.r = msg.rows.filter(r => r.id = answered);
 						repeater(msg, i+1, embed, values, clickButton, fail, identifier, origin, editing);
 					} else if (clickButton.customId == msg.property) {
 						let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
@@ -1244,7 +1255,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					} else if (clickButton.customId == 'back') {
 						messageCollector.stop();
 						buttonsCollector.stop();
-						module.exports.edit(msg, clickButton, values);
+						module.exports.edit(msg, clickButton, {});
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
@@ -1374,7 +1385,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 						clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 					} else if (clickButton.customId == 'done') {
 						if (answered.length > 0) values[msg.assigner] = answered;
-						msg.client.constants.commands.settings.editRequire.push(answered);
+						msg.client.constants.commands.settings.editReq.push(answered);
 						messageCollector.stop('finished');
 						buttonsCollector.stop('finished');
 						repeater(msg, i+1, embed, values, clickButton, null, identifier, origin, editing);
@@ -1421,7 +1432,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					} else if (clickButton.customId == 'back') {
 						messageCollector.stop();
 						buttonsCollector.stop();
-						module.exports.edit(msg, clickButton, values);
+						module.exports.edit(msg, clickButton, {});
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
@@ -1596,7 +1607,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 						msg.property = undefined;
 						messageCollector.stop();
 						buttonsCollector.stop();
-						module.exports.edit(msg, clickButton, values);
+						module.exports.edit(msg, clickButton, {});
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
@@ -1671,7 +1682,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					if (clickButton.customId == 'back') {
 						buttonsCollector.stop();
 						messageCollector.stop();
-						module.exports.edit(msg, clickButton, values);
+						module.exports.edit(msg, clickButton, {});
 					}
 				} else msg.client.ch.notYours(clickButton);
 			});
@@ -1696,10 +1707,10 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 			valDeclaration = valDeclaration.slice(0, valDeclaration.length-2);
 			values.guild = msg.guild;
 			values.date = Date.now();
-			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]};`);
+			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]};`, null, true);
 			if (res && res.rowCount > 0) values.id = res.rowCount+1;
 			else values.id = 1;
-			msg.client.ch.query(`INSERT INTO ${msg.client.constants.commands.settings.tablenames[msg.file.name]} (${msg.client.constants.commands.settings.setupQueries[msg.file.name].cols}) VALUES (${valDeclaration});`, msg.client.ch.stp(msg.client.constants.commands.settings.setupQueries[msg.file.name].vals, {values: values}));
+			msg.client.ch.query(`INSERT INTO ${msg.client.constants.commands.settings.tablenames[msg.file.name]} (${msg.client.constants.commands.settings.setupQueries[msg.file.name].cols}) VALUES (${valDeclaration});`, msg.client.ch.stp(msg.client.constants.commands.settings.setupQueries[msg.file.name].vals, {values: values}), true);
 			const embed = new Discord.MessageEmbed()
 				.setAuthor(
 					msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), 
@@ -1728,7 +1739,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					if (nameText !== '') nameText += ` AND ${names[j]} = $${j+1}`;
 					else nameText += `${names[j]} = $${j+1}`;
 				}
-				msg.client.ch.query(`DELETE FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE ${nameText};`, vals);
+				msg.client.ch.query(`DELETE FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE ${nameText};`, vals, true);
 			});
 			const embed = new Discord.MessageEmbed()
 				.setAuthor(
@@ -1742,8 +1753,8 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 			else msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: []});
 			setTimeout(() => {module.exports.edit(msg, null);}, 3000);
 		} else if (identifier == 'edit') {
-			const added = msg.client.constants.commands.settings.editRequire.splice(2, 1);
-			msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${values.column} = $1 WHERE id = $2;`, [values[added], values.id[0]]);
+			msg.client.constants.commands.settings.editReq.splice(2, 1);
+			msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], values.id], true);
 			const embed = new Discord.MessageEmbed()
 				.setAuthor(
 					msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), 
@@ -1754,15 +1765,18 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 			if (answer) answer.update({embeds: [embed], components: []}).catch(() => {});
 			else if (msg.m) msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 			else msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: []});
-			setTimeout(() => {module.exports.edit(msg, null);}, 3000);
+			msg.r[msg.assigner] = values[msg.assigner];
+			console.log(3, values.id)
+			if (!origin) setTimeout(() => {module.exports.edit(msg, null);}, 3000);
+			else setTimeout(() => {require('./singleRowManager').redirecter(msg, msg.r, null, values.id, origin == 'srm' ? null : 'edit');}, 3000);
 		} else editer(msg, fail, answer, origin, values);
 	}
 }
 
 async function editer(msg, fail, answer, origin, values) {
 	let oldRes, oldSettings, oldRow;
-	if (origin == 'srm') oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
-	else oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [origin]);
+	if (origin == 'srm') oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id], true);
+	else oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [origin], true);
 	if (oldRes && oldRes.rowCount > 0) {
 		oldRow = oldRes.rows[0];
 		oldSettings = oldRow[msg.assigner]; 
@@ -1802,16 +1816,16 @@ async function editer(msg, fail, answer, origin, values) {
 	if (values[msg.assigner] !== undefined && values[msg.assigner] !== null) {
 		if (origin == 'srm') {
 			if (Array.isArray(values[msg.assigner])) {
-				if (values[msg.assigner].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [values[msg.assigner], msg.guild.id]); 
-				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [null, msg.guild.id]); 
-			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [values[msg.assigner], msg.guild.id]); 
+				if (values[msg.assigner].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [values[msg.assigner], msg.guild.id], true); 
+				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [null, msg.guild.id], true); 
+			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [values[msg.assigner], msg.guild.id], true); 
 		} else {
 			if (Array.isArray(values[msg.assigner])) {
-				if (values[msg.assigner].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], origin]); 
-				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [null, origin]); 
-			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], origin]); 
+				if (values[msg.assigner].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], origin], true); 
+				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [null, origin], true); 
+			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], origin], true); 
 		}
-		setTimeout(() => {require('./singleRowManager').redirecter(msg, newSettings, null, origin);}, 3000);
+		setTimeout(() => {require('./singleRowManager').redirecter(msg, newSettings, null, values.id, origin == 'srm' ? null : 'edit');}, 3000);
 	}
 	logger(oldRow, newRow, msg);
 }
@@ -1822,11 +1836,12 @@ async function logger(oldSettings, newSettings, msg) {
 }
 
 async function rower(msg) {
-	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]};`);
+	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]};`, null, true);
 	if (!res || res.rowCount == 0) return;
+	res.rows = res.rows.sort((a,b) => a.uniquetimestamp - b.uniquetimestamp);
 	for (let i = 0; i < res.rowCount; i++) {
 		res.rows[i].id = i+1;
-		msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET id = $1 WHERE uniquetimestamp = $2;`, [res.rows[i].id, res.rows[i].uniquetimestamp]);
+		msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET id = $1 WHERE uniquetimestamp = $2;`, [res.rows[i].id, res.rows[i].uniquetimestamp], true);
 	}
 	return;
 }

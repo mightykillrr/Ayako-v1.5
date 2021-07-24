@@ -497,7 +497,8 @@
                 "modroles": "modrolesnew",
                 "muterole": "muterole"
             },
-            "editRequire": ["id", "column"],
+            "editReq": ["id", "column"],
+            "removeReq": ["id", "cooldown"],
             "setupQueries": {
                 "antispam": {
                     "cols": "active, giveofficialwarnstof, muteafterwarnsamount, kickafterwarnsamount, banafterwarnsamount, readofwarnstof, muteenabledtof, kickenabledtof, banenabledtof, guildid",

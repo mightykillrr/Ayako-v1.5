@@ -1099,7 +1099,7 @@
             "notValid": "This Answer was not valid",
             "howToEdit": "Edit by typing \n`edit` in the next 30 Seconds or\n`{{prefix}}settings {{type}} edit`",
             "howToEdit2": "Edit by typing one of the triggers shown in the `[box]`\nor press the according Button",
-            "howToEdit3": "Respond with:\n`add` to create a new Entry\n`remove` to remove an existing Entry\n`edit` to edit an existing Entry\nor press the according Button",
+            "howToEdit3": "Respond with:\n`add` to create a new Entry\n`remove` to remove an existing Entry\n`edit` to edit an existing Entry\n`list` to list an existing Entry\nor press the according Button",
             "categoy": "Info",
             "description": "Display the Ayako Server Settings",
             "pleaseRestart": "Please try again or type |cancel|",
@@ -1400,7 +1400,7 @@
             },
             "cooldowns": {
                 "category": ["Automation"],
-                "type": "Cooldown",
+                "type": "Cooldowns",
                 "command": "Command",
                 "cooldown": "Cooldown",
                 "active": "Active",
