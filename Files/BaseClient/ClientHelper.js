@@ -22,6 +22,10 @@ Array.prototype.equals = function(arr2) {
 };
 
 module.exports = { 
+	/**
+	 * Checks if needed Paths exist on startup and if not creates them.
+	 * @constructor
+	 */
 	pathCheck() {
 		if (!fs.existsSync('.\\Files\\Downloads')) fs.mkdirSync('.\\Files\\Downloads');
 		if (!fs.existsSync('.\\Files\\Downloads\\Messages')) fs.mkdirSync('.\\Files\\Downloads\\Messages');
@@ -30,6 +34,13 @@ module.exports = {
 		if (!fs.existsSync('.\\Files\\Downloads\\Users')) fs.mkdirSync('.\\Files\\Downloads\\Users');
 		if (!fs.existsSync('.\\Files\\Downloads\\Massbans')) fs.mkdirSync('.\\Files\\Downloads\\Massbans');
 	},
+	/**
+	 * Sends a Message to a channel.
+	 * @constructor
+	 * @param {object} channel - The Channel the Messages will be sent in.
+	 * @param {string} content - The Content of the Message or the Message Options if no content is provided.
+	 * @param {object} options - The Options of this Message, if any.
+	 */
 	async send(channel, content, options) {
 		let webhook;
 		if (client.channelWebhooks.get(channel.id)) webhook = client.channelWebhooks.get(channel.id);
@@ -52,6 +63,13 @@ module.exports = {
 		}
 		return m;
 	},
+	/**
+	 * Replies to a Message.
+	 * @constructor
+	 * @param {object} msg - The Message the Reply will be replied to.
+	 * @param {string} content - The Content of the Reply or the Reply Options if no content is provided.
+	 * @param {object} options - The Options of this Reply, if any.
+	 */
 	async reply(msg, content, options) {
 		if (options && options.type == 'rich') {
 			const oldOptions = options;
@@ -64,6 +82,12 @@ module.exports = {
 		else options.content = content;
 		return await msg.reply(options).catch((e) => {this.logger('Reply Error', e);});
 	},
+	/**
+	 * Places Objects or Strings of the Objects Option into the Expressions option, replacing same named variables marked by "{{variable Name}}".
+	 * @constructor
+	 * @param {string} expression - The String following Strings/Objects will be put into.
+	 * @param {object} Object - The Object containing all Strings/Objects that will be put into the expression.
+	 */
 	stp(expression, Object) {
 		if (Array.isArray(expression)) {
 			const returned = [];
@@ -107,7 +131,15 @@ module.exports = {
 			return text;
 		}
 	},
-	async query(query, arr) {
+	/**
+	 * Sends a query to the DataBase.
+	 * @constructor
+	 * @param {string} query - The Query that will be sent to the DataBase
+	 * @param {array} arr - The Array of Arguments passed to the DataBase for sanitizing, if any.
+	 * @param {boolean} debug - Wether the Query should be logged in the Console when arriving here.
+	 */
+	async query(query, arr, debug) {
+		if (debug == true) console.log(query, arr);
 		const res = await pool.query(query, arr).catch((err) =>{
 			console.log(query, arr);
 			this.logger('Pool Query Error', err);
@@ -115,6 +147,12 @@ module.exports = {
 		if (res) return res;
 		else return null;
 	},
+	/**
+	 * Logs any incoming Messages to the Console and the Discord Error Channel.
+	 * @constructor
+	 * @param {string} type - The Type or Origin of this Log
+	 * @param {string|object} log - The Log that will be logged to the Console and Error Channel.
+	 */
 	async logger(type, log) {
 		if (client && client.user) {
 			const channel = await client.channels.fetch(Constants.standard.errorLogChannel).catch(() => {});
@@ -131,39 +169,45 @@ module.exports = {
 			}
 		}
 	},
-	async downloader(msg, url) {
+	/**
+	 * Prepares incoming URLs for Download, giving it its Destination Path.
+	 * @constructor
+	 * @param {object} ident - The Identifier of this URL
+	 * @param {string} url - The URL the file will be downloaded from.
+	 */
+	async downloader(ident, url) {
 		let path;
 		const pathers = url ? url.split('.') : null;
 		let pathend;
 		if (pathers) pathend = `${pathers[pathers.length-1]}`.replace(URL.parse(url).search, '');
-		if (msg.channel) {
-			path = `.\\Files\\Downloads\\Guilds\\Guild - ${msg.guild.id}\\Channel - ${msg.channel.id}\\${msg.id}`;
-			const guilddir = `.\\Files\\Downloads\\Guilds\\Guild - ${msg.guild.id}`;
+		if (ident.channel) {
+			path = `.\\Files\\Downloads\\Guilds\\Guild - ${ident.guild.id}\\Channel - ${ident.channel.id}\\${ident.id}`;
+			const guilddir = `.\\Files\\Downloads\\Guilds\\Guild - ${ident.guild.id}`;
 			if (!fs.existsSync(guilddir)) fs.mkdirSync(guilddir);
-			const channeldir = `.\\Files\\Downloads\\Guilds\\Guild - ${msg.guild.id}\\Channel - ${msg.channel.id}`;
+			const channeldir = `.\\Files\\Downloads\\Guilds\\Guild - ${ident.guild.id}\\Channel - ${ident.channel.id}`;
 			if (!fs.existsSync(channeldir)) fs.mkdirSync(channeldir);
-		} else if (msg.animated !== undefined && msg.animated !== null) {
-			path = `.\\Files\\Downloads\\Guilds\\Guild - ${msg.guild.id}\\Deleted Emotes\\${msg.id}`;
-			const lastdir = `.\\Files\\Downloads\\Guilds\\Guild - ${msg.guild.id}`;
+		} else if (ident.animated !== undefined && ident.animated !== null) {
+			path = `.\\Files\\Downloads\\Guilds\\Guild - ${ident.guild.id}\\Deleted Emotes\\${ident.id}`;
+			const lastdir = `.\\Files\\Downloads\\Guilds\\Guild - ${ident.guild.id}`;
 			if (!fs.existsSync(lastdir)) fs.mkdirSync(lastdir);
-			const emotedir = `.\\Files\\Downloads\\Guilds\\Guild - ${msg.guild.id}\\Deleted Emotes`;
+			const emotedir = `.\\Files\\Downloads\\Guilds\\Guild - ${ident.guild.id}\\Deleted Emotes`;
 			if (!fs.existsSync(emotedir)) fs.mkdirSync(emotedir);
-			const guilddir = `.\\Files\\Downloads\\Guilds\\Guild - ${msg.guild.id}`;
+			const guilddir = `.\\Files\\Downloads\\Guilds\\Guild - ${ident.guild.id}`;
 			if (!fs.existsSync(guilddir)) fs.mkdirSync(guilddir);
-		} else if (msg.ownerID) {
+		} else if (ident.ownerID) {
 			const now = Date.now();
-			if (msg.wanted) {
-				path = `.\\Files\\Downloads\\Guilds\\Guild - ${msg.id}\\${msg.wanted}\\${now}`;
-				const guilddir = `.\\Files\\Downloads\\Guilds\\Guild - ${msg.id}`;
+			if (ident.wanted) {
+				path = `.\\Files\\Downloads\\Guilds\\Guild - ${ident.id}\\${ident.wanted}\\${now}`;
+				const guilddir = `.\\Files\\Downloads\\Guilds\\Guild - ${ident.id}`;
 				if (!fs.existsSync(guilddir)) fs.mkdirSync(guilddir);
-				const channeldir = `.\\Files\\Downloads\\Guilds\\Guild - ${msg.id}\\${msg.wanted}`;
+				const channeldir = `.\\Files\\Downloads\\Guilds\\Guild - ${ident.id}\\${ident.wanted}`;
 				if (!fs.existsSync(channeldir)) fs.mkdirSync(channeldir);
 			}
-		} else if (msg.avatar) {
+		} else if (ident.avatar) {
 			const now = Date.now();
-			if (msg.wanted) {
-				path = `.\\Files\\Downloads\\Users\\User - ${msg.id}\\${now}`;
-				let userdir = `.\\Files\\Downloads\\Users\\User - ${msg.id}`;
+			if (ident.wanted) {
+				path = `.\\Files\\Downloads\\Users\\User - ${ident.id}\\${now}`;
+				let userdir = `.\\Files\\Downloads\\Users\\User - ${ident.id}`;
 				if (!fs.existsSync(userdir)) {
 					fs.mkdirSync(userdir);
 				}
@@ -171,33 +215,49 @@ module.exports = {
 		}
 		if (!url) {
 			url = [];
-			msg.attachments = msg.attachments.map(o => o);
-			for (let i = 0; i < msg.attachments.length; i++) {
+			ident.attachments = ident.attachments.map(o => o);
+			for (let i = 0; i < ident.attachments.length; i++) {
 				path = `${path}-${i}`;
-				let pather = msg.attachments[i].url.split('.');
+				let pather = ident.attachments[i].url.split('.');
 				pathend = `${pather[pather.length-1]}`;
 				const urlArray = {
-					url: msg.attachments[i].url,
+					url: ident.attachments[i].url,
 					path: `${path}.${pathend}`
 				};
 				url[i] = urlArray;
 			}
-		} else (msg.animated !== undefined && msg.animated !== null) ? pathend = msg.animated ? 'gif' : 'png' : '';
+		} else (ident.animated !== undefined && ident.animated !== null) ? pathend = ident.animated ? 'gif' : 'png' : '';
 		if (Array.isArray(url)) {
 			for (let i = 0; i < url.length; i++) {await this.download(url[i].url, url[i].path);}
 		} else await this.download(url, `${path}.${pathend}`);
 		return `${path}.${pathend}`;
 	},
+	/**
+	 * Used for Downloading files, this creates a Placeholder File before the actual File is downloaded.
+	 * @constructor
+	 * @param {string} path - The Path this Placeholder File will be created at.
+	 */
 	async makeFile(path) {
 		this.logger('Make File used on ', path);
 		const file = fs.readFileSync(path);
 		return file;
 	},
+	/**
+	 * Extracts a File Name out of a File Path.
+	 * @constructor
+	 * @param {string} path - The Path of the File the Name will be extracted from.
+	 */
 	async getName(path) {
 		let name = path.split('\\');
 		name = name[name.length-1];
 		return name;
 	},
+	/**
+	 * The actual File Downloader.
+	 * @constructor
+	 * @param {string} url - The URL the File will be downloaded from.
+	 * @param {object} filePath - The Path to the previously generated Placeholder File.
+	 */
 	async download(url, filePath) {
 		const proto = !url.charAt(4).localeCompare('s') ? https : http;
 		return new Promise((resolve, reject) => {
@@ -224,6 +284,12 @@ module.exports = {
 			request.end();
 		});
 	},
+	/**
+	 * A translator for Discord BitField Permissions into the given Language.
+	 * @constructor
+	 * @param {number} bits - The Bits the Language will be translated from.
+	 * @param {object} lan - The Language File the Bits will be Translated based off of.
+	 */
 	permCalc(bits, lan) {
 		const BitField = new Discord.Permissions(BigInt(bits));
 		const Perms = [];
@@ -263,6 +329,11 @@ module.exports = {
 		if (BitField.has(4294967296)) Perms.push(lan.permissions.REQUEST_TO_SPEAK);
 		return (Perms);
 	},
+	/**
+	 * Converts a Discord Snowflake ID into the Unix Timestamp it was created at.
+	 * @constructor
+	 * @param {number} ID - The Snwoflake ID the Unix Timestamp will be created from.
+	 */
 	getUnix(ID) {
 		const variable = BigInt(ID);
 		const id = BigInt.asUintN(64, variable);
@@ -270,13 +341,34 @@ module.exports = {
 		const unix = (dateBits + DiscordEpoch);
 		return unix;
 	},
+	/**
+	 * A useless function, I don't even know why I created this.
+	 * @constructor
+	 * @param {string} input - The Input MS will translate from.
+	 */
 	ms(input) {return ms(input);},
+	/**
+	 * Identifies and returns the Difference of two Arrays.
+	 * @constructor
+	 * @param {array} array1 - The first Array.
+	 * @param {array} array2 - The second Array.
+	 */
 	getDifference (array1, array2) {
 		return array1.filter(i => {return array2.indexOf(i) < 0;});
 	},
+	/**
+	 * A Title Creator, converting every first Letter of a Word into Uppercase.
+	 * @constructor
+	 * @param {string} str - The String to convert into a Title.
+	 */
 	toTitleCase (str) {
-		return str.replace(regexes.strReplacer1, ' ').replace(regexes.strReplacer2, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+		return str.replace(regexes.strReplacer1, ' ').replace(regexes.strReplacer2, (txt) => { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
 	},
+	/**
+	 * Extracts a Dynamic Avatar URL from a Discord User.
+	 * @constructor
+	 * @param {object} user - The User Object the Avatar URL is extracted from.
+	 */
 	displayAvatarURL(user) {
 		return user.displayAvatarURL({
 			dynamic: true,
@@ -284,6 +376,11 @@ module.exports = {
 			format: 'png'
 		});
 	},
+	/**
+	 * Extracts a Dynamic Icon URL from a Discord Guild.
+	 * @constructor
+	 * @param {object} guild - The Guild Object the Icon URL is extracted from.
+	 */
 	iconURL(guild) {
 		return guild.iconURL({
 			dynamic: true,
@@ -291,6 +388,11 @@ module.exports = {
 			format: 'png'
 		});
 	},
+	/**
+	 * Extracts a Dynamic Banner URL from a Discord Guild.
+	 * @constructor
+	 * @param {object} guild - The Guild Object the Banner URL is extracted from.
+	 */
 	bannerURL(guild) {
 		return guild.bannerURL({
 			dynamic: true,
@@ -298,6 +400,11 @@ module.exports = {
 			format: 'png'
 		});
 	},
+	/**
+	 * Extracts a Dynamic Splash URL from a Discord Guild.
+	 * @constructor
+	 * @param {object} guild - The Guild Object the Splash URL is extracted from.
+	 */
 	splashURL(guild) {
 		return guild.splashURL({
 			dynamic: true,
@@ -305,6 +412,11 @@ module.exports = {
 			format: 'png'
 		});
 	}, 
+	/**
+	 * Extracts a Dynamic discovery Splash URL from a Discord Guild.
+	 * @constructor
+	 * @param {object} guild - The Guild Object the discovery Splash URL is extracted from.
+	 */
 	discoverySplashURL(guild) {
 		return guild.discoverySplashURL({
 			dynamic: true,
@@ -312,6 +424,11 @@ module.exports = {
 			format: 'png'
 		});
 	},
+	/**
+	 * Extracts a Dynamic Avatar URL from a Discord Webhook.
+	 * @constructor
+	 * @param {object} webhook - The Webhook Object the Avatar URL is extracted from.
+	 */
 	avatarURL(webhook) {
 		return webhook.avatarURL({
 			dynamic: true,
@@ -319,6 +436,11 @@ module.exports = {
 			format: 'png'
 		});
 	},
+	/**
+	 * Selects the Language for a Guild if it previously set a specific Language, if not it selects English.
+	 * @constructor
+	 * @param {object} guild - The Guild the Language is Selected for.
+	 */
 	async languageSelector(guild) {
 		if (guild.id) {
 			const resLan = await this.query('SELECT * FROM language WHERE guildid = $1;', [guild.id]);
@@ -331,6 +453,11 @@ module.exports = {
 			return language;
 		}
 	},
+	/**
+	 * Writes a Ban or Massban report including previously sent Messages of the Victim.
+	 * @constructor
+	 * @param {object} object - The Object to create a Log from.
+	 */
 	async txtFileWriter(object) {
 		object = object.map(o => o);
 		let content = '';
@@ -372,7 +499,18 @@ module.exports = {
 			return path;
 		}
 	},
+	/**
+	 * Tests if a String containts non-Latin Codepoints.
+	 * @constructor
+	 * @param {string} text - The String to Test.
+	 */
 	containsNonLatinCodepoints(text) {return regexes.tester.test(text);},
+	/**
+	 * Returns a Discord Member from the Discord API if the provided User is a Member.
+	 * @constructor
+	 * @param {object} guild - The Guild to return the Member from.
+	 * @param {number|object} user - A User or User ID that will be converted into a Member.
+	 */
 	async member(guild, user) {
 		let id;
 		if (user.id) id = user.id;
@@ -381,17 +519,54 @@ module.exports = {
 		if (guild.members.cache.get(id)) return await guild.members.cache.get(id).fetch();
 		else return null;
 	},
+	/**
+	 * Checks and returns Duplicates of 2 BitFields.
+	 * @constructor
+	 * @param {object} bit1 - The first BitField.
+	 * @param {object} bit2 - The second BitField.
+	 */
 	bitDuplicates(bit1, bit2) {return new Discord.Permissions(bit1.bitfield & bit2.bitfield);},
+	/**
+	 * Checks and returns Uniques of 2 Bitfields.
+	 * @constructor
+	 * @param {object} bit1 - The first BitField.
+	 * @param {object} bit2 - The second BitField.
+	 */
 	bitUniques(bit1, bit2) {
 		const bit = new Discord.Permissions(bit1.bitfield & bit2.bitfield);
 		bit1 = bit1.remove([...bit]);
 		bit2 = bit2.remove([...bit]);
 		return [bit1, bit2];
 	},
+	/**
+	 * Converts a String into a Discord Codeblock.
+	 * @constructor
+	 * @param {string} text - The Text to turn into a Codeblock.
+	 */
 	makeCodeBlock(text) {return '```'+text+'```';},
+	/**
+	 * Converts a String into a Discord One-Line-Code.
+	 * @constructor
+	 * @param {string} text - The Text to turn into a One-Line-Code.
+	 */
 	makeInlineCode(text) {return '`'+text+'`';},
+	/**
+	 * Converts a String to a Bold String.
+	 * @constructor
+	 * @param {string} text - The Text to turn Bold.
+	 */
 	makeBold(text) {return '**'+text+'**';},
+	/**
+	 * Converts a String to a underlined String.
+	 * @constructor
+	 * @param {string} text - The Text to turn Underlined.
+	 */
 	makeUnderlined(text) {return '__'+text+'__';},
+	/**
+	 * Awaits a reply of the Executor of a Moderation Command when the Command is used on another Moderator.
+	 * @constructor
+	 * @param {object} msg - The triggering Message of this Awaiter.
+	 */
 	async modRoleWaiter(msg) {
 		const SUCCESS = new Discord.MessageButton()
 			.setCustomID('modProceedAction')
@@ -437,6 +612,12 @@ module.exports = {
 			}
 		});
 	},
+	/**
+	 * Sends an ephemeral Message to the triggering User, telling them this Button/Select Menu was not meant for them.
+	 * @constructor
+	 * @param {object} interaction - The Interaction the triggering User sent.
+	 * @param {object} msg - The Message this Button/Select Menu triggered.
+	 */
 	notYours(interaction, msg) {
 		const embed = new Discord.MessageEmbed()
 			.setAuthor(msg.language.error, client.constants.standard.image, client.constants.standard.invite)
@@ -444,12 +625,22 @@ module.exports = {
 			.setDescription(msg.language.notYours);
 		interaction.reply({embeds: [embed], ephemeral: true}).catch(() => {});
 	},
+	/**
+	 * Edits a Message to display a "time has run out" Error.
+	 * @constructor
+	 * @param {object} msg - The Message this Function replies to.
+	 */
 	collectorEnd(msg) {
 		const embed = new Discord.MessageEmbed()
 			.setDescription(msg.language.timeError)
 			.setColor(msg.client.constants.error);
 		msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 	},
+	/**
+	 * Converts Button Arrays into Action Rows usable by Discord.js. Multiple Action Rows are separated by nested Arrays 
+	 * @constructor
+	 * @param {array} buttonArrays - The Buttons that will be put into the Action Rows.
+	 */
 	buttonRower(buttonArrays) {
 		const actionRows = [];
 		buttonArrays.forEach(buttonRow => {
