@@ -465,7 +465,8 @@
     },
     "selfLog": {
         "author": "Ayako {{setting}} Settings Updated",
-        "description": "User {{msg.author}} / `{{msg.author.tag}}` / `{{msg.author.id}}`\nhas updated Setting `{{setting}}`\n\n**Changes:**"
+        "description": "User {{msg.author}} / `{{msg.author.tag}}` / `{{msg.author.id}}`\nhas updated Setting `{{setting}}`\n\n\n**Changes:**",
+        "descriptionwithID": "User {{msg.author}} / `{{msg.author.tag}}` / `{{msg.author.id}}`\nhas updated Setting `{{setting}}` with ID `{{settings.id}}`\n\n\n**Changes:**"
     },
     "time": {
         "seconds": "Second(s)",
@@ -607,6 +608,7 @@
     "allow": "Allow",
     "wasAdded": "was added",
     "wasRemoved": "was removed",
+    "DeletedEntry": "Deleted Entry Number {{id}}",
     "neutral": "Neutral",
     "problem": "Problem",
     "prefix": "Prefix",
@@ -1097,9 +1099,7 @@
         "settings": {
             "valid": "Valid Answers",
             "notValid": "This Answer was not valid",
-            "howToEdit": "Edit by typing \n`edit` in the next 30 Seconds or\n`{{prefix}}settings {{type}} edit`",
-            "howToEdit2": "Edit by typing one of the triggers shown in the `[box]`\nor press the according Button",
-            "howToEdit3": "Respond with:\n`add` to create a new Entry\n`remove` to remove an existing Entry\n`edit` to edit an existing Entry\n`list` to list an existing Entry\nor press the according Button",
+            "howToEdit3": "Click:\n`add` to create a new Entry\n`remove` to remove an existing Entry\n`edit` to edit an existing Entry\n`list` to list an existing Entry",
             "categoy": "Info",
             "description": "Display the Ayako Server Settings",
             "pleaseRestart": "Please try again or type |cancel|",
@@ -1408,6 +1408,7 @@
                 "bproleid": "Blacklisted Roles",
                 "bpchannelid": "Blacklisted Channels",
                 "bpuserid": "Blacklisted Users",
+                "id": "Number",
                 "edit": {
                     "command": {
                         "name": "[{{trigger}}] Command",

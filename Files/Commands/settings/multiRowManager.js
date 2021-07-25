@@ -1,12 +1,24 @@
+/**
+ * Main Module for managing all Ayako Settings.
+ * @constructor
+ * @param {object} answer - The interaction Object which can be updated.
+ * @param {object} file - The file which is edited right now.
+ * @param {object} msg - The Message Object which iniciated this message.
+ * @param {number} i - Indicator for the current step of srmEditing.
+ * @param {object} values - The edited values, also contains the ID of the currently edited Row if this is a multi Row edit.
+ * @param {object} r - The currently edited Settings Row.
+ * 
+ */
+
 const Discord = require('discord.js');
 const misc = require('./misc.js');
 
 module.exports = {
 	exe(msg, answer) {
-		this.edit(msg, answer);
+		this.edit(msg, answer, {});
 	},
-	redirect(msg, fail, answer, origin, editing, identifier, id) {
-		repeater(msg, 0, null, {id: id}, answer, fail, identifier, origin, editing);
+	redirect(msg, i, values, answer, AddRemoveEditView, fail, srmEditing, comesFromSRM) {
+		repeater(msg, i?i:0, null, values, answer, AddRemoveEditView, fail, srmEditing, comesFromSRM);
 	},
 	async display(msg, answer) {
 		if (!answer) await rower(msg);
@@ -27,7 +39,6 @@ module.exports = {
 			msg.client.constants.emotes.settingsLink,
 			msg.client.constants.standard.invite
 		)
-			.setDescription(`${msg.client.ch.stp(msg.lanSettings.howToEdit, {prefix: msg.client.constants.standard.prefix, type: msg.file.name})}\n\n${embed.description ? embed.description : ''}`)
 			.setColor(msg.client.constants.commands.settings.color);
 		const edit = new Discord.MessageButton()
 			.setCustomId('edit')
@@ -49,28 +60,23 @@ module.exports = {
 				if (clickButton.customId == 'edit') {
 					buttonsCollector.stop();
 					messageCollector.stop();
-					this.edit(msg, clickButton);
+					this.edit(msg, clickButton, {});
 				} else if (clickButton.customId == 'list') {
 					buttonsCollector.stop();
 					messageCollector.stop();
-					this.list(msg, clickButton, 'view');
+					this.list(msg, clickButton, 'view', []);
 				}
 			} else msg.client.ch.notYours(clickButton);
 		});
 		buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') msg.m.edit({embeds: [embed], components: []});});
 		messageCollector.on('collect', (message) => {
-			if (message.author.id == msg.author.id && message.content == msg.language.Edit) {
-				buttonsCollector.stop();
-				messageCollector.stop();
-				message.delete().catch(() => {});
-				this.edit(msg);
-			}
+			if (message.author.id == msg.author.id && message.content.toLowerCase() == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
 		});
 	},
-	async edit(msg, answer, vals) {
-		if (vals && vals.id) {
-			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, vals.id, true);
-			if (res && res.rowCount > 0) return require('./singleRowManager').redirecter(msg, res.rows[0], answer, 'mrm', vals.id, 'edit');
+	async edit(msg, answer, values, AddRemoveEditView, fail) {
+		if (values && values.id) {
+			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, values.id, true);
+			if (res && res.rowCount > 0) return require('./singleRowManager').redirecter(msg, answer, AddRemoveEditView, fail, values);
 		}
 		msg.client.constants.commands.settings.editReq.splice(2, 1);
 		msg.lanSettings = msg.language.commands.settings;
@@ -121,47 +127,32 @@ module.exports = {
 			if (clickButton.user.id == msg.author.id) {
 				if (clickButton.customId == 'add') {
 					CollectorEnder([buttonsCollector, messageCollector]);
-					repeater(msg, 0, null, {}, clickButton, [], 'add');
+					repeater(msg, 0, null, {}, clickButton, 'add');
 				} else if (clickButton.customId == 'remove') {
 					CollectorEnder([buttonsCollector, messageCollector]);
-					repeater(msg, 0, null, {}, clickButton, [], 'remove');
+					repeater(msg, 0, null, {}, clickButton, 'remove');
 				} else if (clickButton.customId == 'edit') {
 					CollectorEnder([buttonsCollector, messageCollector]);
-					repeater(msg, 0, null, {}, clickButton, [], 'edit');
+					repeater(msg, 0, null, {}, clickButton, 'edit');
 				} else if (clickButton.customId == 'list') {
 					CollectorEnder([buttonsCollector, messageCollector]);
-					this.list(msg, clickButton, 'edit');
+					this.list(msg, clickButton, 'edit', []);
 				}
 			} else msg.client.ch.notYours(clickButton, msg);
 		});
 		messageCollector.on('collect', (message) => {
-			if (msg.author.id == message.author.id) {
-				if (message.content.toLowerCase() == msg.language.cancel) misc.aborted(msg, [messageCollector, buttonsCollector]);
-				else if (message.content.toLowerCase() == msg.language.add.toLowerCase()) {
-					CollectorEnder([buttonsCollector, messageCollector]);
-					message.delete().catch(() => {});
-					repeater(msg, 0, null, {}, null, [], 'add');
-				} else if (message.content.toLowerCase() == msg.language.remove.toLowerCase()) {
-					CollectorEnder([buttonsCollector, messageCollector]);
-					message.delete().catch(() => {});
-					repeater(msg, 0, null, {}, null, [], 'remove');
-				} else if (message.content.toLowerCase() == msg.language.Edit.toLowerCase()) {
-					CollectorEnder([buttonsCollector, messageCollector]);
-					message.delete().catch(() => {});
-					repeater(msg, 0, null, {}, null, [], 'edit');
-				} 
-			}
+			if (message.author.id == msg.author.id && message.content.toLowerCase() == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
 		});
 		buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') msg.client.ch.collectorEnd(msg);});
 	},
-	async list(msg, answer, origin) {
-		let fail = [], answered = [], values = {};
+	async list(msg, answer, AddRemoveEditView, fail) {
+		let r = [], answered = [], values = {};
 		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id], true);
-		if (res && res.rowCount > 0) fail = res.rows;
+		if (res && res.rowCount > 0) r = res.rows;
 		else return misc.aborted(msg);
 		const options = [];
-		for (let j = 0; j < fail.length; j++) {
-			options.push({label: `${msg.language.number}: ${fail[j].id} | ${fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]}`, value: `${fail[j].id}`});
+		for (let j = 0; j < r.length; j++) {
+			options.push({label: `${msg.language.number}: ${r[j].id} | ${r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]}`, value: `${r[j].id}`});
 		}
 		const take = [];
 		for(let j = 0; j < options.length; j++) {take.push(options[j]);}
@@ -262,7 +253,7 @@ module.exports = {
 					buttonsCollector.stop('finished');
 					values.id = answered[0];
 					msg.r = msg.rows.find(r => r.id == values.id);
-					gotID(values.id, clickButton, origin);
+					gotID(values.id, clickButton, AddRemoveEditView, fail);
 				} else if (clickButton.customId == 'id') {
 					let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
 					clickButton.values.forEach(v => {
@@ -314,17 +305,8 @@ module.exports = {
 				}
 			} else msg.client.ch.notYours(clickButton, msg);
 		});
-		messageCollector.on('collect', async (message) => {
-			if (msg.author.id == message.author.id) {
-				if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
-				message.delete().catch(() => {});
-				if (isNaN(parseInt(message.content))) return misc.notValid(msg);
-				answered.push(fail[message.content]);
-				messageCollector.stop();
-				buttonsCollector.stop();
-				values.id = answered[0];
-				gotID(values.id, null, origin);
-			}
+		messageCollector.on('collect', (message) => {
+			if (message.author.id == msg.author.id && message.content.toLowerCase() == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
 		});
 		buttonsCollector.on('end', (collected, reason) => {
 			if (reason == 'time') {
@@ -338,24 +320,26 @@ module.exports = {
 				msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 			}
 		});
-		async function gotID(id, answer, origin) {
+		async function gotID(id, answer, AddRemoveEditView, fail) {
 			const res = await msg.client.ch.query(`SELECT * FROM ${msg.file.name} WHERE id = $1 AND guildid = $2;`, [id, msg.guild.id], true);
 			if (res && res.rowCount > 0) {
-				if (origin == 'edit') require('./singleRowManager').redirecter(msg, res.rows[0], answer, id, 'edit');
-				else if (origin == 'view') listdisplay(msg, res.rows[0], answer, id);
+				if (AddRemoveEditView == 'edit') require('./singleRowManager').redirecter(msg, answer, AddRemoveEditView, fail, values);
+				else if (AddRemoveEditView == 'view') listdisplay(msg, answer, id, AddRemoveEditView, fail, values);
 			}
 		}
 	},
 };
 
-async function listdisplay(msg, r, answer, id) {
+async function listdisplay(msg, answer, id, AddRemoveEditView, fail, values) {
+	let r;
+	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [id]);
+	if (res && res.rowCount > 0) r = res.rows[0];
 	let embed = typeof(msg.file.displayEmbed) == 'function' ? msg.file.displayEmbed(msg, r) : misc.noEmbed(msg);
 	embed.setAuthor(
 		msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
 		msg.client.constants.emotes.settingsLink,
 		msg.client.constants.standard.invite
 	)
-		.setDescription(`${msg.client.ch.stp(msg.lanSettings.howToEdit, {prefix: msg.client.constants.standard.prefix, type: msg.file.name})}\n\n${embed.description ? embed.description : ''}`)
 		.setColor(msg.client.constants.commands.settings.color);
 	const button = new Discord.MessageButton()
 		.setCustomId('edit')
@@ -380,27 +364,19 @@ async function listdisplay(msg, r, answer, id) {
 			} else if (clickButton.customId == 'edit') {
 				buttonsCollector.stop();
 				messageCollector.stop();
-				return require('./singleRowManager').redirecter(msg, r, clickButton, id, null);
+				return require('./singleRowManager').redirecter(msg, answer, AddRemoveEditView, fail, values);
 			}
 		} else msg.client.ch.notYours(clickButton);
 	});
 	buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') msg.m.edit({embeds: [embed], components: []});});
 	messageCollector.on('collect', (message) => {
-		if (message.author.id == msg.author.id && message.content.toLowerCase() == msg.language.Edit.toLowerCase()) {
-			buttonsCollector.stop();
-			messageCollector.stop();
-			message.delete().catch(() => {});
-			return require('./singleRowManager').redirecter(msg, r, null, id, null);
-		} else if (message.content.toLowerCase() == msg.language.back.toLowerCase()) {
-			buttonsCollector.stop();
-			messageCollector.stop();
-			module.exports.display(msg);
-			return;
-		}
+		if (message.author.id == msg.author.id && message.content.toLowerCase() == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
 	});
 }
 
-async function repeater(msg, i, embed, values, answer, fail, identifier, origin, editing) {
+async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, srmEditing, comesFromSRM) {
+	if (!Array.isArray(fail)) fail = new Array;
+	if (typeof values !== 'object') values = new Object;
 	if (i == 0) {
 		embed = new Discord.MessageEmbed()
 			.setAuthor(
@@ -409,11 +385,11 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 				msg.client.constants.standard.invite
 			);
 	}
-	if (editing) msg.property = Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == editing[0])[1];
-	else msg.property = identifier == 'edit' ? msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.editReq[i]] : msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier][i]];
-	if ((editing && i == 0) || (!editing && (identifier == 'edit' ? i < msg.client.constants.commands.settings.editReq.length : i < msg.client.constants.commands.settings.setupQueries[msg.file.name][identifier].length))) {
+	if (srmEditing) msg.property = Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == srmEditing[0])[1];
+	else msg.property = AddRemoveEditView == 'edit' ? msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.editReq[i]] : msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.setupQueries[msg.file.name][AddRemoveEditView][i]];
+	if ((srmEditing && i == 0) || (!srmEditing && (AddRemoveEditView == 'edit' ? i < msg.client.constants.commands.settings.editReq.length : i < msg.client.constants.commands.settings.setupQueries[msg.file.name][AddRemoveEditView].length))) {
 		msg.compatibilityType = msg.property.includes('s') ? msg.property : msg.property+'s';
-		msg.assigner = origin == 'srm' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == editing[0])[0] : identifier == 'edit' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.editReq[i] || a[0] == msg.client.constants.commands.settings.editReq[i])[0] : identifier == 'add' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.setupQueries[msg.file.name].add[i] || a[0] == msg.client.constants.commands.settings.setupQueries[msg.file.name].add[i])[0] : Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.removeReq[i] || a[0] == msg.client.constants.commands.settings.removeReq[i])[0];
+		msg.assigner = comesFromSRM ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == srmEditing[0])[0] : AddRemoveEditView == 'edit' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.editReq[i] || a[0] == msg.client.constants.commands.settings.editReq[i])[0] : AddRemoveEditView == 'add' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.setupQueries[msg.file.name].add[i] || a[0] == msg.client.constants.commands.settings.setupQueries[msg.file.name].add[i])[0] : Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.removeReq[i] || a[0] == msg.client.constants.commands.settings.removeReq[i])[0];
 		let answered = [];
 		if (msg.property == 'command') {
 			let req = msg.client.commands;
@@ -426,7 +402,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 			});
 			const take = [];
 			for(let j = 0; j < 25 && j < options.length; j++) {take.push(options[j]);}
-			embed.setDescription(`${identifier !== 'edit' ? msg.lan.otherEdits[identifier].name : msg.language.select[msg.property].desc}\n${identifier !== 'edit' ? msg.lan.otherEdits[identifier].process[i] : ''}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
+			embed.setDescription(`${AddRemoveEditView !== 'edit' ? msg.lan.otherEdits[AddRemoveEditView].name : msg.language.select[msg.property].desc}\n${AddRemoveEditView !== 'edit' ? msg.lan.otherEdits[AddRemoveEditView].process[i] : ''}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
 			const menu = new Discord.MessageSelectMenu()
 				.setCustomId('cmdmenu')
 				.addOptions(take)
@@ -460,11 +436,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 			const messageCollector = msg.channel.createMessageCollector({time: 60000});
 			const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 			messageCollector.on('collect', (message) => {
-				if (message.author.id == msg.author.id) {
-					const command = msg.client.commands.get(message.content.toLowerCase()) || msg.client.commands.find(c => c.aliases && c.aliases.includes(message.content.toLowerCase()));
-					if (command) values.command == command.name;
-					else return;
-				}
+				if (message.author.id == msg.author.id && message.content.toLowerCase() == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
 			});
 			buttonsCollector.on('collect', (clickButton) => {
 				if (clickButton.user.id == msg.author.id) {
@@ -516,7 +488,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					} else if (clickButton.customId == 'done') {
 						CollectorEnder([messageCollector, buttonsCollector]);
 						values.command = answered;
-						repeater(msg, i+1, embed, values, clickButton, null, identifier, origin, editing);
+						repeater(msg, i+1, embed, values, clickButton, AddRemoveEditView, fail, srmEditing, comesFromSRM);
 					} else if (clickButton.customId == 'next' || clickButton.customId == 'prev') {
 						let indexLast; let indexFirst;
 						for (let j = 0; options.length > j; j++) {
@@ -677,7 +649,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 						messageCollector.stop('finished');
 						buttonsCollector.stop('finished');
 						values[msg.assigner] = answered;
-						repeater(msg, i+1, embed, values, clickButton, null, identifier, origin, editing);
+						repeater(msg, i+1, embed, values, clickButton, AddRemoveEditView, fail, srmEditing, comesFromSRM);
 					} else if (clickButton.customId == msg.property) {
 						let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
 						answered = clickButton.values[0];
@@ -726,17 +698,8 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
-			messageCollector.on('collect', async (message) => {
-				if (msg.author.id == message.author.id) {
-					if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
-					message.delete().catch(() => {});
-					if (isNaN(parseInt(message.content))) return misc.notValid(msg);
-					answered = message.content.replace(/\D+/g, '').split(/ +/);
-					messageCollector.stop();
-					buttonsCollector.stop();
-					values[msg.assigner] = message.content;
-					repeater(msg, i+1, embed, values, null, null, identifier, origin, editing);
-				}
+			messageCollector.on('collect', (message) => {
+				if (message.author.id == msg.author.id && message.content.toLowerCase() == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
 			});
 			buttonsCollector.on('end', (collected, reason) => {
 				if (reason == 'time') {
@@ -881,7 +844,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 						}
 						messageCollector.stop('finished');
 						buttonsCollector.stop('finished');
-						repeater(msg, i+1, embed, values, clickButton, null, identifier, origin, editing);
+						repeater(msg, i+1, embed, values, clickButton, AddRemoveEditView, fail, srmEditing, comesFromSRM);
 					} else if (clickButton.customId == msg.property) {
 						clickButton.values.forEach(val => {
 							if (!answered.includes(val)) msg.guild[msg.property].cache.get(val) ? answered.push(msg.guild[msg.property].cache.get(val).id) : '';
@@ -932,40 +895,8 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
-			messageCollector.on('collect', async (message) => {
-				if (msg.author.id == message.author.id) {
-					if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
-					message.delete().catch(() => {});
-					if (msg.property == 'role' || msg.property == 'channel') {
-						const answerContent = msg.content.replace(/\D+/g, '');
-						const result = msg.guild[msg.compatibilityType].cache.get(answerContent);
-						if (result) answered = values[msg.assigner];
-						else misc.notValid(msg);
-					} else if (msg.property == 'roles' || msg.property == 'channels') {
-						const args = message.content.split(/ +/);
-						Promise.all(args.map(async raw => {
-							const id = raw.replace(/\D+/g, '');
-							const request = msg.guild[msg.compatibilityType].cache.get(id);
-							if ((!request || !request.id) && (!values[msg.assigner] || (values[msg.assigner] && !values[msg.assigner].includes(id)))) fail.push(`\`${raw}\` ${msg.lan.edit[msg.property].fail.no}`);
-							else answered.push(id);
-						}));
-						if (answered.length > 0) {
-							if (Array.isArray(answered)) {
-								answered.forEach(id => { 
-									if (values[msg.assigner] && values[msg.assigner].includes(id)) {
-										const index = values[msg.assigner].indexOf(id);
-										values[msg.assigner].splice(index, 1);
-									} else if (values[msg.assigner] && values[msg.assigner].length > 0) values[msg.assigner].push(id);
-									else values[msg.assigner] = [id];
-								});
-							} else values[msg.assigner] = answered;							
-						}
-						answered = values[msg.assigner];
-					} else return misc.notValid(msg);
-					buttonsCollector.stop('finished');
-					messageCollector.stop('finished');
-					repeater(msg, i+1, embed, values, null, fail, identifier, origin, editing);
-				}
+			messageCollector.on('collect', (message) => {
+				if (message.author.id == msg.author.id && message.content.toLowerCase() == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
 			});
 			buttonsCollector.on('end', (collected, reason) => {
 				if (reason == 'time') {
@@ -1023,7 +954,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					}
 					messageCollector.stop();
 					buttonsCollector.stop();
-					repeater(msg, i+1, embed, values, null, fail, identifier, origin, editing);
+					repeater(msg, i+1, embed, values, null, AddRemoveEditView, fail, srmEditing, comesFromSRM);
 				}
 			});
 			buttonsCollector.on('collect', (clickButton) => {
@@ -1084,7 +1015,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 						buttonsCollector.stop();
 						module.exports.edit(msg, clickButton, {});
 					}
-					repeater(msg, i+1, embed, values, clickButton, null, identifier, origin, editing);
+					repeater(msg, i+1, embed, values, clickButton, AddRemoveEditView, fail, srmEditing, comesFromSRM);
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
 			buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') {msg.client.ch.collectorEnd(msg);}});
@@ -1096,7 +1027,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					message.delete().catch(() => {});
 					buttonsCollector.stop();
 					messageCollector.stop();
-					repeater(msg, i+1, embed, values, null, null, identifier, origin, editing);
+					repeater(msg, i+1, embed, values, null, AddRemoveEditView, fail, srmEditing, comesFromSRM);
 				}
 			});
 		} else if (msg.property == 'id') {
@@ -1207,7 +1138,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 						buttonsCollector.stop('finished');
 						values[msg.assigner] = answered[0];
 						if (msg.rows) msg.r = msg.rows.filter(r => r.id = answered);
-						repeater(msg, i+1, embed, values, clickButton, fail, identifier, origin, editing);
+						repeater(msg, i+1, embed, values, clickButton, AddRemoveEditView, fail, srmEditing, comesFromSRM);
 					} else if (clickButton.customId == msg.property) {
 						let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
 						clickButton.values.forEach(v => {
@@ -1259,17 +1190,8 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
-			messageCollector.on('collect', async (message) => {
-				if (msg.author.id == message.author.id) {
-					if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
-					message.delete().catch(() => {});
-					if (isNaN(parseInt(message.content))) return misc.notValid(msg);
-					answered.push(fail[message.content]);
-					messageCollector.stop();
-					buttonsCollector.stop();
-					values[msg.assigner] = answered;
-					repeater(msg, i+1, embed, values, null, fail, identifier, origin, editing);
-				}
+			messageCollector.on('collect', (message) => {
+				if (message.author.id == msg.author.id && message.content.toLowerCase() == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
 			});
 			buttonsCollector.on('end', (collected, reason) => {
 				if (reason == 'time') {
@@ -1388,7 +1310,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 						msg.client.constants.commands.settings.editReq.push(answered);
 						messageCollector.stop('finished');
 						buttonsCollector.stop('finished');
-						repeater(msg, i+1, embed, values, clickButton, null, identifier, origin, editing);
+						repeater(msg, i+1, embed, values, clickButton, AddRemoveEditView, fail, srmEditing, comesFromSRM);
 					} else if (clickButton.customId == msg.property) {
 						answered = clickButton.values[0];
 						let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
@@ -1436,15 +1358,8 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
-			messageCollector.on('collect', async (message) => {
-				if (msg.author.id == message.author.id) {
-					if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
-					message.delete().catch(() => {});
-					//values[msg.assigner] = answered;							
-					buttonsCollector.stop('finished');
-					messageCollector.stop('finished');
-					repeater(msg, i+1, embed, values, null, fail, identifier, origin, editing);
-				}
+			messageCollector.on('collect', (message) => {
+				if (message.author.id == msg.author.id && message.content.toLowerCase() == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
 			});
 			buttonsCollector.on('end', (collected, reason) => {
 				if (reason == 'time') {
@@ -1562,7 +1477,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 						if (answered.length > 0) values[msg.property] = answered;
 						messageCollector.stop('finished');
 						buttonsCollector.stop('finished');
-						repeater(msg, i+1, embed, values, clickButton, fail, identifier, origin, editing);
+						repeater(msg, i+1, embed, values, clickButton, AddRemoveEditView, fail, srmEditing, comesFromSRM);
 					} else if (clickButton.customId == msg.property) {
 						let page = clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0];
 						answered = clickButton.values[0];
@@ -1630,7 +1545,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 					}
 					messageCollector.stop();
 					buttonsCollector.stop();
-					repeater(msg, i+1, embed, values, null, fail, identifier, origin, editing);
+					repeater(msg, i+1, embed, values, null, AddRemoveEditView, fail, srmEditing, comesFromSRM);
 				}
 			});
 			buttonsCollector.on('end', (collected, reason) => {
@@ -1673,7 +1588,7 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 								else values[msg.assigner] = [id];
 							});
 						} else values[msg.assigner] = answered;	
-						repeater(msg, i+1, embed, values, null, fail, identifier, origin, editing);
+						repeater(msg, i+1, embed, values, null, AddRemoveEditView, fail, srmEditing, comesFromSRM);
 					}
 				}
 			});
@@ -1701,7 +1616,13 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 
 		}
 	} else {
-		if (identifier == 'add') {
+		if (AddRemoveEditView == 'add') {
+			const newSettings = {};
+			Object.entries(values).forEach((arr) => {
+				const name = arr[0], value = arr[1];
+				newSettings[name] = value;
+			});
+			newSettings[msg.assigner] = values[msg.assigner];
 			let valDeclaration = '';
 			for (let j = 0; j < msg.client.constants.commands.settings.setupQueries[msg.file.name].vals.length; j++) {valDeclaration += `$${j+1}, `;}
 			valDeclaration = valDeclaration.slice(0, valDeclaration.length-2);
@@ -1721,26 +1642,31 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 			if (answer) answer.update({embeds: [embed], components: []}).catch(() => {});
 			else if (msg.m) msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 			else msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: []});
-			setTimeout(() => {module.exports.edit(msg, null);}, 3000);
-		} else if (identifier == 'remove') {
-			values.id.forEach(async (id) => {
-				const names = [];
-				const arr = fail.find(f => f.id == id);
-				const entries = Object.entries(arr);
-				const vals = [];
-				entries.forEach(e => {
-					if (e[1] !== null) {
-						vals.push(e[1]);
-						names.push(e[0]);
-					} 
-				});
-				let nameText = '';
-				for (let j = 0; j < names.length; j++) {
-					if (nameText !== '') nameText += ` AND ${names[j]} = $${j+1}`;
-					else nameText += `${names[j]} = $${j+1}`;
-				}
-				msg.client.ch.query(`DELETE FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE ${nameText};`, vals, true);
+			setTimeout(() => {module.exports.edit(msg, null, {});}, 3000);
+			misc.log(null, msg, newSettings);
+		} else if (AddRemoveEditView == 'remove') {
+			let oldRow, oldSettings;
+			const oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [values.id], true);
+			if (oldRes && oldRes.rowCount > 0) {
+				oldRow = oldRes.rows[0];
+				oldSettings = oldRow; 
+			}
+			const names = [];
+			const arr = fail.find(f => f.id == values.id);
+			const entries = Object.entries(arr);
+			const vals = [];
+			entries.forEach(e => {
+				if (e[1] !== null) {
+					vals.push(e[1]);
+					names.push(e[0]);
+				} 
 			});
+			let nameText = '';
+			for (let j = 0; j < names.length; j++) {
+				if (nameText !== '') nameText += ` AND ${names[j]} = $${j+1}`;
+				else nameText += `${names[j]} = $${j+1}`;
+			}
+			msg.client.ch.query(`DELETE FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE ${nameText};`, vals, true);
 			const embed = new Discord.MessageEmbed()
 				.setAuthor(
 					msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), 
@@ -1751,8 +1677,21 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 			if (answer) answer.update({embeds: [embed], components: []}).catch(() => {});
 			else if (msg.m) msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 			else msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: []});
-			setTimeout(() => {module.exports.edit(msg, null);}, 3000);
-		} else if (identifier == 'edit') {
+			setTimeout(() => {module.exports.edit(msg, null, {});}, 3000);
+			misc.log(oldSettings, msg, null);
+		} else if (AddRemoveEditView == 'edit') {
+			let oldRow, oldSettings;
+			const oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [values.id], true);
+			if (oldRes && oldRes.rowCount > 0) {
+				oldRow = oldRes.rows[0];
+				oldSettings = oldRow; 
+			}
+			const newSettings = {};
+			Object.entries(oldRow).forEach((arr) => {
+				const name = arr[0], value = arr[1];
+				newSettings[name] = value;
+			});
+			newSettings[msg.assigner] = values[msg.assigner];
 			msg.client.constants.commands.settings.editReq.splice(2, 1);
 			msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], values.id], true);
 			const embed = new Discord.MessageEmbed()
@@ -1766,17 +1705,17 @@ async function repeater(msg, i, embed, values, answer, fail, identifier, origin,
 			else if (msg.m) msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 			else msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: []});
 			msg.r[msg.assigner] = values[msg.assigner];
-			console.log(3, values.id)
-			if (!origin) setTimeout(() => {module.exports.edit(msg, null);}, 3000);
-			else setTimeout(() => {require('./singleRowManager').redirecter(msg, msg.r, null, values.id, origin == 'srm' ? null : 'edit');}, 3000);
-		} else editer(msg, fail, answer, origin, values);
+			if (!comesFromSRM) setTimeout(() => {module.exports.edit(msg, null, {});}, 3000);
+			else setTimeout(() => {require('./singleRowManager').redirecter(msg, answer, AddRemoveEditView, fail, values);}, 3000);
+			misc.log(oldSettings, msg, newSettings);
+		} else editer(msg, values, fail, answer, AddRemoveEditView, comesFromSRM);
 	}
 }
 
-async function editer(msg, fail, answer, origin, values) {
+async function editer(msg, values, fail, answer, AddRemoveEditView, comesFromSRM) {
 	let oldRes, oldSettings, oldRow;
-	if (origin == 'srm') oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id], true);
-	else oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [origin], true);
+	if (comesFromSRM) oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id], true);
+	else oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [values.id], true);
 	if (oldRes && oldRes.rowCount > 0) {
 		oldRow = oldRes.rows[0];
 		oldSettings = oldRow[msg.assigner]; 
@@ -1812,27 +1751,21 @@ async function editer(msg, fail, answer, origin, values) {
 	}
 	if (answer) answer.update({embeds: [embed], components: []}).catch(() => {});
 	else msg.m.edit({embeds: [embed], components: []}).catch(() => {});
-	const newSettings = oldRow;
 	if (values[msg.assigner] !== undefined && values[msg.assigner] !== null) {
-		if (origin == 'srm') {
+		if (comesFromSRM) {
 			if (Array.isArray(values[msg.assigner])) {
 				if (values[msg.assigner].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [values[msg.assigner], msg.guild.id], true); 
 				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [null, msg.guild.id], true); 
 			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [values[msg.assigner], msg.guild.id], true); 
 		} else {
 			if (Array.isArray(values[msg.assigner])) {
-				if (values[msg.assigner].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], origin], true); 
-				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [null, origin], true); 
-			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], origin], true); 
+				if (values[msg.assigner].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], values.id], true); 
+				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [null, values.id], true); 
+			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], values.id], true); 
 		}
-		setTimeout(() => {require('./singleRowManager').redirecter(msg, newSettings, null, values.id, origin == 'srm' ? null : 'edit');}, 3000);
+		setTimeout(() => {require('./singleRowManager').redirecter(msg, answer, AddRemoveEditView, fail, values);}, 3000);
 	}
-	logger(oldRow, newRow, msg);
-}
-
-async function logger(oldSettings, newSettings, msg) {
-	if (oldSettings && (newSettings !== undefined && newSettings !== null) || (newSettings !== undefined && newSettings !== null && newSettings.length > 0 && Array.isArray(newSettings))) misc.log(oldSettings, msg, newSettings);
-	else if ((newSettings !== undefined && newSettings !== null) || (newSettings.length > 0 && Array.isArray(newSettings))) misc.log(oldSettings, msg, newSettings);
+	misc.log(oldRow, msg, newRow);
 }
 
 async function rower(msg) {

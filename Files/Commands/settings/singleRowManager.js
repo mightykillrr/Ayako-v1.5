@@ -1,3 +1,11 @@
+/**
+ * Side Module for managing all single-Row or a specific row of multi-Row Ayako Settings.
+ * @constructor
+ * @param {object} answer - The interaction Object which can be updated.
+ * @param {object} file - The file which is edited right now.
+ * @param {object} msg - The Message Object which iniciated this message.
+ */
+
 const Discord = require('discord.js');
 const misc = require('./misc.js');
 const setuper = require('./setup');
@@ -6,25 +14,26 @@ module.exports = {
 	exe(msg, answer, file) {
 		edit(msg, answer, file);
 	},
-	redirecter(msg, r, answer, origin, identifier) {
-	console.log(2, origin)
-		edit(msg, answer, msg.file, origin, r, identifier);
+	redirecter(msg, answer, AddRemoveEditView, fail, values) {
+		edit(msg, answer, msg.file, AddRemoveEditView, fail, values, 'redirecter');
 	}
 };
 
-async function edit(msg, answer, file, origin, r, identifier) {
-	msg.lanSettings = msg.language.commands.settings;
+async function edit(msg, answer, file, AddRemoveEditView, fail, values, origin) {
+	msg.lanSettings = msg.language.commands.settings; let r;
 	if (!msg.file) {file.name = msg.args[0].toLowerCase(); msg.file = file;}
 	if (!origin) {
-		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
+		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id], true);
 		if (msg.file.setupRequired == false) return require('./multiRowManager').exe(msg, answer);
 		else if (!res || res.rowCount == 0) return setuper.execute(msg);
 		else r = res.rows[0];
+	} else {
+		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [values.id], true);
+		r = res.rows[0];
 	}
 	if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
 	msg.lanSettings = msg.language.commands.settings;
 	const editEmbed = typeof(msg.file.editEmbed) == 'function' ? msg.file.editEmbed(msg, r) : misc.noEmbed(msg);
-	editEmbed.setDescription(`${msg.client.ch.stp(msg.lanSettings.howToEdit2, {prefix: msg.client.constants.standard.prefix, type: msg.file.name})}\n\n${editEmbed.description ? editEmbed.description : ''}`);
 	editEmbed.setColor(msg.client.constants.commands.settings.color);
 	editEmbed.setAuthor(
 		msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), 
@@ -52,8 +61,8 @@ async function edit(msg, answer, file, origin, r, identifier) {
 		.setStyle('DANGER');
 	if (origin) buttons.push(back);
 	const actionRows = msg.client.ch.buttonRower(buttons);
-	if (answer) answer.update({embeds: [editEmbed], components: actionRows}).catch((e) => {console.log(e);});
-	else if (msg.m) msg.m.edit({embeds: [editEmbed], components: actionRows}).catch((e) => {console.log(e);});
+	if (answer) answer.update({embeds: [editEmbed], components: actionRows}).catch(() => {});
+	else if (msg.m) msg.m.edit({embeds: [editEmbed], components: actionRows}).catch(() => {});
 	else msg.m = await msg.client.ch.reply(msg, {embeds: [editEmbed], components: actionRows});
 	const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 	const messageCollector = msg.channel.createMessageCollector({time: 60000});
@@ -62,13 +71,13 @@ async function edit(msg, answer, file, origin, r, identifier) {
 			if (clickButton.customId == 'back') {
 				buttonsCollector.stop();
 				messageCollector.stop();
-				require('./multiRowManager').edit(msg, clickButton, msg.file);
+				require('./multiRowManager').edit(msg, clickButton, values, AddRemoveEditView, fail);
 				return;
 			}
-			let editing;
-			Object.entries(msg.lan.edit).forEach(e => {e[1].trigger.forEach(trigger => {if (trigger.replace(/`/g, '') == clickButton.customId) editing = e;});});
-			if (editing) {
-				require('./multiRowManager').redirect(msg, null, clickButton, 'srm', editing, identifier, origin);
+			let srmEditing;
+			Object.entries(msg.lan.edit).forEach(e => {e[1].trigger.forEach(trigger => {if (trigger.replace(/`/g, '') == clickButton.customId) srmEditing = e;});});
+			if (srmEditing) {
+				require('./multiRowManager').redirect(msg, 0, values, clickButton, AddRemoveEditView, fail, srmEditing, true);
 				buttonsCollector.stop();
 				messageCollector.stop();
 			}
@@ -76,22 +85,6 @@ async function edit(msg, answer, file, origin, r, identifier) {
 	});
 	buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') {msg.client.ch.collectorEnd(msg);}});
 	messageCollector.on('collect', (message) => {
-		if (message.author.id == msg.author.id) {
-			if (message.content.toLowerCase() == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
-			if (message.content.toLowerCase() == msg.language.back.toLowerCase()) {
-				buttonsCollector.stop();
-				messageCollector.stop();
-				require('./multiRowManager').edit(msg, null, msg.file);
-				return;
-			}
-			let editing;
-			Object.entries(msg.lan.edit).forEach(e => {e[1].trigger.forEach(trigger => {if (trigger.replace(/`/g, '') == message.content.toLowerCase()) editing = e;});});
-			if (editing) {
-				require('./multiRowManager').redirect(msg, null, null, 'srm', editing, identifier, origin);
-				message.delete().catch(() => {});
-				buttonsCollector.stop();
-				messageCollector.stop();
-			}
-		}
+		if (message.author.id == msg.author.id && message.content.toLowerCase() == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
 	});
 }
