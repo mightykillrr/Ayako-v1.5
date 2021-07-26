@@ -1,11 +1,3 @@
-/**
- * Side Module for managing all single-Row or a specific row of multi-Row Ayako Settings.
- * @constructor
- * @param {object} answer - The interaction Object which can be updated.
- * @param {object} file - The file which is edited right now.
- * @param {object} msg - The Message Object which iniciated this message.
- */
-
 const Discord = require('discord.js');
 const misc = require('./misc.js');
 const setuper = require('./setup');
