@@ -63,7 +63,6 @@ module.exports = {
 			msg.client.constants.emotes.settingsLink,
 			msg.client.constants.standard.invite
 		)
-			.setDescription(`${msg.client.ch.stp(msg.lanSettings.howToEdit, {prefix: msg.client.constants.standard.prefix, type: file.name})}\n\n${embed.description ? embed.description : ''}`)
 			.setColor(msg.client.constants.commands.settings.color);
 		const button = new Discord.MessageButton()
 			.setCustomId('edit')

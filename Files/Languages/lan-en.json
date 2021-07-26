@@ -1404,10 +1404,10 @@
                 "command": "Command",
                 "cooldown": "Cooldown",
                 "active": "Active",
-                "activechannelid": "Whitelisted Channels",
-                "bproleid": "Blacklisted Roles",
-                "bpchannelid": "Blacklisted Channels",
-                "bpuserid": "Blacklisted Users",
+                "activechannelid": "Active Channels",
+                "bproleid": "Bypassed Roles",
+                "bpchannelid": "Bypassed Channels",
+                "bpuserid": "Bypassed Users",
                 "id": "Number",
                 "edit": {
                     "command": {

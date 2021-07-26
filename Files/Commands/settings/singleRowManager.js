@@ -14,8 +14,8 @@ module.exports = {
 	exe(msg, answer, file) {
 		edit(msg, answer, file);
 	},
-	redirecter(msg, answer, AddRemoveEditView, fail, values) {
-		edit(msg, answer, msg.file, AddRemoveEditView, fail, values, 'redirecter');
+	redirecter(msg, answer, AddRemoveEditView, fail, values, origin) {
+		edit(msg, answer, msg.file, AddRemoveEditView, fail, values, origin);
 	}
 };
 
@@ -33,9 +33,9 @@ async function edit(msg, answer, file, AddRemoveEditView, fail, values, origin) 
 	}
 	if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
 	msg.lanSettings = msg.language.commands.settings;
-	const editEmbed = typeof(msg.file.editEmbed) == 'function' ? msg.file.editEmbed(msg, r) : misc.noEmbed(msg);
-	editEmbed.setColor(msg.client.constants.commands.settings.color);
-	editEmbed.setAuthor(
+	const displayEmbed = typeof(msg.file.displayEmbed) == 'function' ? msg.file.displayEmbed(msg, r) : misc.noEmbed(msg);
+	displayEmbed.setColor(msg.client.constants.commands.settings.color);
+	displayEmbed.setAuthor(
 		msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), 
 		msg.client.constants.emotes.settingsLink, 
 		msg.client.constants.standard.invite
@@ -61,9 +61,9 @@ async function edit(msg, answer, file, AddRemoveEditView, fail, values, origin) 
 		.setStyle('DANGER');
 	if (origin) buttons.push(back);
 	const actionRows = msg.client.ch.buttonRower(buttons);
-	if (answer) answer.update({embeds: [editEmbed], components: actionRows}).catch(() => {});
-	else if (msg.m) msg.m.edit({embeds: [editEmbed], components: actionRows}).catch(() => {});
-	else msg.m = await msg.client.ch.reply(msg, {embeds: [editEmbed], components: actionRows});
+	if (answer) answer.update({embeds: [displayEmbed], components: actionRows}).catch(() => {});
+	else if (msg.m) msg.m.edit({embeds: [displayEmbed], components: actionRows}).catch(() => {});
+	else msg.m = await msg.client.ch.reply(msg, {embeds: [displayEmbed], components: actionRows});
 	const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 	const messageCollector = msg.channel.createMessageCollector({time: 60000});
 	buttonsCollector.on('collect', (clickButton) => {

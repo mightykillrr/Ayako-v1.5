@@ -29,33 +29,6 @@ module.exports = {
 			);
 		return embed;
 	},
-	editEmbed(msg, r) {
-		const embed = new Discord.MessageEmbed()
-			.addFields(
-				{
-					name: msg.client.ch.stp(msg.lan.edit.active.name, {trigger: msg.lan.edit.active.trigger}), 
-					value: `${r.active ? `${msg.client.constants.emotes.tick} ${msg.language.enabled}` : `${msg.client.constants.emotes.cross} ${msg.language.disabled}`}`, 
-					inline: false
-				},
-				{
-					name: msg.client.ch.stp(msg.lan.edit.botroleid.name, {trigger: msg.lan.edit.botroleid.trigger}), 
-					value: `${r.botroleid && r.botroleid.length > 0 ? r.botroleid.map(id => ` <@&${id}>`) : msg.language.none}`, 
-					inline: false
-				},
-				{
-					name: msg.client.ch.stp(msg.lan.edit.userroleid.name, {trigger:  msg.lan.edit.userroleid.trigger}), 
-					value: `${r.userroleid && r.userroleid.length > 0 ? r.userroleid.map(id => ` <@&${id}>`) : msg.language.none}`, 
-					inline: false
-				},
-				{
-					name: msg.client.ch.stp(msg.lan.edit.allroleid.name, {trigger: msg.lan.edit.allroleid.trigger}), 
-					value: `${r.allroleid && r.allroleid.length > 0 ? r.allroleid.map(id => ` <@&${id}>`) : msg.language.none}`, 
-					inline: false
-				},
-				
-			);
-		return embed;
-	},
 	buttons(msg, r) {
 		const active = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.active.trigger[1] ? msg.lan.edit.active.trigger[1].replace(/`/g, '') : msg.lan.edit.active.trigger[0].replace(/`/g, '')}`)

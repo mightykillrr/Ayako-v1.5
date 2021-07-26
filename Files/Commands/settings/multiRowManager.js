@@ -75,7 +75,7 @@ module.exports = {
 	},
 	async edit(msg, answer, values, AddRemoveEditView, fail) {
 		if (values && values.id) {
-			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, values.id, true);
+			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [values.id], true);
 			if (res && res.rowCount > 0) return require('./singleRowManager').redirecter(msg, answer, AddRemoveEditView, fail, values);
 		}
 		msg.client.constants.commands.settings.editReq.splice(2, 1);
@@ -301,7 +301,7 @@ module.exports = {
 				} else if (clickButton.customId == 'back') {
 					messageCollector.stop();
 					buttonsCollector.stop();
-					module.exports.edit(msg, clickButton, {});
+					return module.exports.edit(msg, clickButton, {});
 				}
 			} else msg.client.ch.notYours(clickButton, msg);
 		});
@@ -323,7 +323,7 @@ module.exports = {
 		async function gotID(id, answer, AddRemoveEditView, fail) {
 			const res = await msg.client.ch.query(`SELECT * FROM ${msg.file.name} WHERE id = $1 AND guildid = $2;`, [id, msg.guild.id], true);
 			if (res && res.rowCount > 0) {
-				if (AddRemoveEditView == 'edit') require('./singleRowManager').redirecter(msg, answer, AddRemoveEditView, fail, values);
+				if (AddRemoveEditView == 'edit') require('./singleRowManager').redirecter(msg, answer, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);
 				else if (AddRemoveEditView == 'view') listdisplay(msg, answer, id, AddRemoveEditView, fail, values);
 			}
 		}
@@ -484,8 +484,8 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 						clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 					} else if (clickButton.customId == 'back') {
 						CollectorEnder([messageCollector, buttonsCollector]);
-						module.exports.edit(msg, clickButton, {});
-					} else if (clickButton.customId == 'done') {
+						if (comesFromSRM) return require('./singleRowManager').redirecter(msg, clickButton, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);
+						else return module.exports.edit(msg, clickButton, {});					} else if (clickButton.customId == 'done') {
 						CollectorEnder([messageCollector, buttonsCollector]);
 						values.command = answered;
 						repeater(msg, i+1, embed, values, clickButton, AddRemoveEditView, fail, srmEditing, comesFromSRM);
@@ -694,7 +694,8 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 					} else if (clickButton.customId == 'back') {
 						messageCollector.stop();
 						buttonsCollector.stop();
-						module.exports.edit(msg, clickButton, {});
+						if (comesFromSRM) return require('./singleRowManager').redirecter(msg, clickButton, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);
+						else return module.exports.edit(msg, clickButton, {});
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
@@ -891,7 +892,8 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 					} else if (clickButton.customId == 'back') {
 						messageCollector.stop();
 						buttonsCollector.stop();
-						module.exports.edit(msg, clickButton, {});
+						if (comesFromSRM) return require('./singleRowManager').redirecter(msg, clickButton, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);
+						else return module.exports.edit(msg, clickButton, {});
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
@@ -962,7 +964,8 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 					if (clickButton.customId == 'back') {
 						buttonsCollector.stop();
 						messageCollector.stop();
-						module.exports.edit(msg, clickButton, {});
+						if (comesFromSRM) return require('./singleRowManager').redirecter(msg, clickButton, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);
+						else return module.exports.edit(msg, clickButton, {});
 					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
@@ -1013,7 +1016,8 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 					else if (clickButton.customId == 'back') {
 						messageCollector.stop();
 						buttonsCollector.stop();
-						module.exports.edit(msg, clickButton, {});
+						if (comesFromSRM) return require('./singleRowManager').redirecter(msg, clickButton, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);
+						else return module.exports.edit(msg, clickButton, {});
 					}
 					repeater(msg, i+1, embed, values, clickButton, AddRemoveEditView, fail, srmEditing, comesFromSRM);
 				} else msg.client.ch.notYours(clickButton, msg);
@@ -1186,8 +1190,8 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 					} else if (clickButton.customId == 'back') {
 						messageCollector.stop();
 						buttonsCollector.stop();
-						module.exports.edit(msg, clickButton, {});
-					}
+						if (comesFromSRM) return require('./singleRowManager').redirecter(msg, clickButton, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);
+						else return module.exports.edit(msg, clickButton, {});					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
 			messageCollector.on('collect', (message) => {
@@ -1209,7 +1213,7 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 			const options = [];
 			for (let j = 0; j < Object.entries(msg.lan).length; j++) {
 				const name = Object.entries(msg.lan)[j][0], val = Object.entries(msg.lan)[j][1];
-				if (name !== 'category' && name !== 'type' && name !== 'edit' && name !== 'otherEdits') options.push({label: val.length > 25 ? `${val.slice(0, 24)}\u2026` : val, value: name});
+				if (msg.client.constants.commands.settings.setupQueries[msg.file.name].add.includes(name) || name == 'active') options.push({label: val.length > 25 ? `${val.slice(0, 24)}\u2026` : val, value: name});
 			}
 			const take = [];
 			for(let j = 0; j < 25 && j < options.length; j++) {take.push(options[j]);}
@@ -1354,8 +1358,8 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 					} else if (clickButton.customId == 'back') {
 						messageCollector.stop();
 						buttonsCollector.stop();
-						module.exports.edit(msg, clickButton, {});
-					}
+						if (comesFromSRM) return require('./singleRowManager').redirecter(msg, clickButton, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);
+						else return module.exports.edit(msg, clickButton, {});					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
 			messageCollector.on('collect', (message) => {
@@ -1522,8 +1526,8 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 						msg.property = undefined;
 						messageCollector.stop();
 						buttonsCollector.stop();
-						module.exports.edit(msg, clickButton, {});
-					}
+						if (comesFromSRM) return require('./singleRowManager').redirecter(msg, clickButton, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);
+						else return module.exports.edit(msg, clickButton, {});					}
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
 			messageCollector.on('collect', async (message) => {
@@ -1597,8 +1601,8 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 					if (clickButton.customId == 'back') {
 						buttonsCollector.stop();
 						messageCollector.stop();
-						module.exports.edit(msg, clickButton, {});
-					}
+						if (comesFromSRM) return require('./singleRowManager').redirecter(msg, clickButton, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);
+						else return module.exports.edit(msg, clickButton, {});					}
 				} else msg.client.ch.notYours(clickButton);
 			});
 			buttonsCollector.on('end', (collected, reason) => {
@@ -1692,6 +1696,12 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 				newSettings[name] = value;
 			});
 			newSettings[msg.assigner] = values[msg.assigner];
+			if (Array.isArray(oldSettings) && oldSettings.length > 0) {
+				Promise.all(oldSettings.map(id => {
+					if (values[msg.assigner].includes(id)) values[msg.assigner].splice(values[msg.assigner].indexOf(id), 1);
+					else values[msg.assigner].push(id);
+				}));
+			}
 			msg.client.constants.commands.settings.editReq.splice(2, 1);
 			msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], values.id], true);
 			const embed = new Discord.MessageEmbed()
@@ -1706,7 +1716,7 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 			else msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: []});
 			msg.r[msg.assigner] = values[msg.assigner];
 			if (!comesFromSRM) setTimeout(() => {module.exports.edit(msg, null, {});}, 3000);
-			else setTimeout(() => {require('./singleRowManager').redirecter(msg, answer, AddRemoveEditView, fail, values);}, 3000);
+			else setTimeout(() => {require('./singleRowManager').redirecter(msg, null, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);}, 3000);
 			misc.log(oldSettings, msg, newSettings);
 		} else editer(msg, values, fail, answer, AddRemoveEditView, comesFromSRM);
 	}
@@ -1763,7 +1773,7 @@ async function editer(msg, values, fail, answer, AddRemoveEditView, comesFromSRM
 				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [null, values.id], true); 
 			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], values.id], true); 
 		}
-		setTimeout(() => {require('./singleRowManager').redirecter(msg, answer, AddRemoveEditView, fail, values);}, 3000);
+		setTimeout(() => {require('./singleRowManager').redirecter(msg, null, AddRemoveEditView, fail, values.id ? {id: values.id} : null, values.id ? 'redirecter' : null);}, 3000);
 	}
 	misc.log(oldRow, msg, newRow);
 }
@@ -1771,6 +1781,7 @@ async function editer(msg, values, fail, answer, AddRemoveEditView, comesFromSRM
 async function rower(msg) {
 	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]};`, null, true);
 	if (!res || res.rowCount == 0) return;
+	if (!res.rows[0].uniquetimestamp) return;
 	res.rows = res.rows.sort((a,b) => a.uniquetimestamp - b.uniquetimestamp);
 	for (let i = 0; i < res.rowCount; i++) {
 		res.rows[i].id = i+1;
