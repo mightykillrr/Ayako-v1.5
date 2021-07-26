@@ -12,7 +12,7 @@ module.exports = {
 			const r = res[i];
 			embed.addFields(
 				{
-					name: `${msg.language.number}:\`${r.id}\` | ${msg.language.command}: \`${r.command}\` | ${r.active ? `${msg.client.constants.emotes.tick} ${msg.language.enabled}` : `${msg.client.constants.emotes.cross} ${msg.language.disabled}`}`,
+					name: `${msg.language.number}: \`${r.id}\` | ${msg.language.command}: \`${r.command}\` | ${r.active ? `${msg.client.constants.emotes.tick} ${msg.language.enabled}` : `${msg.client.constants.emotes.cross} ${msg.language.disabled}`}`,
 					value: `${msg.language.cooldown}: ${moment.duration(r.cooldown * 1000).format(`s [${msg.language.time.seconds}]`)} `, 
 					inline: true
 				}

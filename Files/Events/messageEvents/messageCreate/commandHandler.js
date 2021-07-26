@@ -66,8 +66,8 @@ module.exports = {
 		this.commandCheck(msg);
 	},
 	async commandCheck(msg) {
-		const res = await msg.client.ch.query('SELECT * FROM disabledcommands WHERE guildid = $1;', [msg.guild.id]);
-		if (res && res.rowCount > 0 && res.rows[0].disabled.includes(msg.command.name.toLowerCase())) return msg.client.ch.reply(msg, msg.client.ch.stp(msg.language.commands.commandHandler.CommandDisabled, {name: msg.command.name}));
+		//const res = await msg.client.ch.query('SELECT * FROM disabledcommands WHERE guildid = $1;', [msg.guild.id]);
+		//if (res && res.rowCount > 0 && res.rows[0].disabled.includes(msg.command.name.toLowerCase())) return msg.client.ch.reply(msg, msg.client.ch.stp(msg.language.commands.commandHandler.CommandDisabled, {name: msg.command.name}));
 		this.permissionCheck(msg);
 	},
 	async permissionCheck(msg) {

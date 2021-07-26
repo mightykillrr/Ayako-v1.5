@@ -4,6 +4,20 @@ module.exports = {
 	perm: 8192n,
 	type: 1,
 	setupRequired: false,
+	mmrEmbed(msg, res) {
+		const embed = new Discord.MessageEmbed();
+		for (let i = 0; i < res.length; i++) {
+			const r = res[i];
+			embed.addFields(
+				{
+					name: `${msg.language.number}: \`${r.id}\` | ${msg.lan.commands}: ${r.commands.map(c => ` \`${c}\``)} | ${r.active ? `${msg.client.constants.emotes.tick} ${msg.language.enabled}` : `${msg.client.constants.emotes.cross} ${msg.language.disabled}`}`,
+					value: `${msg.lan.channels}: ${r.channels.map(c => ` <#${c}>`)}`, 
+					inline: true
+				}
+			);
+		}
+		return embed;
+	},
 	displayEmbed(msg, r) {
 		const embed = new Discord.MessageEmbed()
 			.addFields(

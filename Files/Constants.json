@@ -524,7 +524,7 @@
                 },
                 "disabled": {
                     "cols": "guildid, active, channels, id, uniquetimestamp, commands",
-                    "vals": ["{{values.guild.id}}", true, "[{{values.channels}}]", "{{values.id}}", "{{values.date}}", "[{{values.commands}}]"],
+                    "vals": ["{{values.guildid}}", true, ["{{values.channels}}"], "{{values.id}}", "{{values.uniquetimestamp}}", ["{{values.commands}}"]],
                     "add": ["commands", "channels"],
                     "remove": ["id"],
                     "removeIdent": "channels",
@@ -536,7 +536,7 @@
                 },
                 "cooldowns": {
                     "cols": "guildid, active, command, cooldown, id, uniquetimestamp",
-                    "vals": ["{{values.guild.id}}", true, "{{values.command}}", "{{values.cooldown}}", "{{values.id}}", "{{values.date}}"],
+                    "vals": ["{{values.guildid}}", true, "{{values.command}}", "{{values.cooldown}}", "{{values.id}}", "{{values.uniquetimestamp}}"],
                     "add": ["command", "cooldown"],
                     "remove": ["id"],
                     "removeIdent": "command",
