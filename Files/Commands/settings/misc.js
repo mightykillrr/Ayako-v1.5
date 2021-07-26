@@ -93,7 +93,7 @@ module.exports = {
 				.setColor(msg.client.constants.commands.settings.log.color)
 				.setTimestamp()
 				.setAuthor(msg.client.ch.stp(msg.language.selfLog.author, {setting: msg.lan.type}))
-				.setDescription(!oldSettings ? msg.client.ch.stp(msg.language.selfLog.description, {msg: msg, setting: msg.file.name}) : msg.client.ch.stp(msg.language.selfLog.descriptionwithID, {msg: msg, setting: msg.file.name, settings: settings.id}))
+				.setDescription(!oldSettings ? msg.client.ch.stp(msg.language.selfLog.description, {msg: msg, setting: msg.file.name}) : msg.client.ch.stp(msg.language.selfLog.descriptionwithID, {msg: msg, setting: msg.file.name, id: settings.id}))
 				.addFields(
 					{
 						name: `${msg.client.ch.stp(msg.language.DeletedEntry, {id: settings.id})}`, 

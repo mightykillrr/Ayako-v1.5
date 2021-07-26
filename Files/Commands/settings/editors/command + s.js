@@ -2,8 +2,9 @@ const Discord = require('discord.js');
 const misc = require('../misc.js');
 
 module.exports = {
-	key: ['command'],
+	key: ['command', 'commands'],
 	async exe(msg, i, embed, values, answer, AddRemoveEditView, fail, srmEditing, comesFromSRM, answered) {
+		const isMany = msg.property.includes('s');
 		let req = msg.client.commands;
 		req = req.filter((command) => (!command.thisGuildOnly || command.thisGuildOnly.includes(msg.guild.id)) && command.perm !== 0);
 		req = req.map(c => c.name);
@@ -19,7 +20,7 @@ module.exports = {
 			.setCustomId('cmdmenu')
 			.addOptions(take)
 			.setMinValues(1)
-			.setMaxValues(1)
+			.setMaxValues(isMany ? take.length : 1)
 			.setPlaceholder(msg.language.select[msg.property].select);
 		const next = new Discord.MessageButton()
 			.setCustomId('next')
@@ -59,14 +60,14 @@ module.exports = {
 				if (clickButton.user.id == msg.author.id) {
 					if (clickButton.customId == 'cmdmenu') {
 						clickButton.values.forEach(val => {
-							answered = val;
+							isMany ? answered.push(val) : answered = val;
 						});
 						let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
 						const menu = new Discord.MessageSelectMenu()
 							.setCustomId('cmdmenu')
 							.addOptions(take)
 							.setMinValues(1)
-							.setMaxValues(1)
+							.setMaxValues(isMany ? take.length : 1)
 							.setPlaceholder(msg.language.select[msg.property].select);
 						const next = new Discord.MessageButton()
 							.setCustomId('next')
@@ -96,7 +97,7 @@ module.exports = {
 								msg.client.constants.standard.invite
 							)
 							.setDescription(`${msg.language.select[msg.property].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``)
-							.addField(msg.language.selected, `${answered} `);
+							.addField(msg.language.selected, `${isMany ? answered.map(c => ` \`${c}\``) : answered} `);
 						const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
 						clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 					} else if (clickButton.customId == 'back') {
@@ -109,7 +110,7 @@ module.exports = {
 						messageCollector.stop();
 						buttonsCollector.stop();
 						interaction = clickButton;
-						values.command = answered;
+						values[msg.property] = answered;
 						resolve(true);
 					} else if (clickButton.customId == 'next' || clickButton.customId == 'prev') {
 						let indexLast; let indexFirst;
@@ -126,7 +127,7 @@ module.exports = {
 							.setCustomId(msg.property)
 							.addOptions(take)
 							.setMinValues(1)
-							.setMaxValues(1)
+							.setMaxValues(isMany ? take.length : 11)
 							.setPlaceholder(msg.language.select[msg.property].select);
 						const next = new Discord.MessageButton()
 							.setCustomId('next')
@@ -156,7 +157,7 @@ module.exports = {
 								msg.client.constants.standard.invite
 							)
 							.setDescription(`${msg.language.select[msg.property].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``);
-						if (answered.length > 0) embed.addField(msg.language.selected, `${answered} `);
+						if (answered.length > 0) embed.addField(msg.language.selected, `${isMany ? answered.map(c => ` \`${c}\``) : answered} `);
 						if (page >= Math.ceil(+options.length / 25)) next.setDisabled(true);
 						else next.setDisabled(false);
 						if (page > 1) prev.setDisabled(false);

@@ -441,6 +441,17 @@
                     "id": "id",
                     "column": "column"
                 },
+                "disabled": {
+                    "commands": "commands",
+                    "channels": "channels",
+                    "bproleid": "roles",
+                    "blroleid": "roles",
+                    "bpuserid": "users",
+                    "bluserid": "users",
+                    "active": "boolean",
+                    "id": "id",
+                    "column": "column"
+                },
                 "disboard": {
                     "enabled": "boolean",
                     "channelid": "channel",
@@ -498,7 +509,6 @@
                 "muterole": "muterole"
             },
             "editReq": ["id", "column"],
-            "removeReq": ["id", "cooldown"],
             "setupQueries": {
                 "antispam": {
                     "cols": "active, giveofficialwarnstof, muteafterwarnsamount, kickafterwarnsamount, banafterwarnsamount, readofwarnstof, muteenabledtof, kickenabledtof, banenabledtof, guildid",
@@ -513,8 +523,12 @@
                     "vals": ["{{msg.guild.id}}", true]
                 },
                 "disabled": {
-                    "cols": "guildid",
-                    "vals": ["{{msg.guild.id}}"]
+                    "cols": "guildid, active, channels, id, uniquetimestamp, commands",
+                    "vals": ["{{values.guild.id}}", true, "[{{values.channels}}]", "{{values.id}}", "{{values.date}}", "[{{values.commands}}]"],
+                    "add": ["commands", "channels"],
+                    "remove": ["id"],
+                    "removeIdent": "channels",
+                    "removeReq": ["id", "channels"]
                 },
                 "disboard": {
                     "cols": "guildid, active",
@@ -525,7 +539,8 @@
                     "vals": ["{{values.guild.id}}", true, "{{values.command}}", "{{values.cooldown}}", "{{values.id}}", "{{values.date}}"],
                     "add": ["command", "cooldown"],
                     "remove": ["id"],
-                    "removeIdent": "command"
+                    "removeIdent": "command",
+                    "removeReq": ["id", "cooldown"]
                 },
                 "forcecooldowns": {
                     "cols": null,
