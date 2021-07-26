@@ -18,7 +18,7 @@ module.exports = {
 	async display(msg, answer) {
 		if (!answer) await rower(msg);
 		msg.client.constants.commands.settings.editReq.splice(2, 1);
-		let res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id], true);
+		let res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 		if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
 		msg.lanSettings = msg.language.commands.settings;
 		msg.lan = msg.lanSettings[msg.file.name];
@@ -70,7 +70,7 @@ module.exports = {
 	},
 	async edit(msg, answer, values, AddRemoveEditView, fail) {
 		if (values && values.id) {
-			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [values.id], true);
+			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [values.id]);
 			if (res && res.rowCount > 0) return require('./singleRowManager').redirecter(msg, answer, AddRemoveEditView, fail, values);
 		}
 		msg.client.constants.commands.settings.editReq.splice(2, 1);
@@ -78,7 +78,7 @@ module.exports = {
 		msg.lan = msg.lanSettings[msg.file.name];
 		let embed;
 		await rower(msg);
-		let res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id], true);
+		let res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 		if (res && res.rowCount > 0) {
 			res.rows = res.rows.sort((a, b) => a.id - b.id);
 			msg.rows = res.rows;
@@ -142,7 +142,7 @@ module.exports = {
 	},
 	async list(msg, answer, AddRemoveEditView, fail) {
 		let r = [], answered = [], values = {};
-		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id], true);
+		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 		if (res && res.rowCount > 0) r = res.rows;
 		else return misc.aborted(msg);
 		const options = [];
@@ -316,7 +316,7 @@ module.exports = {
 			}
 		});
 		async function gotID(id, answer, AddRemoveEditView, fail) {
-			const res = await msg.client.ch.query(`SELECT * FROM ${msg.file.name} WHERE id = $1 AND guildid = $2;`, [id, msg.guild.id], true);
+			const res = await msg.client.ch.query(`SELECT * FROM ${msg.file.name} WHERE id = $1 AND guildid = $2;`, [id, msg.guild.id]);
 			if (res && res.rowCount > 0) {
 				if (AddRemoveEditView == 'edit') require('./singleRowManager').redirecter(msg, answer, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);
 				else if (AddRemoveEditView == 'view') listdisplay(msg, answer, id, AddRemoveEditView, fail, values);
@@ -403,10 +403,10 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 			valDeclaration = valDeclaration.slice(0, valDeclaration.length-2);
 			values.guild = msg.guild;
 			values.date = Date.now();
-			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]};`, null, true);
+			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]};`, null);
 			if (res && res.rowCount > 0) values.id = res.rowCount+1;
 			else values.id = 1;
-			msg.client.ch.query(`INSERT INTO ${msg.client.constants.commands.settings.tablenames[msg.file.name]} (${msg.client.constants.commands.settings.setupQueries[msg.file.name].cols}) VALUES (${valDeclaration});`, msg.client.ch.stp(msg.client.constants.commands.settings.setupQueries[msg.file.name].vals, {values: values}), true);
+			msg.client.ch.query(`INSERT INTO ${msg.client.constants.commands.settings.tablenames[msg.file.name]} (${msg.client.constants.commands.settings.setupQueries[msg.file.name].cols}) VALUES (${valDeclaration});`, msg.client.ch.stp(msg.client.constants.commands.settings.setupQueries[msg.file.name].vals, {values: values}));
 			const embed = new Discord.MessageEmbed()
 				.setAuthor(
 					msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), 
@@ -421,7 +421,7 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 			misc.log(null, msg, newSettings);
 		} else if (AddRemoveEditView == 'remove') {
 			let oldRow, oldSettings;
-			const oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [values.id], true);
+			const oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [values.id]);
 			if (oldRes && oldRes.rowCount > 0) {
 				oldRow = oldRes.rows[0];
 				oldSettings = oldRow; 
@@ -441,7 +441,7 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 				if (nameText !== '') nameText += ` AND ${names[j]} = $${j+1}`;
 				else nameText += `${names[j]} = $${j+1}`;
 			}
-			msg.client.ch.query(`DELETE FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE ${nameText};`, vals, true);
+			msg.client.ch.query(`DELETE FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE ${nameText};`, vals);
 			const embed = new Discord.MessageEmbed()
 				.setAuthor(
 					msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), 
@@ -456,7 +456,7 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 			misc.log(oldSettings, msg, null);
 		} else if (AddRemoveEditView == 'edit') {
 			let oldRow, oldSettings;
-			const oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [values.id], true);
+			const oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [values.id]);
 			if (oldRes && oldRes.rowCount > 0) {
 				oldRow = oldRes.rows[0];
 				oldSettings = oldRow; 
@@ -474,7 +474,7 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 				}));
 			}
 			msg.client.constants.commands.settings.editReq.splice(2, 1);
-			msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], values.id], true);
+			msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], values.id]);
 			const embed = new Discord.MessageEmbed()
 				.setAuthor(
 					msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), 
@@ -495,8 +495,8 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 
 async function editer(msg, values, fail, answer, AddRemoveEditView, comesFromSRM) {
 	let oldRes, oldSettings, oldRow;
-	if (comesFromSRM) oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id], true);
-	else oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [values.id], true);
+	if (comesFromSRM) oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
+	else oldRes = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [values.id]);
 	if (oldRes && oldRes.rowCount > 0) {
 		oldRow = oldRes.rows[0];
 		oldSettings = oldRow[msg.assigner]; 
@@ -535,14 +535,14 @@ async function editer(msg, values, fail, answer, AddRemoveEditView, comesFromSRM
 	if (values[msg.assigner] !== undefined && values[msg.assigner] !== null) {
 		if (comesFromSRM) {
 			if (Array.isArray(values[msg.assigner])) {
-				if (values[msg.assigner].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [values[msg.assigner], msg.guild.id], true); 
-				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [null, msg.guild.id], true); 
-			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [values[msg.assigner], msg.guild.id], true); 
+				if (values[msg.assigner].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [values[msg.assigner], msg.guild.id]); 
+				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [null, msg.guild.id]); 
+			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE guildid = $2;`, [values[msg.assigner], msg.guild.id]); 
 		} else {
 			if (Array.isArray(values[msg.assigner])) {
-				if (values[msg.assigner].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], values.id], true); 
-				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [null, values.id], true); 
-			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], values.id], true); 
+				if (values[msg.assigner].length > 0) await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], values.id]); 
+				else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [null, values.id]); 
+			} else await msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET ${msg.assigner} = $1 WHERE id = $2;`, [values[msg.assigner], values.id]); 
 		}
 		setTimeout(() => {require('./singleRowManager').redirecter(msg, null, AddRemoveEditView, fail, values.id ? {id: values.id} : null, values.id ? 'redirecter' : null);}, 3000);
 	}
@@ -550,13 +550,13 @@ async function editer(msg, values, fail, answer, AddRemoveEditView, comesFromSRM
 }
 
 async function rower(msg) {
-	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]};`, null, true);
+	const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]};`, null);
 	if (!res || res.rowCount == 0) return;
 	if (!res.rows[0].uniquetimestamp) return;
 	res.rows = res.rows.sort((a,b) => a.uniquetimestamp - b.uniquetimestamp);
 	for (let i = 0; i < res.rowCount; i++) {
 		res.rows[i].id = i+1;
-		msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET id = $1 WHERE uniquetimestamp = $2;`, [res.rows[i].id, res.rows[i].uniquetimestamp], true);
+		msg.client.ch.query(`UPDATE ${msg.client.constants.commands.settings.tablenames[msg.file.name]} SET id = $1 WHERE uniquetimestamp = $2;`, [res.rows[i].id, res.rows[i].uniquetimestamp]);
 	}
 	return;
 }

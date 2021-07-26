@@ -729,6 +729,8 @@
     "avatar": "Avatar",
     "yes": "yes",
     "no": "no",
+    "Yes": "Yes",
+    "No": "No",
     "found": "Found",
     "failed": "Failed",
     "username": "Username",

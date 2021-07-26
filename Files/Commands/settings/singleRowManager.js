@@ -15,12 +15,12 @@ async function edit(msg, answer, file, AddRemoveEditView, fail, values, origin) 
 	msg.lanSettings = msg.language.commands.settings; let r;
 	if (!msg.file) {file.name = msg.args[0].toLowerCase(); msg.file = file;}
 	if (!origin) {
-		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id], true);
+		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 		if (msg.file.setupRequired == false) return require('./multiRowManager').exe(msg, answer);
-		else if (!res || res.rowCount == 0) return setuper.execute(msg);
+		else if (!res || res.rowCount == 0) return setuper.execute(msg, answer);
 		else r = res.rows[0];
 	} else {
-		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [values.id], true);
+		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [values.id]);
 		r = res.rows[0];
 	}
 	if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);

@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const Settings = require('../settings');
 
 module.exports = {
-	async execute(msg) {
+	async execute(msg, answer) {
 		const embed = new Discord.MessageEmbed()
 			.setAuthor(
 				msg.lanSettings.setup.author, 
@@ -16,14 +16,16 @@ module.exports = {
 			);
 		const yes = new Discord.MessageButton()
 			.setCustomId('yes')
-			.setLabel(msg.language.yes)
+			.setLabel(msg.language.Yes)
 			.setStyle('SUCCESS');
 		const no = new Discord.MessageButton()
 			.setCustomId('no')
-			.setLabel(msg.language.no)
+			.setLabel(msg.language.No)
 			.setStyle('DANGER');
 		const rows = msg.client.ch.buttonRower([yes,no]);
-		msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: rows});
+		if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
+		else if (msg.m) await msg.m.edit({embeds: [embed], components: rows}).catch(() => {});
+		else msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: rows});
 		const messageCollector = msg.channel.createMessageCollector({time: 60000});
 		const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 		messageCollector.on('collect', (message) => {
