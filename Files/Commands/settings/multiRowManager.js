@@ -370,6 +370,7 @@ async function listdisplay(msg, answer, id, AddRemoveEditView, fail, values) {
 }
 
 async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, srmEditing, comesFromSRM) {
+	console.log(values);
 	if (!Array.isArray(fail)) fail = new Array;
 	if (typeof values !== 'object') values = new Object;
 	if (i == 0) {
@@ -384,7 +385,7 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 	else msg.property = AddRemoveEditView == 'edit' ? msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.editReq[i]] : msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.setupQueries[msg.file.name][AddRemoveEditView][i]];
 	if ((srmEditing && i == 0) || (!srmEditing && (AddRemoveEditView == 'edit' ? i < msg.client.constants.commands.settings.editReq.length : i < msg.client.constants.commands.settings.setupQueries[msg.file.name][AddRemoveEditView].length))) {
 		msg.compatibilityType = msg.property.includes('s') ? msg.property : msg.property+'s';
-		msg.assigner = comesFromSRM ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == srmEditing[0])[0] : AddRemoveEditView == 'edit' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.editReq[i] || a[0] == msg.client.constants.commands.settings.editReq[i])[0] : AddRemoveEditView == 'add' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.setupQueries[msg.file.name].add[i] || a[0] == msg.client.constants.commands.settings.setupQueries[msg.file.name].add[i])[0] : Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.removeReq[i] || a[0] == msg.client.constants.commands.settings.removeReq[i])[0];
+		msg.assigner = comesFromSRM ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == srmEditing[0])[0] : AddRemoveEditView == 'edit' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.editReq[i] || a[0] == msg.client.constants.commands.settings.editReq[i])[0] : AddRemoveEditView == 'add' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.setupQueries[msg.file.name].add[i] || a[0] == msg.client.constants.commands.settings.setupQueries[msg.file.name].add[i])[0] : Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.setupQueries[msg.file.name].removeReq[i] || a[0] == msg.client.constants.commands.settings.setupQueries[msg.file.name].removeReq[i])[0];
 		let answered = [];
 		const editor = editors.find(f => f.key.includes(msg.property));
 		const returned = await editor.exe(msg, i, embed, values, answer, AddRemoveEditView, fail, srmEditing, comesFromSRM, answered);
@@ -406,7 +407,15 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]};`, null);
 			if (res && res.rowCount > 0) values.id = res.rowCount+1;
 			else values.id = 1;
-			msg.client.ch.query(`INSERT INTO ${msg.client.constants.commands.settings.tablenames[msg.file.name]} (${msg.client.constants.commands.settings.setupQueries[msg.file.name].cols}) VALUES (${valDeclaration});`, msg.client.ch.stp(msg.client.constants.commands.settings.setupQueries[msg.file.name].vals, {values: values}));
+			const vals = new Array;
+			for (let j = 0; j < Object.entries(values).length; j++) {
+				const valArr = Object.entries(values)[j];
+				const assingArr = msg.client.constants.commands.settings.setupQueries[msg.file.name].vals[j];
+				if (assingArr.includes('{{') && assingArr.includes('}}')) vals.push(valArr[[1]]);
+				else vals.push(assingArr);
+			}
+			msg.client.constants.commands.settings.setupQueries[msg.file.name].vals
+			msg.client.ch.query(`INSERT INTO ${msg.client.constants.commands.settings.tablenames[msg.file.name]} (${msg.client.constants.commands.settings.setupQueries[msg.file.name].cols}) VALUES (${valDeclaration});`, vals);
 			const embed = new Discord.MessageEmbed()
 				.setAuthor(
 					msg.client.ch.stp(msg.lanSettings.authorEdit, {type: msg.lan.type}), 
