@@ -370,7 +370,6 @@ async function listdisplay(msg, answer, id, AddRemoveEditView, fail, values) {
 }
 
 async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, srmEditing, comesFromSRM) {
-	console.log(values);
 	if (!Array.isArray(fail)) fail = new Array;
 	if (typeof values !== 'object') values = new Object;
 	if (i == 0) {
@@ -402,19 +401,22 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 			let valDeclaration = '';
 			for (let j = 0; j < msg.client.constants.commands.settings.setupQueries[msg.file.name].vals.length; j++) {valDeclaration += `$${j+1}, `;}
 			valDeclaration = valDeclaration.slice(0, valDeclaration.length-2);
-			values.guild = msg.guild;
-			values.date = Date.now();
+			values.guildid = msg.guild.id;
+			values.uniquetimestamp = Date.now();
 			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]};`, null);
 			if (res && res.rowCount > 0) values.id = res.rowCount+1;
 			else values.id = 1;
 			const vals = new Array;
-			for (let j = 0; j < Object.entries(values).length; j++) {
-				const valArr = Object.entries(values)[j];
-				const assingArr = msg.client.constants.commands.settings.setupQueries[msg.file.name].vals[j];
-				if (assingArr.includes('{{') && assingArr.includes('}}')) vals.push(valArr[[1]]);
-				else vals.push(assingArr);
+			for (let j = 0; j < msg.client.constants.commands.settings.setupQueries[msg.file.name].cols.split(/, +/).length; j++) {
+				const assign = msg.client.constants.commands.settings.setupQueries[msg.file.name].vals[j];
+				const valObj = values[msg.client.constants.commands.settings.setupQueries[msg.file.name].cols.split(/, +/)[j]];
+				const valName = msg.client.constants.commands.settings.setupQueries[msg.file.name].cols.split(/, +/)[j];
+				if (valObj) {
+					if (Array.isArray(assign)) vals.push(valObj);
+					else if (typeof assign == 'string') vals.push(msg.client.ch.stp(assign, {values: values}));
+					else vals.push(assign);
+				} else if (valName) vals.push(assign);
 			}
-			msg.client.constants.commands.settings.setupQueries[msg.file.name].vals
 			msg.client.ch.query(`INSERT INTO ${msg.client.constants.commands.settings.tablenames[msg.file.name]} (${msg.client.constants.commands.settings.setupQueries[msg.file.name].cols}) VALUES (${valDeclaration});`, vals);
 			const embed = new Discord.MessageEmbed()
 				.setAuthor(
