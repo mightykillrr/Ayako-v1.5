@@ -48,7 +48,7 @@ module.exports = {
 		const messageCollector = msg.channel.createMessageCollector({time: 60000});
 		const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 		let interaction;
-		const resolved = await new Promise(async (resolve,) => {
+		const resolved = await new Promise((resolve,) => {
 			messageCollector.on('collect', (message) => {
 				if (message.author.id == msg.author.id && message.content.toLowerCase() == msg.language.cancel) {
 					resolve(false);

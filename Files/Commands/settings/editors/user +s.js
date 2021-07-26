@@ -22,7 +22,7 @@ module.exports = {
 		const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 		const messageCollector = msg.channel.createMessageCollector({time: 60000});
 		let interaction;
-		const resolved = await new Promise(async (resolve,) => {
+		const resolved = await new Promise((resolve,) => {
 			messageCollector.on('collect', async (message) => {
 				if (message.author.id == msg.author.id) {
 					if (message.content == msg.language.cancel) {
@@ -69,7 +69,8 @@ module.exports = {
 			buttonsCollector.on('end', (collected, reason) => {
 				if (reason == 'time') {
 					msg.client.ch.collectorEnd(msg);
-					resolve(false);				}
+					resolve(false);		
+				}
 			});
 		});
 		if (resolved) return ['repeater', msg, i+1, embed, values, interaction, AddRemoveEditView, fail, srmEditing, comesFromSRM];

@@ -88,15 +88,15 @@ module.exports = {
 			}
 		} else if (type == 'deleted') {
 			const settings = new Object;
-			settings.id = oldSettings;
+			settings.id = oldSettings.id;
 			embed
 				.setColor(msg.client.constants.commands.settings.log.color)
 				.setTimestamp()
 				.setAuthor(msg.client.ch.stp(msg.language.selfLog.author, {setting: msg.lan.type}))
-				.setDescription(!oldSettings ? msg.client.ch.stp(msg.language.selfLog.description, {msg: msg, setting: msg.file.name}) : msg.client.ch.stp(msg.language.selfLog.descriptionwithID, {msg: msg, setting: msg.file.name, settings: settings}))
+				.setDescription(!oldSettings ? msg.client.ch.stp(msg.language.selfLog.description, {msg: msg, setting: msg.file.name}) : msg.client.ch.stp(msg.language.selfLog.descriptionwithID, {msg: msg, setting: msg.file.name, settings: settings.id}))
 				.addFields(
 					{
-						name: `${msg.client.ch.stp(msg.language.DeletedEntry, {id: oldSettings})}`, 
+						name: `${msg.client.ch.stp(msg.language.DeletedEntry, {id: settings.id})}`, 
 						value: '\u200b',
 						inline: false
 					}

@@ -53,7 +53,7 @@ module.exports = {
 		const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 		const messageCollector = msg.channel.createMessageCollector({time: 60000});
 		let interaction;
-		const resolved = await new Promise(async (resolve,) => {
+		const resolved = await new Promise((resolve,) => {
 			buttonsCollector.on('collect', (clickButton) => {
 				if (clickButton.user.id == msg.author.id) {
 					if (clickButton.customId == 'next' || clickButton.customId == 'prev') {

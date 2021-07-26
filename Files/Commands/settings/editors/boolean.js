@@ -30,7 +30,7 @@ module.exports = {
 		const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 		const messageCollector = msg.channel.createMessageCollector({time: 60000});
 		let interaction;
-		const resolved = await new Promise(async (resolve,) => {
+		const resolved = await new Promise((resolve,) => {
 			buttonsCollector.on('collect', (clickButton) => {
 				if (clickButton.user.id == msg.author.id) {
 					buttonsCollector.stop();
@@ -45,6 +45,7 @@ module.exports = {
 						else return require('../multiRowManager').edit(msg, clickButton, {});
 					}
 					interaction = clickButton;
+					resolve(true);
 				} else msg.client.ch.notYours(clickButton, msg);
 			});
 			buttonsCollector.on('end', (_collected, reason) => {
