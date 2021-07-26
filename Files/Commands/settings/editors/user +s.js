@@ -21,56 +21,58 @@ module.exports = {
 		else msg.m.edit({embeds: [embed], components: rows}).catch(() => {});
 		const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 		const messageCollector = msg.channel.createMessageCollector({time: 60000});
-		messageCollector.on('collect', async (message) => {
-			if (message.author.id == msg.author.id) {
-				if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
-				message.delete().catch(() => {});
-				const args = message.content.split(/ +/);
-				let answered = [];
-				await Promise.all(args.map(async raw => {
-					const id = raw.replace(/\D+/g, '');
-					const request = await msg.client.users.fetch(id).catch(() => {});
-					if ((!request || !request.id) && (!values[msg.assigner] || (values[msg.assigner] && !values[msg.assigner].includes(id)))) fail.push(`\`${raw}\` ${msg.lan.edit[msg.property].fail.no}`);
-					else answered.push(id);
-				}));
-				message.delete().catch(() => {});
-				if (answered.length > 0) {
-					if (Array.isArray(answered)) {
-						answered.forEach(id => { 
-							if (values[msg.assigner] && values[msg.assigner].includes(id)) {
-								const index = values[msg.assigner].indexOf(id);
-								values[msg.assigner].splice(index, 1);
-							} else if (values[msg.assigner] && values[msg.assigner].length > 0) values[msg.assigner].push(id);
-							else values[msg.assigner] = [id];
-						});
-					} else values[msg.assigner] = answered;	
-				}
-				messageCollector.stop();
-				buttonsCollector.stop();
-				return ['repeater', msg, i+1, embed, values, null, AddRemoveEditView, fail, srmEditing, comesFromSRM];
-			}
-		});
-		buttonsCollector.on('collect', (clickButton) => {
-			if (clickButton.user.id == msg.author.id) {
-				if (clickButton.customId == 'back') {
-					buttonsCollector.stop();
+		let interaction;
+		const resolved = await new Promise(async (resolve,) => {
+			messageCollector.on('collect', async (message) => {
+				if (message.author.id == msg.author.id) {
+					if (message.content == msg.language.cancel) {
+						resolve(false);
+						return misc.aborted(msg, [messageCollector, buttonsCollector]);
+					}
+					message.delete().catch(() => {});
+					const args = message.content.split(/ +/);
+					let answered = [];
+					await Promise.all(args.map(async raw => {
+						const id = raw.replace(/\D+/g, '');
+						const request = await msg.client.users.fetch(id).catch(() => {});
+						if ((!request || !request.id) && (!values[msg.assigner] || (values[msg.assigner] && !values[msg.assigner].includes(id)))) fail.push(`\`${raw}\` ${msg.lan.edit[msg.property].fail.no}`);
+						else answered.push(id);
+					}));
+					message.delete().catch(() => {});
+					if (answered.length > 0) {
+						if (Array.isArray(answered)) {
+							answered.forEach(id => { 
+								if (values[msg.assigner] && values[msg.assigner].includes(id)) {
+									const index = values[msg.assigner].indexOf(id);
+									values[msg.assigner].splice(index, 1);
+								} else if (values[msg.assigner] && values[msg.assigner].length > 0) values[msg.assigner].push(id);
+								else values[msg.assigner] = [id];
+							});
+						} else values[msg.assigner] = answered;	
+					}
 					messageCollector.stop();
-					if (comesFromSRM) return require('../singleRowManager').redirecter(msg, clickButton, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);
-					else return require('../multiRowManager').edit(msg, clickButton, {});
+					buttonsCollector.stop();
+					resolve(true);
 				}
-			} else msg.client.ch.notYours(clickButton, msg);
+			});
+			buttonsCollector.on('collect', (clickButton) => {
+				if (clickButton.user.id == msg.author.id) {
+					if (clickButton.customId == 'back') {
+						buttonsCollector.stop();
+						messageCollector.stop();
+						resolve(false);
+						if (comesFromSRM) return require('../singleRowManager').redirecter(msg, clickButton, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);
+						else return require('../multiRowManager').edit(msg, clickButton, {});
+					}
+				} else msg.client.ch.notYours(clickButton, msg);
+			});
+			buttonsCollector.on('end', (collected, reason) => {
+				if (reason == 'time') {
+					msg.client.ch.collectorEnd(msg);
+					resolve(false);				}
+			});
 		});
-		buttonsCollector.on('end', (collected, reason) => {
-			if (reason == 'time') {
-				const embed = new Discord.MessageEmbed()
-					.setAuthor(
-						msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
-						msg.client.constants.emotes.settingsLink, 
-						msg.client.constants.standard.invite
-					)
-					.setDescription(msg.language.timeError);
-				msg.m.edit({embeds: [embed], components: []}).catch(() => {});
-			}
-		});
+		if (resolved) return ['repeater', msg, i+1, embed, values, interaction, AddRemoveEditView, fail, srmEditing, comesFromSRM];
+		else return null;
 	}
 };

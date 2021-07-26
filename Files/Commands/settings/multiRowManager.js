@@ -388,7 +388,6 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 		let answered = [];
 		const editor = editors.find(f => f.key.includes(msg.property));
 		const returned = await editor.exe(msg, i, embed, values, answer, AddRemoveEditView, fail, srmEditing, comesFromSRM, answered);
-		console.log(1, returned);
 		if (Array.isArray(returned) && returned[0] == 'repeater') repeater(returned[1], returned[2], returned[3], returned[4], returned[5], returned[6], returned[7], returned[8], returned[9]);
 		else return;
 	} else {

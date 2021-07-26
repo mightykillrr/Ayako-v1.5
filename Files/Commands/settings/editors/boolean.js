@@ -29,32 +29,43 @@ module.exports = {
 		else msg.m.edit({embeds: [embed], components: actionRows}).catch(() => {});
 		const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 		const messageCollector = msg.channel.createMessageCollector({time: 60000});
-		buttonsCollector.on('collect', (clickButton) => {
-			if (clickButton.user.id == msg.author.id) {
-				buttonsCollector.stop();
-				messageCollector.stop();
-				if (clickButton.customId == 'true') values[msg.assigner] = true;
-				else if (clickButton.customId == 'false') values[msg.assigner] = false;
-				else if (clickButton.customId == 'back') {
-					messageCollector.stop();
+		let interaction;
+		const resolved = await new Promise(async (resolve,) => {
+			buttonsCollector.on('collect', (clickButton) => {
+				if (clickButton.user.id == msg.author.id) {
 					buttonsCollector.stop();
-					if (comesFromSRM) return require('../singleRowManager').redirecter(msg, clickButton, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);
-					else return require('../multiRowManager').edit(msg, clickButton, {});
+					messageCollector.stop();
+					if (clickButton.customId == 'true') values[msg.assigner] = true;
+					else if (clickButton.customId == 'false') values[msg.assigner] = false;
+					else if (clickButton.customId == 'back') {
+						messageCollector.stop();
+						buttonsCollector.stop();
+						resolve(false);
+						if (comesFromSRM) return require('../singleRowManager').redirecter(msg, clickButton, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);
+						else return require('../multiRowManager').edit(msg, clickButton, {});
+					}
+					interaction = clickButton;
+				} else msg.client.ch.notYours(clickButton, msg);
+			});
+			buttonsCollector.on('end', (_collected, reason) => {
+				if (reason == 'time') {
+					msg.client.ch.collectorEnd(msg);
+					resolve(false);
 				}
-				return ['repeater', msg, i+1, embed, values, clickButton, AddRemoveEditView, fail, srmEditing, comesFromSRM];
-			} else msg.client.ch.notYours(clickButton, msg);
+			});
+			messageCollector.on('collect', (message) => {
+				if (message.author.id == msg.author.id) {
+					if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
+					values[msg.assigner] = message.content.toLowerCase() == msg.language.true.toLowerCase() ? true : message.content.toLowerCase() == msg.language.false.toLowerCase() ? false : null;
+					if (values[msg.assigner] == null) return misc.notValid(msg);
+					message.delete().catch(() => {});
+					buttonsCollector.stop();
+					messageCollector.stop();
+					resolve(true);
+				}
+			});
 		});
-		buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') {msg.client.ch.collectorEnd(msg);}});
-		messageCollector.on('collect', (message) => {
-			if (message.author.id == msg.author.id) {
-				if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
-				values[msg.assigner] = message.content.toLowerCase() == msg.language.true.toLowerCase() ? true : message.content.toLowerCase() == msg.language.false.toLowerCase() ? false : null;
-				if (values[msg.assigner] == null) return misc.notValid(msg);
-				message.delete().catch(() => {});
-				buttonsCollector.stop();
-				messageCollector.stop();
-				return ['repeater', msg, i+1, embed, values, null, AddRemoveEditView, fail, srmEditing, comesFromSRM];
-			}
-		});
+		if (resolved) return ['repeater', msg, i+1, embed, values, interaction, AddRemoveEditView, fail, srmEditing, comesFromSRM];
+		else return null;
 	}
 };
