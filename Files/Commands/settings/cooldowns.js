@@ -24,7 +24,7 @@ module.exports = {
 		const embed = new Discord.MessageEmbed()
 			.addFields(
 				{
-					name: msg.lan.type, 
+					name: msg.lanSettings.active, 
 					value: r.active ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled, 
 					inline: false
 				},
@@ -79,7 +79,7 @@ module.exports = {
 	buttons(msg, r) {
 		const active = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.active.trigger[1] ? msg.lan.edit.active.trigger[1].replace(/`/g, '') : msg.lan.edit.active.trigger[0].replace(/`/g, '')}`)
-			.setLabel(msg.lan.type)
+			.setLabel(msg.lanSettings.active)
 			.setStyle(r.active ? 'SUCCESS' : 'DANGER');
 		const command = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.command.trigger[1] ? msg.lan.edit.command.trigger[1].replace(/`/g, '') : msg.lan.edit.command.trigger[0].replace(/`/g, '')}`)

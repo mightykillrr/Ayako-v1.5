@@ -527,7 +527,7 @@
                     "vals": ["{{values.guildid}}", true, ["{{values.channels}}"], "{{values.id}}", "{{values.uniquetimestamp}}", ["{{values.commands}}"]],
                     "add": ["commands", "channels"],
                     "remove": ["id"],
-                    "removeIdent": "channels",
+                    "removeIdent": "commands",
                     "removeReq": ["id", "channels"]
                 },
                 "disboard": {

@@ -1117,6 +1117,7 @@
             "invalSettings": "These Settings don't exist, please enter a valid Setting",
             "author": "Ayako {{type}} Settings",
             "authorEdit": "[Edit Mode] Ayako {{type}} Settings",
+            "active": "Active",
             "noEmbed": {
                 "author": "Ayako Settings",
                 "desc": "No Settings available for the selected Setting"
@@ -1192,7 +1193,7 @@
                         "recommended": "Recommended: `6`"
                     },
                     "active": {
-                        "name": "[{{trigger}}] Anti-Spam",
+                        "name": "[{{trigger}}] Active",
                         "trigger": ["`active`"],
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
@@ -1245,7 +1246,7 @@
                 "allroleid": "Roles given to joining Bots and Users",
                 "edit": {
                     "active": {
-                        "name": "[{{trigger}}] Auto-Role",
+                        "name": "[{{trigger}}] Active",
                         "trigger": ["`active`"],
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
@@ -1307,7 +1308,7 @@
                 "clearint2": "(The Interval in which the blacklisted-words-said Count is cleared)\n",
                 "edit": {
                     "active": {
-                        "name": "[{{trigger}}] Blacklist",
+                        "name": "[{{trigger}}] Active",
                         "trigger": ["`active`"],
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
@@ -1409,7 +1410,6 @@
                 "type": "Cooldowns",
                 "command": "Command",
                 "cooldown": "Cooldown",
-                "active": "Active",
                 "activechannelid": "Active Channels",
                 "bproleid": "Whitelisted Roles",
                 "bpchannelid": "Whitelisted Channels",
@@ -1427,7 +1427,7 @@
                         "answers": "`Time in Seconds`"
                     },
                     "active": {
-                        "name": "[{{trigger}}] This Cooldown",
+                        "name": "[{{trigger}}] Active",
                         "trigger": ["`active`"],
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
@@ -1514,7 +1514,6 @@
                 "category": ["Automation", "None"],
                 "type": "Disabled",
                 "commands": "Commands",
-                "active": "Active",
                 "bproleid": "Whitelisted Roles",
                 "blroleid": "Blacklisted Roles",
                 "channels": "Channels",
@@ -1528,7 +1527,7 @@
                         "answers": "`Ayako Commands or Aliases`"
                     },
                     "active": {
-                        "name": "[{{trigger}}] This Cooldown",
+                        "name": "[{{trigger}}] Active",
                         "trigger": ["`active`"],
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
@@ -1568,6 +1567,16 @@
                         "trigger": ["`user`"],
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered User is already added it will be removed.\nUsers listed here can use these Commands in the Channels they are disabled in, no matter if they have a Blacklisted Role.",
+                        "fail": {
+                            "no": "I couldn't find this User\n",
+                            "wrongGuild": "This User is not Part of this Server\n"
+                        }
+                    },
+                    "bluserid": {
+                        "name": "[{{trigger}}] Blacklisted Users",
+                        "trigger": ["`user`"],
+                        "answers": "`Mention(s) or ID(s)`",
+                        "recommended": "This is a switch.\nIf the entered User is already added it will be removed.\nUsers listed here can never use these Commands in the Channels they are disabled in, no matter if they have a Whitelisted Role",
                         "fail": {
                             "no": "I couldn't find this User\n",
                             "wrongGuild": "This User is not Part of this Server\n"
@@ -1619,7 +1628,7 @@
                 "type": "DISBOARD",
                 "edit": {
                     "active": {
-                        "name": "[{{trigger}}] DISBOARD",
+                        "name": "[{{trigger}}] Active",
                         "trigger": ["`active`"],
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"

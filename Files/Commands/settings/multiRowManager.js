@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const misc = require('./misc.js');
+
 const fs = require('fs');
 const files = fs.readdirSync('./Files/Commands/settings/editors').filter(file => file.endsWith('.js'));
 const editors = new Discord.Collection();
@@ -147,7 +148,7 @@ module.exports = {
 		else return misc.aborted(msg);
 		const options = [];
 		for (let j = 0; j < r.length; j++) {
-			options.push({label: `${msg.language.number}: ${r[j].id} | ${r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]}`, value: `${r[j].id}`});
+			options.push({label: `${msg.language.number}: ${r[j].id} | ${Array.isArray(r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]) ? `${r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent][0]} ${Array.isArray(r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]) && r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent] > 1 ? `+ ${r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent].length}` : ''}` : r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]}`, value: `${r[j].id}`});
 		}
 		const take = [];
 		for(let j = 0; j < options.length; j++) {take.push(options[j]);}
@@ -185,7 +186,7 @@ module.exports = {
 			)
 			.setDescription(`${msg.language.select.id.desc}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
 		const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
-		if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
+		if (answer) answer.update({embeds: [embed], components: rows}).catch((e) => {console.log(e)});
 		else msg.m.edit({embeds: [embed], components: rows}).catch(() => {});
 		const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 		const messageCollector = msg.channel.createMessageCollector({time: 60000});
@@ -316,7 +317,7 @@ module.exports = {
 			}
 		});
 		async function gotID(id, answer, AddRemoveEditView, fail) {
-			const res = await msg.client.ch.query(`SELECT * FROM ${msg.file.name} WHERE id = $1 AND guildid = $2;`, [id, msg.guild.id]);
+			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1 AND guildid = $2;`, [id, msg.guild.id]);
 			if (res && res.rowCount > 0) {
 				if (AddRemoveEditView == 'edit') require('./singleRowManager').redirecter(msg, answer, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);
 				else if (AddRemoveEditView == 'view') listdisplay(msg, answer, id, AddRemoveEditView, fail, values);

@@ -22,7 +22,7 @@ module.exports = {
 		const embed = new Discord.MessageEmbed()
 			.addFields(
 				{
-					name: msg.lan.type, 
+					name: msg.lanSettings.active, 
 					value: r.active ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled, 
 					inline: false
 				},
@@ -77,16 +77,16 @@ module.exports = {
 	buttons(msg, r) {
 		const active = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.active.trigger[1] ? msg.lan.edit.active.trigger[1].replace(/`/g, '') : msg.lan.edit.active.trigger[0].replace(/`/g, '')}`)
-			.setLabel(msg.lan.type)
+			.setLabel(msg.lanSettings.active)
 			.setStyle(r.active ? 'SUCCESS' : 'DANGER');
 		const commands = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.commands.trigger[1] ? msg.lan.edit.commands.trigger[1].replace(/`/g, '') : msg.lan.edit.commands.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.lan.commands)
-			.setStyle('PRIMARY');
+			.setStyle('SECONDARY');
 		const channels = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.channels.trigger[1] ? msg.lan.edit.channels.trigger[1].replace(/`/g, '') : msg.lan.edit.channels.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.lan.channels)
-			.setStyle('PRIMARY');
+			.setStyle('SECONDARY');
 		const bpuserid = new Discord.MessageButton()
 			.setCustomId(`${msg.lan.edit.bpuserid.trigger[1] ? msg.lan.edit.bpuserid.trigger[1].replace(/`/g, '') : msg.lan.edit.bpuserid.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.lan.bpuserid)
