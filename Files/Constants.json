@@ -441,6 +441,11 @@
                     "id": "id",
                     "column": "column"
                 },
+                "overview": {
+                    "prefix": "string",
+                    "interactionsmode": "boolean",
+                    "muteroleid": "role"
+                },
                 "disabled": {
                     "commands": "commands",
                     "channels": "channels",
@@ -500,7 +505,7 @@
                 "verification": "verification",
                 "welcome": "welcome",
                 "language": "language",
-                "overview": null,
+                "overview": "guildsettings",
                 "prefix": "prefix",
                 "user": "usersettings",
                 "interactions": "interactions",
@@ -541,6 +546,10 @@
                     "remove": ["id"],
                     "removeIdent": "command",
                     "removeReq": ["id", "cooldown"]
+                },
+                "overview": {
+                    "cols": "guildid, interactionsmode",
+                    "vals": ["{{msg.guild.id}}", true]
                 },
                 "forcecooldowns": {
                     "cols": null,

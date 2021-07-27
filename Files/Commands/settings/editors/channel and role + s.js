@@ -140,7 +140,7 @@ module.exports = {
 						resolve(true);
 					} else if (clickButton.customId == msg.property) {
 						clickButton.values.forEach(val => {
-							if (!answered.includes(val)) msg.guild[msg.property].cache.get(val) ? answered.push(msg.guild[msg.property].cache.get(val).id) : '';
+							if (!answered.includes(val)) msg.guild[msg.compatibilityType].cache.get(val) ? answered.push(msg.guild[msg.compatibilityType].cache.get(val).id) : '';
 							else answered.splice(answered.indexOf(val), 1);
 						});
 						let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
@@ -198,10 +198,12 @@ module.exports = {
 					}
 					message.delete().catch(() => {});
 					if (msg.property == 'role' || msg.property == 'channel') {
-						const answerContent = msg.content.replace(/\D+/g, '');
+						const answerContent = message.content.replace(/\D+/g, '');
 						const result = msg.guild[msg.compatibilityType].cache.get(answerContent);
-						if (result) answered = values[msg.assigner];
-						else misc.notValid(msg);
+						if (result) {
+							values[msg.assigner] = answerContent;
+							answered = values[msg.assigner];
+						} else misc.notValid(msg);
 					} else if (msg.property == 'roles' || msg.property == 'channels') {
 						const args = message.content.split(/ +/);
 						Promise.all(args.map(async raw => {
@@ -237,6 +239,7 @@ module.exports = {
 				});
 			});
 		});
+		console.log(values)
 		if (resolved) return ['repeater', msg, i+1, embed, values, interaction, AddRemoveEditView, fail, srmEditing, comesFromSRM, answered];
 		else return null;
 	}

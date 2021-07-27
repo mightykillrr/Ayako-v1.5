@@ -31,28 +31,29 @@ module.exports = {
 			}
 			const embed = new Discord.MessageEmbed()
 				.setAuthor(
-					msg.lan.overview.author, 
+					msg.lan.settings.author, 
 					msg.client.constants.emotes.settingsLink, 
 					msg.client.constants.standard.invite
 				)
-				.setDescription(msg.client.ch.stp(msg.lan.overview.desc, {prefix: msg.client.constants.standard.prefix, commands: categoryText})+'\n\n'+msg.client.ch.makeBold(msg.client.ch.makeUnderlined(msg.language.settingsOverview)))
+				.setDescription(msg.client.ch.stp(msg.lan.settings.desc, {prefix: msg.client.constants.standard.prefix, commands: categoryText}))
 				.setColor(msg.client.constants.commands.settings.color);
 			msg.client.ch.reply(msg, embed);
 		} else {
-			const file = settings.get(msg.args[0].toLowerCase());
+			let file = settings.get(msg.args[0].toLowerCase());
 			if (!file) return msg.client.ch.reply(msg, msg.lan.invalSettings);
-			file.name == msg.args[0].toLowerCase();
-			msg.lan = msg.lan[msg.args[0].toLowerCase()];
+			if (file.hasNoSettings) {
+				file = require('./settings/overview');
+				file.name = 'overview';
+			}
+			msg.file = file;
+			msg.lan = msg.language.commands.settings[file.name];
+			msg.lanSettings = msg.language.commands.settings;
 			if (!msg.args[1]) this.display(msg, file);
 			else if (msg.args[1] && file.perm && !msg.member.permissions.has(new Discord.Permissions(file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
 			else this.edit(msg, file);
 		}
-		settings = undefined;
 	}, 
 	async display(msg, file) {
-		msg.lanSettings = msg.language.commands.settings;
-		file.name = msg.args[0].toLowerCase();
-		msg.file = file;
 		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 		let embed;
 		if (msg.file.setupRequired == false) return require('./settings/multiRowManager').display(msg);

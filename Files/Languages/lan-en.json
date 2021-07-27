@@ -721,6 +721,7 @@
     "discoverySplash": "Discovery Splash Image",
     "banner": "Banner Image",
     "aborted": "Aborted",
+    "muted": "Muted",
     "title": "Title",
     "color": "Color",
     "hoisted": "Hoisted",
@@ -837,7 +838,7 @@
             "exeNoPerms": "You can't mute this Member",
             "meNoPerms": "I can't mute this Member `Missing Permissions`",
             "success": "Member {{target}} was muted",
-            "noRole": "I wasn't able to find a Mute Role\nVisit `h!muterole` to set or create one"
+            "noRole": "I wasn't able to find a Mute Role\nVisit `h!settings overview` to set or create one"
         },
         "tempmuteAdd": {
             "author": "Member was tempmuted",
@@ -852,7 +853,7 @@
             "exeNoPerms": "You can't tempmuted this Member",
             "meNoPerms": "I can't tempmuted this Member `Missing Permissions`",
             "success": "Member {{target}} was tempmuted",
-            "noRole": "I wasn't able to find a Mute Role\nVisit `h!muterole` to set or create one"
+            "noRole": "I wasn't able to find a Mute Role\nVisit `h!settings overview` to set or create one"
         },
         "muteRemove": {
             "author": "Member was unmuted",
@@ -864,7 +865,7 @@
             "exeNoPerms": "You can't mute this Member",
             "hasNoRole": "This Member isn't muted",
             "success": "Member {{target}} was unmuted",
-            "noRole": "I wasn't able to find a Mute Role\nVisit `h!muterole` to set or create one"
+            "noRole": "I wasn't able to find a Mute Role\nVisit `h!settings overview` to set or create one"
         },
         "banAdd": {
             "author": "User was banned",
@@ -1129,11 +1130,40 @@
                 "done": "Setup finished\nRedirecting {{loading}}",
                 "abort": "Setup aborted"
             },
+            "settings": {
+                "author": "Ayako Settings",
+                "desc": "Settings can be displayed and edited with this Command: `{{prefix}}settings [command]`\n\n```Other = 🔵\nRoles = 🔴\nChannels = 🟢\nChats = 🟡```\n**Available Command Settings**:\n{{commands}}"
+            },
             "overview": {
                 "category": ["None"],
-                "author": "Ayako Settings",
-                "desc": "Settings can be displayed and edited with this Command: `{{prefix}}settings [command]`\n\n```Other = 🔵\nRoles = 🔴\nChannels = 🟢\nChats = 🟡```\n**Available Command Settings**:\n{{commands}}",
-                "muteRoleError": "Mute Role Deleted!"
+                "type": "Overview",
+                "muteroleid": "Mute Role",
+                "interactionsmode": "Interactions Mode",
+                "prefix": "Prefix",
+                "edit": {
+                    "muteroleid": {
+                        "name": "[{{trigger}}] Mute Roles",
+                        "trigger": ["`role`"],
+                        "select": "Select a Role",
+                        "desc": "Select the Role you want as Mute Role",
+                        "fail": {
+                            "no": "I couldn't find this Role\n",
+                            "wrongGuild": "This Role is not Part of this Server\n"
+                        }
+                    },
+                    "interactionsmode": {
+                        "name": "[{{trigger}}] Interactions Mode",
+                        "trigger": ["`mode`"],
+                        "answers": "`True` for Small or `False` for Big",
+                        "recommended": "Recommended: `True`"
+                    },
+                    "prefix": {
+                        "name": "[{{trigger}}] Prefix",
+                        "trigger": ["`prefix`"],
+                        "answers": "Any String",
+                        "recommended": "Recommended: `,`, `.`, `!`"
+                    }
+                }
             },
             "antispam": {
                 "category": ["Auto Moderation"],
@@ -1665,8 +1695,6 @@
                 "category": ["Compaction", "Fun"],
                 "type": "Interactions",
                 "size": "Interaction Size",
-                "big": "Big",
-                "small": "Small",
                 "block": "**Blocked Interactions**",
                 "edit": { 
                     "size": {

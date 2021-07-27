@@ -4,6 +4,13 @@ const misc = require('../misc.js');
 module.exports = {
 	key: ['string'],
 	async exe(msg, i, embed, values, answer, AddRemoveEditView, fail, srmEditing, comesFromSRM) {
+		embed = new Discord.MessageEmbed()
+			.setAuthor(
+				msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+				msg.client.constants.emotes.settingsLink, 
+				msg.client.constants.standard.invite
+			)
+			.setDescription(`${msg.lan.edit[msg.assigner].answers}\n${msg.lan.edit[msg.assigner].recommended}`);
 		const button = new Discord.MessageButton()
 			.setCustomId('back')
 			.setLabel(msg.language.back)
