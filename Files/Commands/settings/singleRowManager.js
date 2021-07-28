@@ -32,20 +32,7 @@ async function edit(msg, answer, file, AddRemoveEditView, fail, values, origin) 
 		msg.client.constants.emotes.settingsLink, 
 		msg.client.constants.standard.invite
 	);
-	let rows = [];
-	for (let o = 0; o < Object.keys(msg.lan.edit).length; o++) {
-		const edit = Object.entries(msg.lan.edit)[o];
-		const name = edit[1];
-		const button = new Discord.MessageButton()
-			.setCustomId(`${name.name}`)
-			.setLabel(`${name.trigger[1] ? name.trigger[1].replace(/`/g, '') : name.trigger[0].replace(/`/g, '')}`)
-			.setStyle('PRIMARY');
-		rows.push(button);
-	}
-	let i; let j;
-	let buttons = [];
-	if (typeof(msg.file.buttons) == 'function') buttons = msg.file.buttons(msg, r);
-	else for (i = 0, j = rows.length; i < j; i += 5) {buttons.push(rows.slice(i, i+5));}
+	const buttons = msg.file.buttons(msg, r);
 	const back = new Discord.MessageButton()
 		.setLabel(msg.language.back)
 		.setEmoji(msg.client.constants.emotes.back)
@@ -67,7 +54,7 @@ async function edit(msg, answer, file, AddRemoveEditView, fail, values, origin) 
 				return;
 			}
 			let srmEditing;
-			Object.entries(msg.lan.edit).forEach(e => {e[1].trigger.forEach(trigger => {if (trigger.replace(/`/g, '') == clickButton.customId) srmEditing = e;});});
+			Object.entries(msg.lan.edit).forEach(e => {if (e[1].name == clickButton.customId) srmEditing = e;});
 			if (srmEditing) {
 				require('./multiRowManager').redirect(msg, 0, values, clickButton, AddRemoveEditView, fail, srmEditing, true);
 				buttonsCollector.stop();

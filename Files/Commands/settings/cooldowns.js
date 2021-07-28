@@ -78,31 +78,31 @@ module.exports = {
 	},
 	buttons(msg, r) {
 		const active = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.active.trigger[1] ? msg.lan.edit.active.trigger[1].replace(/`/g, '') : msg.lan.edit.active.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.active.name)
 			.setLabel(msg.lanSettings.active)
 			.setStyle(r.active ? 'SUCCESS' : 'DANGER');
 		const command = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.command.trigger[1] ? msg.lan.edit.command.trigger[1].replace(/`/g, '') : msg.lan.edit.command.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.command.name)
 			.setLabel(msg.client.ch.stp(msg.lan.command.replace(/\*/g, ''), {amount: r.command ? `\`${r.command}\`` : '--'}))
 			.setStyle('SECONDARY');
 		const cooldown = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.cooldown.trigger[1] ? msg.lan.edit.cooldown.trigger[1].replace(/`/g, '') : msg.lan.edit.cooldown.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.cooldown.name)
 			.setLabel(msg.client.ch.stp(msg.lan.cooldown.replace(/\*/g, ''), {amount: r.cooldown ? `${r.cooldown} ${msg.language.time.seconds}` : '--'}))
 			.setStyle('SECONDARY');
 		const achannel = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.activechannelid.trigger[1] ? msg.lan.edit.activechannelid.trigger[1].replace(/`/g, '') : msg.lan.edit.activechannelid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.activechannelid.name)
 			.setLabel(msg.lan.activechannelid)
 			.setStyle('PRIMARY');
 		const bchannel = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.bpchannelid.trigger[1] ? msg.lan.edit.bpchannelid.trigger[1].replace(/`/g, '') : msg.lan.edit.bpchannelid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.bpchannelid.name)
 			.setLabel(msg.lan.bpchannelid)
 			.setStyle('PRIMARY');
 		const user = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.bpuserid.trigger[1] ? msg.lan.edit.bpuserid.trigger[1].replace(/`/g, '') : msg.lan.edit.bpuserid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.bpuserid.name)
 			.setLabel(msg.lan.bpuserid)
 			.setStyle('PRIMARY');
 		const role = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.bproleid.trigger[1] ? msg.lan.edit.bproleid.trigger[1].replace(/`/g, '') : msg.lan.edit.bproleid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.bproleid.name)
 			.setLabel(msg.lan.bproleid)
 			.setStyle('PRIMARY');
 		return [[active], [command, cooldown], [achannel,bchannel,user,role]];

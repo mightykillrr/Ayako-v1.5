@@ -31,19 +31,19 @@ module.exports = {
 	},
 	buttons(msg, r) {
 		const active = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.active.trigger[1] ? msg.lan.edit.active.trigger[1].replace(/`/g, '') : msg.lan.edit.active.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.active.name)
 			.setLabel(msg.lanSettings.active)
 			.setStyle(r.active ? 'SUCCESS' : 'DANGER');
 		const bot = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.botroleid.trigger[1] ? msg.lan.edit.botroleid.trigger[1].replace(/`/g, '') : msg.lan.edit.botroleid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.botRole.name)
 			.setLabel(msg.lan.botRole)
 			.setStyle('PRIMARY');
 		const user = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.userroleid.trigger[1] ? msg.lan.edit.userroleid.trigger[1].replace(/`/g, '') : msg.lan.edit.userroleid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.userRole.name)
 			.setLabel(msg.lan.userRole)
 			.setStyle('PRIMARY');
 		const all = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.allroleid.trigger[1] ? msg.lan.edit.allroleid.trigger[1].replace(/`/g, '') : msg.lan.edit.allroleid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.allRole.name)
 			.setLabel(msg.lan.allRole)
 			.setStyle('PRIMARY');
 		return [[active], [bot,user,all]];

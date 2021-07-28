@@ -76,31 +76,31 @@ module.exports = {
 	},
 	buttons(msg, r) {
 		const active = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.active.trigger[1] ? msg.lan.edit.active.trigger[1].replace(/`/g, '') : msg.lan.edit.active.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.active.name)
 			.setLabel(msg.lanSettings.active)
 			.setStyle(r.active ? 'SUCCESS' : 'DANGER');
 		const commands = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.commands.trigger[1] ? msg.lan.edit.commands.trigger[1].replace(/`/g, '') : msg.lan.edit.commands.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.commands.name)
 			.setLabel(msg.lan.commands)
 			.setStyle('SECONDARY');
 		const channels = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.channels.trigger[1] ? msg.lan.edit.channels.trigger[1].replace(/`/g, '') : msg.lan.edit.channels.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.channels.name)
 			.setLabel(msg.lan.channels)
 			.setStyle('SECONDARY');
 		const bpuserid = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.bpuserid.trigger[1] ? msg.lan.edit.bpuserid.trigger[1].replace(/`/g, '') : msg.lan.edit.bpuserid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.bpuserid.name)
 			.setLabel(msg.lan.bpuserid)
 			.setStyle('PRIMARY');
 		const bluserid = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.bluserid.trigger[1] ? msg.lan.edit.bluserid.trigger[1].replace(/`/g, '') : msg.lan.edit.bluserid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.bluserid.name)
 			.setLabel(msg.lan.bluserid)
 			.setStyle('PRIMARY');
 		const bproleid = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.bproleid.trigger[1] ? msg.lan.edit.bproleid.trigger[1].replace(/`/g, '') : msg.lan.edit.bproleid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.bproleid.name)
 			.setLabel(msg.lan.bproleid)
 			.setStyle('PRIMARY');
 		const blroleid = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.blroleid.trigger[1] ? msg.lan.edit.blroleid.trigger[1].replace(/`/g, '') : msg.lan.edit.blroleid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.blroleid.name)
 			.setLabel(msg.lan.blroleid)
 			.setStyle('PRIMARY');
 		return [[active], [commands, channels], [bpuserid,bluserid,bproleid,blroleid]];

@@ -1142,8 +1142,7 @@
                 "prefix": "Prefix",
                 "edit": {
                     "muteroleid": {
-                        "name": "[{{trigger}}] Mute Roles",
-                        "trigger": ["`role`"],
+                        "name": "Mute Roles",
                         "select": "Select a Role",
                         "desc": "Select the Role you want as Mute Role",
                         "fail": {
@@ -1152,14 +1151,12 @@
                         }
                     },
                     "interactionsmode": {
-                        "name": "[{{trigger}}] Interactions Mode",
-                        "trigger": ["`mode`"],
+                        "name": "Interactions Mode",
                         "answers": "`True` for Small or `False` for Big",
                         "recommended": "Recommended: `True`"
                     },
                     "prefix": {
-                        "name": "[{{trigger}}] Prefix",
-                        "trigger": ["`prefix`"],
+                        "name": "Prefix",
                         "answers": "Any String",
                         "recommended": "Recommended: `,`, `.`, `!`"
                     }
@@ -1181,56 +1178,47 @@
                 "readofwarnstof": "**Read Warnings** (required for the following 3 options)",
                 "edit": {
                     "banenabledtof": {
-                        "name": "[{{trigger}}] Ban Members",
-                        "trigger": ["`bm`","`ban`"],
+                        "name": "Ban Members",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
                     },
                     "kickenabledtof": {
-                        "name": "[{{trigger}}] Kick Members",
-                        "trigger": ["`km`","`kick`"],
+                        "name": "Kick Members",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `False`"
                     },
                     "muteenabledtof": {
-                        "name": "[{{trigger}}] Mute Members",
-                        "trigger": ["`mm`","`mute`"],
+                        "name": "Mute Members",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
                     },
                     "giveofficialwarnstof": {
-                        "name": "[{{trigger}}] Warn Members",
-                        "trigger": ["`wm`","`warn`"],
+                        "name": "Warn Members",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
                     },
                     "muteafterwarnsamount": {
-                        "name": "[{{trigger}}] Mute after **{{amount}}** warns",
-                        "trigger": ["`maw`","`mute after`"],
+                        "name": "Mute after **{{amount}}** warns",
                         "answers": "`Number`",
                         "recommended": "Recommended: `3`"
                     },
                     "kickafterwarnsamount": {
-                        "name": "[{{trigger}}] Kick after **{{amount}}** warns",
-                        "trigger": ["`kaw`","`kick after`"],
+                        "name": "Kick after **{{amount}}** warns",
                         "answers": "`Number`",
                         "recommended": "Recommended: `5`"
                     },
                     "banafterwarnsamount": {
-                        "name": "[{{trigger}}] Ban after **{{amount}}** warns",
-                        "trigger": ["`baw`","`ban after`"],
+                        "name": "Ban after **{{amount}}** warns",
                         "answers": "`Number`",
                         "recommended": "Recommended: `6`"
                     },
                     "active": {
-                        "name": "[{{trigger}}] Active",
-                        "trigger": ["`active`"],
+                        "name": "Active",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
                     },
                     "bpchannelid": {
-                        "name": "[{{trigger}}] Whitelisted Channels",
-                        "trigger": ["`channel`"],
+                        "name": "Whitelisted Channels",
                         "recommended": "This is a switch.\nIf the entered Channel is already bypassed it will be removed.",
                         "select": "Select 1 or more Channels",
                         "desc": "Select the Channel(s) you want to bypass below",
@@ -1240,8 +1228,7 @@
                         }
                     },
                     "bproleid": {
-                        "name": "[{{trigger}}] Whitelisted Roles",
-                        "trigger": ["`role`"],
+                        "name": "Whitelisted Roles",
                         "recommended": "This is a switch.\nIf the entered Role is already bypassed it will be removed.",
                         "select": "Select 1 or more Roles",
                         "desc": "Select the Role(s) you want to bypass below",
@@ -1251,8 +1238,7 @@
                         }
                     },
                     "bpuserid": {
-                        "name": "[{{trigger}}] Whitelisted Users",
-                        "trigger": ["`user`"],
+                        "name": "Whitelisted Users",
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered User is already bypassed they will be removed.",
                         "fail": {
@@ -1261,8 +1247,7 @@
                         }
                     },
                     "readofwarnstof": {
-                        "name": "[{{trigger}}] **Read Warnings** (required for the following 3 options)",
-                        "trigger": ["`rw`","`read warns`"],
+                        "name": "**Read Warnings** (required for the following 3 options)",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
                     }
@@ -1276,14 +1261,12 @@
                 "allroleid": "Roles given to joining Bots and Users",
                 "edit": {
                     "active": {
-                        "name": "[{{trigger}}] Active",
-                        "trigger": ["`active`"],
+                        "name": "Active",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
                     },
                     "botroleid": {
-                        "name": "[{{trigger}}] Roles given to joining Bots",
-                        "trigger": ["`bots`"],
+                        "name": "Roles given to joining Bots",
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered Role is already added it will be removed.",
                         "select": "Select 1 or more Roles",
@@ -1294,8 +1277,7 @@
                         }
                     },
                     "userroleid": {
-                        "name": "[{{trigger}}] Roles given to joining Users",
-                        "trigger": ["`users`"],
+                        "name": "Roles given to joining Users",
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered Role is already added it will be removed.",
                         "select": "Select 1 or more Roles",
@@ -1306,8 +1288,7 @@
                         }
                     },
                     "allroleid": {
-                        "name": "[{{trigger}}] Roles given to joining Bots and Users",
-                        "trigger": ["`all`"],
+                        "name": "Roles given to joining Bots and Users",
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered Role is already added it will be removed.",
                         "select": "Select 1 or more Roles",
@@ -1338,68 +1319,57 @@
                 "clearint2": "(The Interval in which the blacklisted-words-said Count is cleared)\n",
                 "edit": {
                     "active": {
-                        "name": "[{{trigger}}] Active",
-                        "trigger": ["`active`"],
+                        "name": "Active",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
                     },
                     "words": {
-                        "name": "[{{trigger}}] Blacklisted Words",
-                        "trigger": ["`words`"],
+                        "name": "Blacklisted Words",
                         "answers": "any words or sentences",
                         "recommended": "If you enter Multiple Words or Sentences, split them with `#`"
                     },
                     "warntof": {
-                        "name": "[{{trigger}}] Warn Members",
-                        "trigger": ["`wm`", "`warn`"],
+                        "name": "Warn Members",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
                     },
                     "mutetof": {
-                        "name": "[{{trigger}}] Mute Members",
-                        "trigger": ["`mm`", "`mute`"],
+                        "name": "Mute Members",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
                     },
                     "kicktof": {
-                        "name": "[{{trigger}}] Kick Members",
-                        "trigger": ["`km`", "`kick`"],
+                        "name": "Kick Members",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `False`"
                     },
                     "bantof": {
-                        "name": "[{{trigger}}] Ban Members",
-                        "trigger": ["`bm`", "`ban`"],
+                        "name": "Ban Members",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
                     },
                     "warnafter": {
-                        "name": "[{{trigger}}] Warn after **{{amount}}** blacklisted Words",
-                        "trigger": ["`wa`", "`warn after`"],
+                        "name": "Warn after **{{amount}}** blacklisted Words",
                         "answers": "`Number`",
                         "recommended": "Recommended: `4`"
                     },
                     "muteafter": {
-                        "name": "[{{trigger}}] Mute after **{{amount}}** blacklisted Words",
-                        "trigger": ["`ma`", "`mute after`"],
+                        "name": "Mute after **{{amount}}** blacklisted Words",
                         "answers": "`Number`",
                         "recommended": "Recommended: `6`"
                     },
                     "kickafter": {
-                        "name": "[{{trigger}}] Kick after **{{amount}}** blacklisted Words",
-                        "trigger": ["`ka`", "`kick after`"],
+                        "name": "Kick after **{{amount}}** blacklisted Words",
                         "answers": "`Number`",
                         "recommended": "Recommended: `8`"
                     },
                     "banafter": {
-                        "name": "[{{trigger}}] Ban after **{{amount}}** blacklisted Words",
-                        "trigger": ["`ba`", "`ban after`"],
+                        "name": "Ban after **{{amount}}** blacklisted Words",
                         "answers": "`Number`",
                         "recommended": "Recommended: `10`"
                     },
                     "bpchannelid": {
-                        "name": "[{{trigger}}] Whitelisted Channels",
-                        "trigger": ["`channel`"],
+                        "name": "Whitelisted Channels",
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered Channel is already added it will be removed.",
                         "fail": {
@@ -1408,8 +1378,7 @@
                         }
                     },
                     "bproleid": {
-                        "name": "[{{trigger}}] Whitelisted Roles",
-                        "trigger": ["`role`"],
+                        "name": "Whitelisted Roles",
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered Role is already added it will be removed.",
                         "fail": {
@@ -1418,8 +1387,7 @@
                         }
                     },
                     "bpuserid": {
-                        "name": "[{{trigger}}] Whitelisted Users",
-                        "trigger": ["`user`"],
+                        "name": "Whitelisted Users",
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered User is already added it will be removed.",
                         "fail": {
@@ -1428,8 +1396,7 @@
                         }
                     },
                     "clearint": {
-                        "name": "[{{trigger}}] Clear Interval",
-                        "trigger": ["`clear`"],
+                        "name": "Clear Interval",
                         "answers": "`time`",
                         "recommended": "Recommended: `24 hours`"
                     }
@@ -1447,24 +1414,20 @@
                 "id": "Number",
                 "edit": {
                     "command": {
-                        "name": "[{{trigger}}] Command",
-                        "trigger": ["`command`", "`cmd`"],
+                        "name": "Command",
                         "answers": "`A Ayako Command or Command Alias`"
                     },
                     "cooldown": {
-                        "name": "[{{trigger}}] Cooldown",
-                        "trigger": ["`cooldown`", "`cd`"],
+                        "name": "Cooldown",
                         "answers": "Time in Seconds"
                     },
                     "active": {
-                        "name": "[{{trigger}}] Active",
-                        "trigger": ["`active`"],
+                        "name": "Active",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
                     },
                     "activechannelid": {
-                        "name": "[{{trigger}}] Active Channels",
-                        "trigger": ["`achannel`"],
+                        "name": "Active Channels",
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered Channel is already added it will be removed.\nThe Cooldown will only apply in these Channels, if none are set it applies on the whole Server.",
                         "fail": {
@@ -1473,8 +1436,7 @@
                         }
                     },
                     "bproleid": {
-                        "name": "[{{trigger}}] Whitelisted Roles",
-                        "trigger": ["`role`"],
+                        "name": "Whitelisted Roles",
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered Role is already added it will be removed.\nMembers with one of these Roles will bypass the Cooldown.",
                         "fail": {
@@ -1483,8 +1445,7 @@
                         }
                     },
                     "bpchannelid": {
-                        "name": "[{{trigger}}] Whitelisted Channels",
-                        "trigger": ["`bchannel`"],
+                        "name": "Whitelisted Channels",
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered Channel is already added it will be removed.\nIf no Active Channels are set and the Cooldown applies on the whole Server, they will not apply on Channels listed here.",
                         "fail": {
@@ -1493,8 +1454,7 @@
                         }
                     },
                     "bpuserid": {
-                        "name": "[{{trigger}}] Whitelisted Users",
-                        "trigger": ["`user`"],
+                        "name": "Whitelisted Users",
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered User is already added it will be removed.\nUsers listed here bypass the Cooldown",
                         "fail": {
@@ -1526,7 +1486,7 @@
                         "command": "The Command this Cooldown applies to",
                         "cooldown": "The Length of the Cooldown in Seconds",
                         "process": {
-                            "0": "What would you like to edit?\nRespond with one of these:\n{{triggers}}"
+                            "0": "What would you like to edit?\nClick on one of the Buttons"
                         },
                         "note": {
                             "command": "Select a Ayako Command or Command Alias",
@@ -1552,19 +1512,16 @@
                 "id": "Number",
                 "edit": {
                     "commands": {
-                        "name": "[{{trigger}}] Commands",
-                        "trigger": ["`command`", "`cmd`"],
+                        "name": "Commands",
                         "answers": "`Ayako Commands or Aliases`"
                     },
                     "active": {
-                        "name": "[{{trigger}}] Active",
-                        "trigger": ["`active`"],
+                        "name": "Active",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
                     },
                     "bproleid": {
-                        "name": "[{{trigger}}] Whitelisted Roles",
-                        "trigger": ["`role`"],
+                        "name": "Whitelisted Roles",
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered Role is already added it will be removed.\nMembers with one of these Roles can still use these Commands.",
                         "fail": {
@@ -1573,8 +1530,7 @@
                         }
                     },
                     "blroleid": {
-                        "name": "[{{trigger}}] Blacklisted Roles",
-                        "trigger": ["`role`"],
+                        "name": "Blacklisted Roles",
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered Role is already added it will be removed.\nMembers with one of these Roles can not use any of these Commands, even if they have a Role that Whitelists them, doesn't apply if the User itself is Whitelisted.",
                         "fail": {
@@ -1583,8 +1539,7 @@
                         }
                     },
                     "channels": {
-                        "name": "[{{trigger}}] Channel",
-                        "trigger": ["`channel`"],
+                        "name": "Channel",
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered Channel is already added it will be removed.\nThe Channel(s) these Commands are disabled in.",
                         "fail": {
@@ -1593,8 +1548,7 @@
                         }
                     },
                     "bpuserid": {
-                        "name": "[{{trigger}}] Whitelisted Users",
-                        "trigger": ["`user`"],
+                        "name": "Whitelisted Users",
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered User is already added it will be removed.\nUsers listed here can use these Commands in the Channels they are disabled in, no matter if they have a Blacklisted Role.",
                         "fail": {
@@ -1603,8 +1557,7 @@
                         }
                     },
                     "bluserid": {
-                        "name": "[{{trigger}}] Blacklisted Users",
-                        "trigger": ["`user`"],
+                        "name": "Blacklisted Users",
                         "answers": "`Mention(s) or ID(s)`",
                         "recommended": "This is a switch.\nIf the entered User is already added it will be removed.\nUsers listed here can never use these Commands in the Channels they are disabled in, no matter if they have a Whitelisted Role",
                         "fail": {
@@ -1636,7 +1589,7 @@
                         "bluserid": "Users on which the immunity of Whitelisted Roles is reverted. Users listed here can never use these Commands, even if they have a Whitelisted Role and even if they themselves are listed as Whitelisted User",
                         "commands": "The Commands which are Restricted",
                         "process": {
-                            "0": "What would you like to edit?\nRespond with one of these:\n{{triggers}}"
+                            "0": "What would you like to edit?\nClick on one of the Buttons"
                         },
                         "note": {
                             "active": "Select `true` or `false`",
@@ -1658,14 +1611,12 @@
                 "type": "DISBOARD",
                 "edit": {
                     "active": {
-                        "name": "[{{trigger}}] Active",
-                        "trigger": ["`active`"],
+                        "name": "Active",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
                     },
                     "role": {
-                        "name": "[{{trigger}}] Ping Role",
-                        "trigger": ["`role`"],
+                        "name": "Ping Role",
                         "answers": "`Mention or ID`",
                         "recommended": "The Role that will be pinged when you can use `!d bump` again",
                         "fail": {
@@ -1674,8 +1625,7 @@
                         }
                     },
                     "channelid": {
-                        "name": "[{{trigger}}] Channel",
-                        "trigger": ["`channel`"],
+                        "name": "Channel",
                         "answers": "`Mention or ID`",
                         "recommended": "The Channel in which Bump Reminders will be sent",
                         "fail": {
@@ -1698,14 +1648,12 @@
                 "block": "**Blocked Interactions**",
                 "edit": { 
                     "size": {
-                        "name": "[{{trigger}}] Interaction Size",
-                        "trigger": ["`size`"],
+                        "name": "Interaction Size",
                         "answers": "`Big` or `Small`",
                         "recommended": "Recommended: `small`"
                     },
                     "block": {
-                        "name": "[{{trigger}}] Blocked Interactions",
-                        "trigger": ["`block`"],
+                        "name": "Blocked Interactions",
                         "answers": "Interaction Name",
                         "recommended": "(`pat`, `hug`, `cuddle` etc.)"
                     }
@@ -1759,14 +1707,12 @@
                 "deletetime": "Delete Timeout",
                 "edit": {
                     "active": {
-                        "name": "[{{trigger}}] Active",
-                        "trigger": ["`active`"],
+                        "name": "Active",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
                     },
                     "blchannelid": {
-                        "name": "[{{trigger}}] Blacklisted Channels",
-                        "trigger": ["`channels`"],
+                        "name": "Blacklisted Channels",
                         "answers": "`Mention or ID`",
                         "recommended": "This is a switch.\nIf the entered Channel is already bypassed it will be removed.\nDeleted Messages of Members in these Channels won't be snipe-able",
                         "fail": {
@@ -1775,8 +1721,7 @@
                         }
                     },
                     "blroleid": {
-                        "name": "[{{trigger}}] Blacklisted Roles",
-                        "trigger": ["`roles`"],
+                        "name": "Blacklisted Roles",
                         "answers": "`Mention or ID`",
                         "recommended": "This is a switch.\nIf the entered Role is already bypassed it will be removed.\nDeleted Messages of Members with these Roles won't be snipe-able",
                         "fail": {
@@ -1785,8 +1730,7 @@
                         }
                     },
                     "bluserid": {
-                        "name": "[{{trigger}}] Blacklisted Users",
-                        "trigger": ["`roles`"],
+                        "name": "Blacklisted Users",
                         "answers": "`Mention or ID`",
                         "recommended": "This is a switch.\nIf the entered User is already bypassed it will be removed.\nDeleted Messages of these Users won't be snipe-able",
                         "fail": {
@@ -1795,38 +1739,32 @@
                         }
                     },
                     "links": {
-                        "name": "[{{trigger}}] Links snipe-able",
-                        "trigger": ["`links`"],
+                        "name": "Links snipe-able",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `False`"
                     },
                     "invites": {
-                        "name": "[{{trigger}}] Invites snipe-able",
-                        "trigger": ["`invites`"],
+                        "name": "Invites snipe-able",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `False`"
                     },
                     "blwords": {
-                        "name": "[{{trigger}}] Words saved as Blacklisted snipe-able",
-                        "trigger": ["`words`"],
+                        "name": "Words saved as Blacklisted snipe-able",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `False`"
                     },
                     "bots": {
-                        "name": "[{{trigger}}] Bot Messages snipe-able",
-                        "trigger": ["`bots`"],
+                        "name": "Bot Messages snipe-able",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `False`"
                     },
                     "deleteable": {
-                        "name": "[{{trigger}}] Snipes delete-able",
-                        "trigger": ["`delete`"],
+                        "name": "Snipes delete-able",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `False`"
                     },
                     "deletetime": {
-                        "name": "[{{trigger}}] Time until Snipes are deleted",
-                        "trigger": ["`time`"],
+                        "name": "Time until Snipes are deleted",
                         "answers": "Time in Seconds",
                         "recommended": "Recommended: `3 Seconds`"
                     }
@@ -1855,11 +1793,8 @@
                 "stoprole": "Stop Role",
                 "separator": "Separator Role",
                 "edit": { 
-                    "howToEdit": "Enter any of the triggers shown in the [box] infront of the option you want to edit",
-                    "author": "[Edit Mode] Ayako Role-Separator Settings",
                     "stoprole": {
-                        "name": "[{{trigger}}] Role",
-                        "trigger": ["`stoprole`"],
+                        "name": "Role",
                         "answers": "`Mention or ID`",
                         "recommended": "The Role which Role at which the Separator Role stops assigning itself to separate the Members Roles\nIf any of the Roles between the Separator Role itself and the Stop Role is added to a Member, the Separator Role is auto-assigned.",
                         "fail": {
@@ -1868,30 +1803,25 @@
                         }
                     },
                     "active": {
-                        "name": "[{{trigger}}] Separator Active",
-                        "trigger": ["`active`"],
+                        "name": "Separator Active",
                         "answers": "`True` or `False`"
                     },
                     "add": {
-                        "name": "[{{trigger}}] Add a Separator",
-                        "trigger": ["`add`"],
+                        "name": "Add a Separator",
                         "answers": "`Separator Role ID or Mention`"
                     },
                     "remove": {
-                        "name": "[{{trigger}}] Remove a Separator",
-                        "trigger": ["`remove`"],
+                        "name": "Remove a Separator",
                         "answers": "`Separator Number`"
                     },
                     "edit": {
-                        "name": "[{{trigger}}] Edit a Separator",
-                        "trigger": ["`edit`"],
+                        "name": "Edit a Separator",
                         "answers": "`Separator Number`",
                         "question": "What do you want to edit?",
                         "editing": "Editing\n{{role}} / `{{role.id}}`\nNumber: `{{nr}}`"
                     },
                     "oneTimeRunner": {
-                        "name": "[{{trigger}}] Apply the Separators to every Member of your Server",
-                        "trigger": ["`once`"],
+                        "name": "Apply the Separators to every Member of your Server",
                         "description": "Can only be run once every __7 days__.",
                         "cant": "You don't have any Separators set so you can't uset his function",
                         "time": "You can't use this Function just yet since your Server used it in the past 7 days",

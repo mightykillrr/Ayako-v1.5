@@ -29,15 +29,15 @@ module.exports = {
 	},
 	buttons(msg, r) {
 		const prefix = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.prefix.trigger[1] ? msg.lan.edit.prefix.trigger[1].replace(/`/g, '') : msg.lan.edit.prefix.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.prefix.name)
 			.setLabel(msg.lan.prefix)
 			.setStyle('SUCCESS');
 		const interactionsmode = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.interactionsmode.trigger[1] ? msg.lan.edit.interactionsmode.trigger[1].replace(/`/g, '') : msg.lan.edit.interactionsmode.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.interactionsmode.name)
 			.setLabel(msg.lan.interactionsmode)
 			.setStyle('SECONDARY');
 		const muteroleid = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.muteroleid.trigger[1] ? msg.lan.edit.muteroleid.trigger[1].replace(/`/g, '') : msg.lan.edit.muteroleid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.muteroleid.name)
 			.setLabel(msg.lan.muteroleid)
 			.setStyle(r.active ? 'SUCCESS' : 'DANGER');
 		return [[prefix,interactionsmode,muteroleid]];

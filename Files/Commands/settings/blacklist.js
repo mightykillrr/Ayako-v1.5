@@ -88,55 +88,55 @@ module.exports = {
 	},
 	buttons(msg, r) {
 		const active = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.active.trigger[1] ? msg.lan.edit.active.trigger[1].replace(/`/g, '') : msg.lan.edit.active.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.active.name)
 			.setLabel(msg.lanSettings.active)
 			.setStyle(r.active ? 'SUCCESS' : 'DANGER');
 		const wm = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.warntof.trigger[1] ? msg.lan.edit.warntof.trigger[1].replace(/`/g, '') : msg.lan.edit.warntof.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.mutetof.name)
 			.setLabel(msg.lan.mutetof)
 			.setStyle(r.warntof ? 'SUCCESS' : 'DANGER');
 		const mm = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.mutetof.trigger[1] ? msg.lan.edit.mutetof.trigger[1].replace(/`/g, '') : msg.lan.edit.mutetof.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.mutetof.name)
 			.setLabel(msg.lan.mutetof)
 			.setStyle(r.mutetof ? 'SUCCESS' : 'DANGER');
 		const km = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.kicktof.trigger[1] ? msg.lan.edit.kicktof.trigger[1].replace(/`/g, '') : msg.lan.edit.kicktof.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.kicktof.name)
 			.setLabel(msg.lan.kicktof)
 			.setStyle(r.kicktof ? 'SUCCESS' : 'DANGER');
 		const bm = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.bantof.trigger[1] ? msg.lan.edit.bantof.trigger[1].replace(/`/g, '') : msg.lan.edit.bantof.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.bantof.name)
 			.setLabel(msg.lan.bantof)
 			.setStyle(r.bantof ? 'SUCCESS' : 'DANGER');
 		const channel = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.bpchannelid.trigger[1] ? msg.lan.edit.bpchannelid.trigger[1].replace(/`/g, '') : msg.lan.edit.bpchannelid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.bpchannelid.name)
 			.setLabel(msg.lan.bpchannelid)
 			.setStyle('PRIMARY');
 		const user = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.bpuserid.trigger[1] ? msg.lan.edit.bpuserid.trigger[1].replace(/`/g, '') : msg.lan.edit.bpuserid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.bpuserid.name)
 			.setLabel(msg.lan.bpuserid)
 			.setStyle('PRIMARY');
 		const role = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.bproleid.trigger[1] ? msg.lan.edit.bproleid.trigger[1].replace(/`/g, '') : msg.lan.edit.bproleid.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.bproleid.name)
 			.setLabel(msg.lan.bproleid)
 			.setStyle('PRIMARY');
 		const maw = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.muteafter.trigger[1] ? msg.lan.edit.muteafter.trigger[1].replace(/`/g, '') : msg.lan.edit.muteafter.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.muteafter.name)
 			.setLabel(msg.client.ch.stp(msg.lan.muteafter.replace(/\*/g, ''), {amount: r.muteafter ? r.muteafter : '--'}))
 			.setStyle('SECONDARY');
 		const kaw = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.kickafter.trigger[1] ? msg.lan.edit.kickafter.trigger[1].replace(/`/g, '') : msg.lan.edit.kickafter.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.kickafter.name)
 			.setLabel(msg.client.ch.stp(msg.lan.kickafter.replace(/\*/g, ''), {amount: r.kickafter ? r.kickafter : '--'}))
 			.setStyle('SECONDARY');
 		const baw = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.banafter.trigger[1] ? msg.lan.edit.banafter.trigger[1].replace(/`/g, '') : msg.lan.edit.banafter.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.banafter.name)
 			.setLabel(msg.client.ch.stp(msg.lan.banafter.replace(/\*/g, ''), {amount: r.banafter ? r.banafter : '--'}))
 			.setStyle('SECONDARY');
 		const words = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.words.trigger[1] ? msg.lan.edit.words.trigger[1].replace(/`/g, '') : msg.lan.edit.words.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.words.name)
 			.setLabel(msg.lan.words.replace(/\*/g, ''))
 			.setStyle('PRIMARY');
 		const waw = new Discord.MessageButton()
-			.setCustomId(`${msg.lan.edit.warnafter.trigger[1] ? msg.lan.edit.warnafter.trigger[1].replace(/`/g, '') : msg.lan.edit.warnafter.trigger[0].replace(/`/g, '')}`)
+			.setCustomId(msg.lan.edit.warnafter.name)
 			.setLabel(msg.client.ch.stp(msg.lan.warnafter.replace(/\*/g, ''), {amount: r.warnafter ? r.warnafter : '--'}))
 			.setStyle('SECONDARY');
 		return [[active, words], [channel,user,role], [wm,mm,km,bm], [waw, maw,kaw,baw]];

@@ -27,9 +27,9 @@ module.exports = {
 		if (res && res.rowCount > 0) {
 			res.rows = res.rows.sort((a, b) => a.id - b.id);
 			msg.rows = res.rows;
-			embed = typeof(msg.file.mmrEmbed) == 'function' ? msg.file.mmrEmbed(msg, res.rows) : misc.noEmbed(msg);
-		}
-		else embed = misc.noEmbed(msg);
+			if (msg.file.mmrEmbed[Symbol.toStringTag] == 'AsyncFunction') embed = await msg.file.mmrEmbed(msg, res.rows);
+			else embed = typeof(msg.file.mmrEmbed) == 'function' ? msg.file.mmrEmbed(msg, res.rows) : misc.noEmbed(msg);		
+		} else embed = misc.noEmbed(msg);
 		embed.setAuthor(
 			msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
 			msg.client.constants.emotes.settingsLink,
@@ -83,7 +83,8 @@ module.exports = {
 		if (res && res.rowCount > 0) {
 			res.rows = res.rows.sort((a, b) => a.id - b.id);
 			msg.rows = res.rows;
-			embed = typeof(msg.file.mmrEmbed) == 'function' ? msg.file.mmrEmbed(msg, res.rows) : misc.noEmbed(msg);
+			if (msg.file.mmrEmbed[Symbol.toStringTag] == 'AsyncFunction') embed = await msg.file.mmrEmbed(msg, res.rows);
+			else embed = typeof(msg.file.mmrEmbed) == 'function' ? msg.file.mmrEmbed(msg, res.rows) : misc.noEmbed(msg);
 		}
 		else embed = misc.noEmbed(msg);
 		embed.setAuthor(
