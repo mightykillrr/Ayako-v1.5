@@ -599,6 +599,7 @@
     "type": "Type",
     "position": "Position",
     "topic": "Topic",
+    "affected": "Affected",
     "nsfw": "NSFW",
     "slowmode": "Slowmode",
     "lastPinat": "Last Pin at",
@@ -1790,38 +1791,52 @@
             },
             "separators": {
                 "category": ["Automation"],
+                "type": "Separator",
                 "stoprole": "Stop Role",
                 "separator": "Separator Role",
+                "isvarying": "Self-Adapting",
+                "roles": "Roles of this Separator",
+                "oneTimeRunner": "Apply the Separators to every Member of your Server",
                 "edit": { 
                     "stoprole": {
                         "name": "Role",
                         "answers": "`Mention or ID`",
-                        "recommended": "The Role which Role at which the Separator Role stops assigning itself to separate the Members Roles\nIf any of the Roles between the Separator Role itself and the Stop Role is added to a Member, the Separator Role is auto-assigned.",
+                        "recommended": "The Role which marks the end to the Separator Roles trigger.\nIf none is defined the Separator Role will work till the very top of the Role List",
+                        "fail": {
+                            "no": "I couldn't find this Role\n",
+                            "wrongGuild": "This Role is not Part of this Server\n"
+                        }
+                    },
+                    "separator": {
+                        "name": "Role",
+                        "answers": "`Mention or ID`",
+                        "recommended": "The Separator Role, it will be applied to Members if they fulfill following conditions:\n**Self-Adapting `True`**: \nLooking at the Role list of the Server, The Separator Role will be applied if a Member gains any Role between the Seaprator and the Stop Role, if no Stop Role is defined it stops at the top of the Role List. Any Role moved between these 2 Roles or above the Separator Role will instantly start triggering the Separator Role\n\n**Self-Adapting `False`**:\nThe Separator Role will be assinged to Members with at least one of the defined Roles",
                         "fail": {
                             "no": "I couldn't find this Role\n",
                             "wrongGuild": "This Role is not Part of this Server\n"
                         }
                     },
                     "active": {
-                        "name": "Separator Active",
-                        "answers": "`True` or `False`"
+                        "name": "Active",
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `True`"
                     },
-                    "add": {
-                        "name": "Add a Separator",
-                        "answers": "`Separator Role ID or Mention`"
+                    "isvarying": {
+                        "name": "Self-Adapting",
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `True`"
                     },
-                    "remove": {
-                        "name": "Remove a Separator",
-                        "answers": "`Separator Number`"
-                    },
-                    "edit": {
-                        "name": "Edit a Separator",
-                        "answers": "`Separator Number`",
-                        "question": "What do you want to edit?",
-                        "editing": "Editing\n{{role}} / `{{role.id}}`\nNumber: `{{nr}}`"
+                    "roles": {
+                        "name": "Roles of this Separator",
+                        "answers": "`Mention or ID`",
+                        "recommended": "This is a switch.\nIf the entered Role is already bypassed it will be removed.\nRoles entered here will trigger the Separator Role",
+                        "fail": {
+                            "no": "I couldn't find this Role\n",
+                            "wrongGuild": "This Role is not Part of this Server\n"
+                        }
                     },
                     "oneTimeRunner": {
-                        "name": "Apply the Separators to every Member of your Server",
+                        "name": "Apply ALL Separators to EVERY Member of your Server",
                         "description": "Can only be run once every __7 days__.",
                         "cant": "You don't have any Separators set so you can't uset his function",
                         "time": "You can't use this Function just yet since your Server used it in the past 7 days",
@@ -1830,11 +1845,36 @@
                         "answers": "`Yes` or `No`"
                     }
                 },
-                "list": {
-                    "name": "List affected Roles by typing \n`list [number]` in the next 30 Seconds or\n`{{prefix}}settings separator list [number]`",
-                    "separatorRole": "Separator Role",
-                    "affectedRoles": "Affected Roles",
-                    "notExistent":  "This Number doesn't exist"
+                "otherEdits": {
+                    "add": {
+                        "name": "Add a Separator",
+                        "process": {
+                            "0": "Select a Role that will be used as Separator"
+                        }
+                    },
+                    "remove": {
+                        "name": "Remove a Separator",
+                        "process": {
+                            "0": "Respond with the ID of the Separator you want to delete"
+                        }
+                    },
+                    "edit": {
+                        "active": "Whether these Separator are enabled or not",
+                        "separator": "The Separator Role, it will be applied to Members if they fulfill following conditions:\n**Self-Adapting `True`**: \nLooking at the Role list of the Server, The Separator Role will be applied if a Member gains any Role between the Seaprator and the Stop Role, if no Stop Role is defined it stops at the top of the Role List. Any Role moved between these 2 Roles or above the Separator Role will instantly start triggering the Separator Role\n\n**Self-Adapting `False`**:\nThe Separator Role will be assinged to Members with at least one of the defined Roles",
+                        "stoprole": "The Role which marks the end to the Separator Roles trigger.\nIf none is defined the Separator Role will work till the very top of the Role List",
+                        "isvarying": "The \"Self-Adapt\" Mode. Wether the Separator should follow defined Roles or Self-Adjust to Support every Role between it and the Stop Role (if no Stop Role is defined the Separator Role will stop at the top of the Role List)",
+                        "roles": "Roles entered here will trigger the Separator Role",
+                        "process": {
+                            "0": "What would you like to edit?\nClick on one of the Buttons"
+                        },
+                        "note": {
+                            "active": "Select `True` or `False`",
+                            "separator": "Respond with or Select 1 Role ID or Mention",
+                            "stoprole": "Respond with or Select 1 Role ID or Mention",
+                            "isvarying": "Respond with or Select 1 or more Channel IDs or Mentions",
+                            "roles": "Respond with 1 or more Role IDs or Mentions"
+                        }
+                    }
                 }
             },
             "giveaway": {

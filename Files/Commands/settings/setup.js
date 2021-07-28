@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const Settings = require('../settings');
+const misc = require('./misc');
 
 module.exports = {
 	async execute(msg, answer) {
@@ -30,10 +31,10 @@ module.exports = {
 		const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 		messageCollector.on('collect', (message) => {
 			if (message.author.id == msg.author.id) {
-				if (message.content == msg.language.cancel) return Settings.aborted(msg, [messageCollector, buttonsCollector]);
+				if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
 				if (msg.content == msg.language.yes) yesFunc(message, null);
 				else if (msg.content == msg.language.no) noFunc(message, null);
-				else return Settings.notValid(msg);
+				else return misc.notValid(msg);
 				buttonsCollector.stop();
 				messageCollector.stop();
 			}
@@ -42,7 +43,7 @@ module.exports = {
 			if (clickButton.user.id == msg.author.id) {
 				if (clickButton.customId == 'yes') yesFunc(null, clickButton);
 				else if (clickButton.customId == 'no') noFunc(null, clickButton);
-				else return Settings.notValid(msg);
+				else return misc.notValid(msg);
 				buttonsCollector.stop();
 				messageCollector.stop();
 			} else msg.client.ch.notYours(clickButton);

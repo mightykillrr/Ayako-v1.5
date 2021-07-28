@@ -440,9 +440,7 @@
                     "bpchannelid": "channels",
                     "bproleid": "roles",
                     "bpuserid": "users",
-                    "active": "boolean",
-                    "id": "id",
-                    "column": "column"
+                    "active": "boolean"
                 },
                 "overview": {
                     "prefix": "string",
@@ -456,9 +454,7 @@
                     "blroleid": "roles",
                     "bpuserid": "users",
                     "bluserid": "users",
-                    "active": "boolean",
-                    "id": "id",
-                    "column": "column"
+                    "active": "boolean"
                 },
                 "disboard": {
                     "enabled": "boolean",
@@ -472,10 +468,10 @@
                 "separators": {
                     "active": "boolean",
                     "stoprole": "role",
-                    "remove": "number",
-                    "add": "role",
-                    "edit": "number",
-                    "oneTimeRunner": "name"
+                    "separator": "role",
+                    "oneTimeRunner": "onetimerunner",
+                    "roles": "roles",
+                    "isvarying": "boolean"
                 },
                 "snipe": {
                     "active": "boolean",
@@ -503,7 +499,7 @@
                 "nitro": "nitrosettings",
                 "reactionroles": "reactionroles",
                 "selfroles": "selfroles",
-                "separators": "roleseparators",
+                "separators": "roleseparator",
                 "suggestions": "suggestionsettings",
                 "ticketing": null,
                 "vc": null,
@@ -585,8 +581,12 @@
                     "vals": ["{{msg.guild.id}}"]
                 },
                 "separators": {
-                    "cols": "guildid, active",
-                    "vals": ["{{msg.guild.id}}", true]
+                    "cols": "guildid, active, id, uniquetimestamp, isvarying, separator",
+                    "vals": ["{{values.guildid}}", false, "{{values.id}}", "{{values.uniquetimestamp}}", true, "{{values.separator}}"],
+                    "add": ["separator"],
+                    "remove": ["id"],
+                    "removeIdent": "",
+                    "removeReq": ["id", "roles"]
                 },
                 "suggestions": {
                     "cols": "guildid",

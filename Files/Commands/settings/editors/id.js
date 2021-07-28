@@ -10,7 +10,7 @@ module.exports = {
 		const options = [];
 		fail = fail.sort((a, b) => a.id - b.id);
 		for (let j = 0; j < fail.length; j++) {
-			options.push({label: `${msg.language.number}: ${fail[j].id} | ${Array.isArray(fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]) ? `${fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent][0]} ${Array.isArray(fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]) && fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent] > 1 ? `+ ${fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent].length}` : ''}` : fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]}`, value: `${fail[j].id}`});
+			options.push({label: `${msg.language.number}: ${fail[j].id} | ${fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent] ? `${Array.isArray(fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]) ? `${fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent][0]} ${Array.isArray(fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]) && fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent] > 1 ? `+ ${fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent].length}` : ''}` : fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]}` : ''}`, value: `${fail[j].id}`});
 		}
 		const take = [];
 		for(let j = 0; j < options.length; j++) {take.push(options[j]);}
@@ -112,15 +112,12 @@ module.exports = {
 						messageCollector.stop();
 						buttonsCollector.stop();
 						interaction = clickButton;
-						values[msg.assigner] = answered[0];
+						values[msg.assigner] = answered;
 						resolve(true);
 						if (msg.rows) msg.r = msg.rows.filter(r => r.id = answered);
 					} else if (clickButton.customId == msg.property) {
 						let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
-						clickButton.values.forEach(v => {
-							if (answered.includes(v)) answered.splice(answered.indexOf(v), 1);
-							else answered.push(v);
-						});
+						answered = clickButton.values[0];
 						const menu = new Discord.MessageSelectMenu()
 							.setCustomId(msg.property)
 							.addOptions(take)
@@ -156,7 +153,7 @@ module.exports = {
 								msg.client.constants.standard.invite
 							)
 							.setDescription(`${msg.language.select[msg.property].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``)
-							.addField(msg.language.selected, `${answered.map(c => ` ${c}`)} `);
+							.addField(msg.language.selected, `${answered} `);
 						const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
 						clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 					} else if (clickButton.customId == 'back') {

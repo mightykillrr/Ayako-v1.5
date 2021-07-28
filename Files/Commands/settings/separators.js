@@ -3,9 +3,11 @@ const Discord = require('discord.js');
 module.exports = {
 	perm: 268435456n,
 	type: 2,
+	setupRequired: false,
 	async mmrEmbed(msg, res) {
 		const result = await checker(msg, res);
-		if (result) res = await msg.client.ch.query('SELECT * FROM roleseparator WHERE guildid = $1;', [msg.guild.id]);
+		if (result) res = (await msg.client.ch.query('SELECT * FROM roleseparator WHERE guildid = $1;', [msg.guild.id])).rows;
+		res.sort((a, b) => a.uniquetimestamp - b.uniquetimestamp);
 		const embed = new Discord.MessageEmbed();
 		for (let i = 0; i < res.length; i++) {
 			const r = res[i];
@@ -15,12 +17,12 @@ module.exports = {
 			embed.addFields(
 				{
 					name: `${msg.language.number}: \`${r.id}\` | ${r.active ? `${msg.client.constants.emotes.tick} ${msg.language.enabled}` : `${msg.client.constants.emotes.cross} ${msg.language.disabled}`}`,
-					value: `${msg.lan.separator}: ${sep} | ${msg.lan.stoprole}: ${r.stoprole ? stop : msg.language.none}\n${msg.language.affectedRoles}: ${affected} ${msg.language.roles}`, 
+					value: `${msg.lan.separator}: ${sep} | ${msg.lan.stoprole}: ${r.stoprole ? stop : msg.language.none}\n${msg.language.affected}: ${affected} ${msg.language.roles}`, 
 					inline: true
 				}
 			);
 		}
-		embed.setDescription(msg.lan.edit.oneTimeRunner.name.replace('[{{trigger}}] ', ''));
+		embed.setDescription(msg.lan.edit.oneTimeRunner.name);
 		return embed;
 	},
 	displayEmbed(msg, r) {
@@ -38,7 +40,7 @@ module.exports = {
 					inline: false
 				},
 				{
-					name: msg.language.isvarying, 
+					name: msg.lan.isvarying, 
 					value:  r.isvarying ? msg.client.constants.emotes.tick+' '+msg.language.enabled : msg.client.constants.emotes.cross+' '+msg.language.disabled,
 					inline: false
 				},
@@ -49,12 +51,12 @@ module.exports = {
 				},
 				{
 					name: msg.lan.separator, 
-					value: r.separator ? `\`${msg.guild.roles.cache.get(r.separator)}\`` : msg.language.none, 
+					value: r.separator ? `${msg.guild.roles.cache.get(r.separator)}` : msg.language.none, 
 					inline: false
 				},
 				{
 					name: msg.lan.stoprole, 
-					value: r.stoprole ? `\`${msg.guild.roles.cache.get(r.stoprole)}\`` : msg.language.none, 
+					value: r.stoprole ? `${msg.guild.roles.cache.get(r.stoprole)}` : msg.language.none, 
 					inline: false
 				},
 				{
@@ -104,17 +106,65 @@ module.exports = {
 		}
 		return embed;
 	},
-
+	buttons(msg, r) {
+		if (r.isvarying == true) {
+			const active = new Discord.MessageButton()
+				.setCustomId(msg.lan.edit.active.name)
+				.setLabel(msg.lanSettings.active)
+				.setStyle(r.active ? 'SUCCESS' : 'DANGER');
+			const separator = new Discord.MessageButton()
+				.setCustomId(msg.lan.edit.separator.name)
+				.setLabel(msg.lan.separator)
+				.setStyle('SECONDARY');
+			const stoprole = new Discord.MessageButton()
+				.setCustomId(msg.lan.edit.stoprole.name)
+				.setLabel(msg.lan.stoprole)
+				.setStyle('SECONDARY');
+			const isvarying = new Discord.MessageButton()
+				.setCustomId(msg.lan.edit.isvarying.name)
+				.setLabel(msg.lan.isvarying)
+				.setStyle(r.isvarying ? 'SUCCESS' : 'SECONDARY');
+			const oneTimeRunner = new Discord.MessageButton()
+				.setCustomId(msg.lan.edit.oneTimeRunner.name)
+				.setLabel(msg.lan.oneTimeRunner)
+				.setEmoji(msg.client.constants.emotes.warning)
+				.setStyle('DANGER');
+			return [[active], [separator, stoprole], [isvarying], [oneTimeRunner]];
+		} else {
+			const active = new Discord.MessageButton()
+				.setCustomId(msg.lan.edit.active.name)
+				.setLabel(msg.lanSettings.active)
+				.setStyle(r.active ? 'SUCCESS' : 'DANGER');
+			const separator = new Discord.MessageButton()
+				.setCustomId(msg.lan.edit.separator.name)
+				.setLabel(msg.lan.separator)
+				.isvarying('SECONDARY');
+			const isvarying = new Discord.MessageButton()
+				.setCustomId(msg.lan.edit.isvarying.name)
+				.setLabel(msg.lan.isvarying)
+				.setStyle(r.isvarying ? 'SUCCESS' : 'SECONDARY');
+			const roles = new Discord.MessageButton()
+				.setCustomId(msg.lan.edit.roles.name)
+				.setLabel(msg.lan.roles)
+				.setStyle('PRIMARY');
+			const oneTimeRunner = new Discord.MessageButton()
+				.setCustomId(msg.lan.edit.oneTimeRunner.name)
+				.setLabel(msg.lan.oneTimeRunner)
+				.setEmoji(msg.client.constants.emotes.warning)
+				.setStyle('DANGER');
+			return [[active], [separator, roles], [isvarying], [oneTimeRunner]];
+		}
+	}
 };
 
 async function checker(msg, res) {
 	const sepend = [];
 	const stopend = [];
-	res.rows.forEach(row => {
-		const sep = msg.guild.roles.cache.get(row.separator);
-		const stop = msg.guild.roles.cache.get(row.stoprole);
-		if (!sep || !sep.id) sepend.push(row.separator);
-		if (!stop || !stop.id) stopend.push(row.stoprole);	
+	res.forEach(r => {
+		const sep = msg.guild.roles.cache.get(r.separator);
+		const stop = msg.guild.roles.cache.get(r.stoprole);
+		if (!sep || !sep.id) sepend.push(r.separator);
+		if (!stop || !stop.id) stopend.push(r.stoprole);	
 	});
 	for (const s of sepend) {await msg.client.ch.query('DELETE FROM roleseparator WHERE guildid = $1 AND separator = $2;', [msg.guild.id, s]);}
 	for (const s of stopend) {await msg.client.ch.query('DELETE FROM roleseparator WHERE guildid = $1 AND stoprole = $2;', [msg.guild.id, s]);}

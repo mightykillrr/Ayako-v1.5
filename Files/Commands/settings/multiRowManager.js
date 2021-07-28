@@ -103,17 +103,12 @@ module.exports = {
 			.setStyle('DANGER')
 			.setLabel(msg.language.remove)
 			.setDisabled(embed.fields.length > 0 ? false : true);
-		const edit = new Discord.MessageButton()
-			.setCustomId('edit')
-			.setStyle('SECONDARY')
-			.setLabel(msg.language.Edit)
-			.setDisabled(embed.fields.length > 0 ? false : true);
 		const list = new Discord.MessageButton()
 			.setCustomId('list')
 			.setStyle('SECONDARY')
 			.setLabel(msg.language.List)
 			.setDisabled(embed.fields.length > 0 ? false : true);
-		const row = msg.client.ch.buttonRower([[add, remove, edit, list]]);
+		const row = msg.client.ch.buttonRower([[add, remove, list]]);
 		if (answer) answer.update({embeds: [embed], components: row}).catch(() => {});
 		else if (msg.m) msg.m.edit({embeds: [embed], components: row}).catch(() => {});
 		else msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: row});
@@ -128,9 +123,6 @@ module.exports = {
 				} else if (clickButton.customId == 'remove') {
 					CollectorEnder([buttonsCollector, messageCollector]);
 					repeater(msg, 0, null, {}, clickButton, 'remove');
-				} else if (clickButton.customId == 'edit') {
-					CollectorEnder([buttonsCollector, messageCollector]);
-					repeater(msg, 0, null, {}, clickButton, 'edit');
 				} else if (clickButton.customId == 'list') {
 					CollectorEnder([buttonsCollector, messageCollector]);
 					this.list(msg, clickButton, 'edit', []);
@@ -149,7 +141,7 @@ module.exports = {
 		else return misc.aborted(msg);
 		const options = [];
 		for (let j = 0; j < r.length; j++) {
-			options.push({label: `${msg.language.number}: ${r[j].id} | ${Array.isArray(r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]) ? `${r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent][0]} ${Array.isArray(r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]) && r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent] > 1 ? `+ ${r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent].length}` : ''}` : r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]}`, value: `${r[j].id}`});
+			options.push({label: `${msg.language.number}: ${r[j].id} | ${r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent] ? `${Array.isArray(r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]) ? `${r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent][0]} ${Array.isArray(r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]) && r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent] > 1 ? `+ ${r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent].length}` : ''}` : r[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]}` : ''}`, value: `${r[j].id}`});
 		}
 		const take = [];
 		for(let j = 0; j < options.length; j++) {take.push(options[j]);}
@@ -383,16 +375,22 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 			);
 	}
 	if (srmEditing) msg.property = Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == srmEditing[0])[1];
-	else msg.property = AddRemoveEditView == 'edit' ? msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.editReq[i]] : msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.setupQueries[msg.file.name][AddRemoveEditView][i]];
-	if ((srmEditing && i == 0) || (!srmEditing && (AddRemoveEditView == 'edit' ? i < msg.client.constants.commands.settings.editReq.length : i < msg.client.constants.commands.settings.setupQueries[msg.file.name][AddRemoveEditView].length))) {
+	else msg.property = AddRemoveEditView == 'edit' ? msg.client.constants.commands.settings.editReq[i] : msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.setupQueries[msg.file.name][AddRemoveEditView][i]];
+	if ((srmEditing && i == 0) || (!srmEditing && (AddRemoveEditView == 'edit' ? i < msg.client.constants.commands.settings.editReq.length : i < msg.client.constants.commands.settings.setupQueries[msg.file.name][AddRemoveEditView].length)) && msg.property) {
 		msg.compatibilityType = msg.property.includes('s') ? msg.property : msg.property+'s';
-		msg.assigner = comesFromSRM ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == srmEditing[0])[0] : AddRemoveEditView == 'edit' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.editReq[i] || a[0] == msg.client.constants.commands.settings.editReq[i])[0] : AddRemoveEditView == 'add' ? Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.setupQueries[msg.file.name].add[i] || a[0] == msg.client.constants.commands.settings.setupQueries[msg.file.name].add[i])[0] : Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.setupQueries[msg.file.name].removeReq[i] || a[0] == msg.client.constants.commands.settings.setupQueries[msg.file.name].removeReq[i])[0];
+		msg.assigner = comesFromSRM ? 
+			Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == srmEditing[0])[0] : 
+			AddRemoveEditView == 'edit' ? 
+				Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.editReq[i] || a[0] == msg.client.constants.commands.settings.editReq[i])[0] : 
+				AddRemoveEditView == 'add' ? 
+					Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.setupQueries[msg.file.name].add[i] || a[0] == msg.client.constants.commands.settings.setupQueries[msg.file.name].add[i])[0] : 
+					Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.setupQueries[msg.file.name].removeReq[i] || a[0] == msg.client.constants.commands.settings.setupQueries[msg.file.name].removeReq[i])[0];
 		let answered = [];
 		const editor = editors.find(f => f.key.includes(msg.property));
 		const returned = await editor.exe(msg, i, embed, values, answer, AddRemoveEditView, fail, srmEditing, comesFromSRM, answered);
 		if (Array.isArray(returned) && returned[0] == 'repeater') repeater(returned[1], returned[2], returned[3], returned[4], returned[5], returned[6], returned[7], returned[8], returned[9]);
 		else return;
-	} else {
+	} else if (['add', 'remove', 'edit'].includes(AddRemoveEditView)) {
 		if (AddRemoveEditView == 'add') {
 			const newSettings = {};
 			Object.entries(values).forEach((arr) => {
@@ -503,7 +501,12 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 			else setTimeout(() => {require('./singleRowManager').redirecter(msg, null, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);}, 3000);
 			misc.log(oldSettings, msg, newSettings);
 		} else editer(msg, values, fail, answer, AddRemoveEditView, comesFromSRM);
-	}
+	} else if (!msg.property) throw new Error(
+		'No Message Property defined!'+
+		srmEditing ? `I'm searching for ${srmEditing[0]} in ${msg.client.constants.commands.settings.edit[msg.file.name]}`
+			: AddRemoveEditView == 'edit' ? `I'm searching for ${msg.client.constants.commands.settings.editReq[i]} in ${msg.client.constants.commands.settings.edit[msg.file.name]}`
+				: `I'm searching for ${msg.client.constants.commands.settings.setupQueries[msg.file.name][AddRemoveEditView][i]} in ${msg.client.constants.commands.settings.edit[msg.file.name]}`
+	);
 }
 
 async function editer(msg, values, fail, answer, AddRemoveEditView, comesFromSRM) {
