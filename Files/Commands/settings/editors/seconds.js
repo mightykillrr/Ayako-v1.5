@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const misc = require('../misc.js');
 
 module.exports = {
-	key: ['cooldown'],
+	key: ['seconds'],
 	async exe(msg, i, embed, values, answer, AddRemoveEditView, fail, srmEditing, comesFromSRM, answered) {
 		const req = [];
 		for (let j = 1; j < 9999; j++) {req.push(j);}

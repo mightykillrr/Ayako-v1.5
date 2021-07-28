@@ -40,7 +40,6 @@ module.exports = {
 			.setCustomId(`${msg.lan.edit.muteroleid.trigger[1] ? msg.lan.edit.muteroleid.trigger[1].replace(/`/g, '') : msg.lan.edit.muteroleid.trigger[0].replace(/`/g, '')}`)
 			.setLabel(msg.lan.muteroleid)
 			.setStyle(r.active ? 'SUCCESS' : 'DANGER');
-
 		return [[prefix,interactionsmode,muteroleid]];
 	}
 

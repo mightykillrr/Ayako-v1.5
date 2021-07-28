@@ -806,9 +806,9 @@
             "select": "Select 1 or more Commands",
             "desc": "Select 1 or more Commands below"
         },
-        "cooldown": {
-            "select": "Select a Cooldown (in Seconds)",
-            "desc": "Select the Cooldown (in Seconds)"
+        "seconds": {
+            "select": "Select Seconds",
+            "desc": "Select the Seconds"
         },
         "id": {
             "select": "Select the Entry",
@@ -1454,7 +1454,7 @@
                     "cooldown": {
                         "name": "[{{trigger}}] Cooldown",
                         "trigger": ["`cooldown`", "`cd`"],
-                        "answers": "`Time in Seconds`"
+                        "answers": "Time in Seconds"
                     },
                     "active": {
                         "name": "[{{trigger}}] Active",
@@ -1750,55 +1750,85 @@
                 "type": "Snipe",
                 "blchannelid": "Blacklisted Channels",
                 "blroleid": "Blacklisted Roles",
-                "links": "Links snipeable",
-                "invites": "Invites snipeable",
-                "blwords": "Words saved as Blacklisted snipeable",
-                "bots": "Bot Messages snipeable",
+                "bluserid": "Blacklisted Users",
+                "links": "Links snipe-able",
+                "invites": "Invites snipe-able",
+                "blwords": "Words saved as Blacklisted snipe-able",
+                "bots": "Bot Messages snipe-able",
+                "deleteable": "Delete-able by Reaction",
+                "deletetime": "Delete Timeout",
                 "edit": {
-                    "blroleid": {
-                        "name": "[{{trigger}}] Blacklisted Roles",
-                        "trigger": ["`roles`"],
-                        "answers": "`Mention or ID`",
-                        "recommended": "Deleted Messages of Members with these Roles won't be snipeable\nThis is a switch.\nIf the entered Channel is already bypassed it will be removed.",
-                        "fail": {
-                            "no": "I couldn't find this Role\n",
-                            "wrongGuild": "This Role is not Part of this Server\n"
-                        }
+                    "active": {
+                        "name": "[{{trigger}}] Active",
+                        "trigger": ["`active`"],
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `True`"
                     },
                     "blchannelid": {
                         "name": "[{{trigger}}] Blacklisted Channels",
                         "trigger": ["`channels`"],
                         "answers": "`Mention or ID`",
-                        "recommended": "Deleted Messages of Members in these Channels won't be snipeable\nThis is a switch.\nIf the entered Channel is already bypassed it will be removed.",
+                        "recommended": "This is a switch.\nIf the entered Channel is already bypassed it will be removed.\nDeleted Messages of Members in these Channels won't be snipe-able",
                         "fail": {
                             "no": "I couldn't find this Channel\n",
                             "wrongGuild": "This Channel is not Part of this Server\n"
                         }
                     },
-                    "active": {
-                        "name": "[{{trigger}}] Snipe",
-                        "trigger": ["`active`"],
-                        "answers": "`True` or `False`"
+                    "blroleid": {
+                        "name": "[{{trigger}}] Blacklisted Roles",
+                        "trigger": ["`roles`"],
+                        "answers": "`Mention or ID`",
+                        "recommended": "This is a switch.\nIf the entered Role is already bypassed it will be removed.\nDeleted Messages of Members with these Roles won't be snipe-able",
+                        "fail": {
+                            "no": "I couldn't find this Role\n",
+                            "wrongGuild": "This Role is not Part of this Server\n"
+                        }
+                    },
+                    "bluserid": {
+                        "name": "[{{trigger}}] Blacklisted Users",
+                        "trigger": ["`roles`"],
+                        "answers": "`Mention or ID`",
+                        "recommended": "This is a switch.\nIf the entered User is already bypassed it will be removed.\nDeleted Messages of these Users won't be snipe-able",
+                        "fail": {
+                            "no": "I couldn't find this User\n",
+                            "wrongGuild": "This User is not Part of this Server\n"
+                        }
                     },
                     "links": {
-                        "name": "[{{trigger}}] Links snipeable",
+                        "name": "[{{trigger}}] Links snipe-able",
                         "trigger": ["`links`"],
-                        "answers": "`True` or `False`"
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `False`"
                     },
                     "invites": {
-                        "name": "[{{trigger}}] Invites snipeable",
+                        "name": "[{{trigger}}] Invites snipe-able",
                         "trigger": ["`invites`"],
-                        "answers": "`True` or `False`"
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `False`"
                     },
                     "blwords": {
-                        "name": "[{{trigger}}] Words saved as Blacklisted snipeable",
+                        "name": "[{{trigger}}] Words saved as Blacklisted snipe-able",
                         "trigger": ["`words`"],
-                        "answers": "`True` or `False`"
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `False`"
                     },
                     "bots": {
-                        "name": "[{{trigger}}] Bot Messages snipeable",
+                        "name": "[{{trigger}}] Bot Messages snipe-able",
                         "trigger": ["`bots`"],
-                        "answers": "`True` or `False`"
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `False`"
+                    },
+                    "deleteable": {
+                        "name": "[{{trigger}}] Snipes delete-able",
+                        "trigger": ["`delete`"],
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `False`"
+                    },
+                    "deletetime": {
+                        "name": "[{{trigger}}] Time until Snipes are deleted",
+                        "trigger": ["`time`"],
+                        "answers": "Time in Seconds",
+                        "recommended": "Recommended: `3 Seconds`"
                     }
                 }
             },

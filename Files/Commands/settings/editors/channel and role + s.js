@@ -239,7 +239,6 @@ module.exports = {
 				});
 			});
 		});
-		console.log(values)
 		if (resolved) return ['repeater', msg, i+1, embed, values, interaction, AddRemoveEditView, fail, srmEditing, comesFromSRM, answered];
 		else return null;
 	}

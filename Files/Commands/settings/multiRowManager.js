@@ -381,7 +381,6 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 				msg.client.constants.standard.invite
 			);
 	}
-	console.log(srmEditing, comesFromSRM)
 	if (srmEditing) msg.property = Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == srmEditing[0])[1];
 	else msg.property = AddRemoveEditView == 'edit' ? msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.editReq[i]] : msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.setupQueries[msg.file.name][AddRemoveEditView][i]];
 	if ((srmEditing && i == 0) || (!srmEditing && (AddRemoveEditView == 'edit' ? i < msg.client.constants.commands.settings.editReq.length : i < msg.client.constants.commands.settings.setupQueries[msg.file.name][AddRemoveEditView].length))) {
