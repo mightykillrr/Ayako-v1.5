@@ -135,6 +135,7 @@ module.exports = {
 		buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') msg.client.ch.collectorEnd(msg);});
 	},
 	async list(msg, answer, AddRemoveEditView, fail) {
+		
 		let r = [], answered = [], values = {};
 		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 		if (res && res.rowCount > 0) r = res.rows;
@@ -179,7 +180,7 @@ module.exports = {
 			)
 			.setDescription(`${msg.language.select.id.desc}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
 		const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
-		if (answer) answer.update({embeds: [embed], components: rows}).catch((e) => {console.log(e);});
+		if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
 		else msg.m.edit({embeds: [embed], components: rows}).catch(() => {});
 		const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 		const messageCollector = msg.channel.createMessageCollector({time: 60000});
@@ -230,7 +231,7 @@ module.exports = {
 							msg.client.constants.standard.invite
 						)
 						.setDescription(`${msg.language.select.id.desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``);
-					if (answered.length > 0) embed.addField(msg.language.selected, `${answered.map(c => ` ${c}`)} `);
+					if (answered.length > 0) embed.addField(msg.language.selected, `${answered}`);
 					if (page >= Math.ceil(+options.length / 25)) next.setDisabled(true);
 					else next.setDisabled(false);
 					if (page > 1) prev.setDisabled(false);
@@ -238,17 +239,14 @@ module.exports = {
 					const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
 					clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 				} else if (clickButton.customId == 'done') {
-					messageCollector.stop('finished');
-					buttonsCollector.stop('finished');
+					messageCollector.stop();
+					buttonsCollector.stop();
 					values.id = answered[0];
 					msg.r = msg.rows.find(r => r.id == values.id);
 					gotID(values.id, clickButton, AddRemoveEditView, fail);
 				} else if (clickButton.customId == 'id') {
 					let page = clickButton.message.embeds[0].description ? clickButton.message.embeds[0].description.split(/`+/)[1].split(/\/+/)[0] : 0;
-					clickButton.values.forEach(v => {
-						if (answered.includes(v)) answered.splice(answered.indexOf(v), 1);
-						else answered.push(v);
-					});
+					answered = clickButton.values[0];
 					const menu = new Discord.MessageSelectMenu()
 						.setCustomId('id')
 						.addOptions(take)
@@ -284,7 +282,7 @@ module.exports = {
 							msg.client.constants.standard.invite
 						)
 						.setDescription(`${msg.language.select.id.desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``)
-						.addField(msg.language.selected, `${answered.map(c => ` ${c}`)} `);
+						.addField(msg.language.selected, `${answered}`);
 					const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
 					clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 				} else if (clickButton.customId == 'back') {
@@ -297,18 +295,7 @@ module.exports = {
 		messageCollector.on('collect', (message) => {
 			if (message.author.id == msg.author.id && message.content.toLowerCase() == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
 		});
-		buttonsCollector.on('end', (collected, reason) => {
-			if (reason == 'time') {
-				const embed = new Discord.MessageEmbed()
-					.setAuthor(
-						msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}),
-						msg.client.constants.emotes.settingsLink, 
-						msg.client.constants.standard.invite
-					)
-					.setDescription(msg.language.timeError);
-				msg.m.edit({embeds: [embed], components: []}).catch(() => {});
-			}
-		});
+		buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') msg.m.edit({embeds: [embed], components: []});});
 		async function gotID(id, answer, AddRemoveEditView, fail) {
 			const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1 AND guildid = $2;`, [id, msg.guild.id]);
 			if (res && res.rowCount > 0) {
@@ -353,7 +340,7 @@ async function listdisplay(msg, answer, id, AddRemoveEditView, fail, values) {
 			} else if (clickButton.customId == 'edit') {
 				buttonsCollector.stop();
 				messageCollector.stop();
-				return require('./singleRowManager').redirecter(msg, answer, AddRemoveEditView, fail, values);
+				return require('./singleRowManager').redirecter(msg, clickButton, 'edit', fail, values, true);
 			}
 		} else msg.client.ch.notYours(clickButton);
 	});

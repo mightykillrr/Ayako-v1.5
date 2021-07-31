@@ -30,11 +30,12 @@ module.exports = {
 			for (let i = 0; i < Object.entries(lengthVar).length; i++) {
 				if (Object.entries(oldSettings)[i][1] !== Object.entries(newSettings)[i][1]) changed.push([[Object.entries(oldSettings)[i][0], Object.entries(oldSettings)[i][1]], [Object.entries(newSettings)[i][0], Object.entries(newSettings)[i][1]]]);
 			}
+			console.log(oldSettings, newSettings);
 			embed
 				.setColor(msg.client.constants.commands.settings.log.color)
 				.setTimestamp()
 				.setAuthor(msg.client.ch.stp(msg.language.selfLog.author, {setting: msg.lan.type}))
-				.setDescription(!oldSettings.id ? msg.client.ch.stp(msg.language.selfLog.description, {msg: msg, setting: msg.file.name}) : msg.client.ch.stp(msg.language.selfLog.descriptionwithID, {msg: msg, setting: msg.file.name, settings: oldSettings}));
+				.setDescription(!oldSettings.id ? msg.client.ch.stp(msg.language.selfLog.description, {msg: msg, setting: msg.file.name}) : msg.client.ch.stp(msg.language.selfLog.descriptionwithID, {msg: msg, setting: msg.file.name, id: newSettings.id}));
 			if (changed.length > 0) {
 				changed.forEach(change => {
 					if ((Array.isArray(change[0][1]) && Array.isArray(change[1][1])) && change[0][1].equals(change[1][1])) return;
@@ -66,7 +67,7 @@ module.exports = {
 				.setColor(msg.client.constants.commands.settings.log.color)
 				.setTimestamp()
 				.setAuthor(msg.client.ch.stp(msg.language.selfLog.author, {setting: msg.lan.type}))
-				.setDescription(!oldSettings.id ? msg.client.ch.stp(msg.language.selfLog.description, {msg: msg, setting: msg.file.name}) : msg.client.ch.stp(msg.language.selfLog.descriptionwithID, {msg: msg, setting: msg.file.name, settings: oldSettings}));
+				.setDescription(!oldSettings.id ? msg.client.ch.stp(msg.language.selfLog.description, {msg: msg, setting: msg.file.name}) : msg.client.ch.stp(msg.language.selfLog.descriptionwithID, {msg: msg, setting: msg.file.name, id: newSettings.id}));
 			if (changed.length > 0) {
 				changed.forEach(change => {
 					if ((Array.isArray(change[0][1]) && Array.isArray(change[1][1])) && change[0][1].equals(change[1][1])) return;

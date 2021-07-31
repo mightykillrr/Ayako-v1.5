@@ -13,19 +13,36 @@ module.exports = {
 			const r = res[i];
 			const sep = msg.guild.roles.cache.get(r.separator);
 			const stop = r.stoprole ? msg.guild.roles.cache.get(r.stoprole) : null;
-			const affected = r.stoprole ? (sep.rawPosition > stop.rawPosition ? sep.rawPosition - stop.rawPosition : stop.rawPosition - sep.rawPosition)-1 : (sep.rawPosition > msg.guild.roles.highest.rawPosition ? sep.rawPosition - msg.guild.roles.highest.rawPosition : msg.guild.roles.highest.rawPosition - sep.rawPosition)-1;
+			const affected = r.stoprole ? (sep.rawPosition > stop.rawPosition ? sep.rawPosition - stop.rawPosition : stop.rawPosition - sep.rawPosition)-1 : (sep.rawPosition >= msg.guild.roles.highest.rawPosition ? sep.rawPosition - msg.guild.roles.highest.rawPosition : msg.guild.roles.highest.rawPosition - sep.rawPosition)-1;
 			embed.addFields(
 				{
 					name: `${msg.language.number}: \`${r.id}\` | ${r.active ? `${msg.client.constants.emotes.tick} ${msg.language.enabled}` : `${msg.client.constants.emotes.cross} ${msg.language.disabled}`}`,
-					value: `${msg.lan.separator}: ${sep} | ${msg.lan.stoprole}: ${r.stoprole ? stop : msg.language.none}\n${msg.language.affected}: ${affected} ${msg.language.roles}`, 
+					value: `${msg.lan.separator}: ${sep}\n${msg.lan.stoprole}: ${r.stoprole ? stop : msg.language.none}\n${msg.language.affected}: ${affected} ${msg.language.roles}`, 
 					inline: true
 				}
 			);
 		}
-		embed.setDescription(msg.lan.edit.oneTimeRunner.name);
 		return embed;
 	},
 	displayEmbed(msg, r) {
+		const sep = msg.guild.roles.cache.get(r.separator);
+		const stop = r.stoprole ? msg.guild.roles.cache.get(r.stoprole) : null;
+		console.log(1, Date.now()); // 1  +0s
+		const affected = r.stoprole ? 
+			(sep.rawPosition > stop.rawPosition ? sep.rawPosition - stop.rawPosition : 
+				stop.rawPosition - sep.rawPosition)-1 : 
+			(sep.rawPosition >= msg.guild.roles.highest.rawPosition ? 
+				msg.guild.roles.cache.filter(r => r.rawPosition > sep.rawPosition && r.rawPosition < msg.guild.roles.highest.rawPosition) : 
+				msg.guild.roles.cache.filter(r => r.rawPosition < sep.rawPosition && r.rawPosition > msg.guild.roles.highest.rawPosition));
+		console.log(2, Date.now()); // 2 +1.134s
+		const affectedRoles = r.stoprole ? 
+			(sep.rawPosition > stop.rawPosition ? 
+				msg.guild.roles.cache.filter(r => r.rawPosition < sep.rawPosition && r.rawPosition > stop.rawPosition) : 
+				msg.guild.roles.cache.filter(r => r.rawPosition > sep.rawPosition && r.rawPosition < stop.rawPosition)) : 
+			(sep.rawPosition > msg.guild.roles.highest.rawPosition ? 
+				msg.guild.roles.cache.filter(r => r.rawPosition < sep.rawPosition && r.rawPosition > msg.guild.roles.highest.rawPosition) : 
+				msg.guild.roles.cache.filter(r => r.rawPosition > sep.rawPosition && r.rawPosition < msg.guild.roles.highest.rawPosition));
+		console.log(3, Date.now()); // 3 +5.546s
 		const embed = new Discord.MessageEmbed();
 		if (r.isvarying == true) {
 			embed.addFields(
@@ -51,17 +68,32 @@ module.exports = {
 				},
 				{
 					name: msg.lan.separator, 
-					value: r.separator ? `${msg.guild.roles.cache.get(r.separator)}` : msg.language.none, 
+					value: r.separator ? `${sep}` : msg.language.none, 
 					inline: false
 				},
 				{
 					name: msg.lan.stoprole, 
-					value: r.stoprole ? `${msg.guild.roles.cache.get(r.stoprole)}` : msg.language.none, 
+					value: r.stoprole ? `${stop}` : msg.language.none, 
 					inline: false
 				},
 				{
 					name: msg.language.number, 
 					value: r.id ? `\`${r.id}\`` : msg.language.none, 
+					inline: false
+				},
+				{
+					name: '\u200b', 
+					value: '\u200b', 
+					inline: false
+				},				
+				{
+					name: '\u200b', 
+					value: '\u200b', 
+					inline: false
+				},
+				{
+					name: `${msg.language.affected} ${affected} ${msg.language.roles}`,
+					value: `${`${affectedRoles.map(r => ` ${r}`)}`.length > 1020 ? msg.language.tooManyRoles : affectedRoles.map(r => ` ${r}`)}`,
 					inline: false
 				}
 			);

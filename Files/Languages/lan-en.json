@@ -1796,10 +1796,10 @@
                 "separator": "Separator Role",
                 "isvarying": "Self-Adapting",
                 "roles": "Roles of this Separator",
-                "oneTimeRunner": "Apply the Separators to every Member of your Server",
+                "oneTimeRunner": "Apply all Separators to every Member of your Server",
                 "edit": { 
                     "stoprole": {
-                        "name": "Role",
+                        "name": "Stop-Role",
                         "answers": "`Mention or ID`",
                         "recommended": "The Role which marks the end to the Separator Roles trigger.\nIf none is defined the Separator Role will work till the very top of the Role List",
                         "fail": {
@@ -1808,7 +1808,7 @@
                         }
                     },
                     "separator": {
-                        "name": "Role",
+                        "name": "Separator-Role",
                         "answers": "`Mention or ID`",
                         "recommended": "The Separator Role, it will be applied to Members if they fulfill following conditions:\n**Self-Adapting `True`**: \nLooking at the Role list of the Server, The Separator Role will be applied if a Member gains any Role between the Seaprator and the Stop Role, if no Stop Role is defined it stops at the top of the Role List. Any Role moved between these 2 Roles or above the Separator Role will instantly start triggering the Separator Role\n\n**Self-Adapting `False`**:\nThe Separator Role will be assinged to Members with at least one of the defined Roles",
                         "fail": {

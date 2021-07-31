@@ -101,7 +101,7 @@ module.exports = {
 								msg.client.constants.standard.invite
 							)
 							.setDescription(`${msg.language.select[msg.property].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``);
-						if (answered.length > 0) embed.addField(msg.language.selected, `${answered.map(c => msg.compatibilityType == 'channels' ? `<#${c}>` : msg.compatibilityType == 'roles' ? `<@&${c}>` : ` ${c}`)} `);
+						if (answered.length > 0) embed.addField(msg.language.selected, `${msg.property.includes('s') ? answered.map(c => msg.compatibilityType == 'channels' ? `<#${c}>` : msg.compatibilityType == 'roles' ? `<@&${c}>` : ` ${c}`) : msg.compatibilityType == 'channels' ? `<#${answered}>` : msg.compatibilityType == 'roles' ? `<@&${answered}>` : `${answered}`} `);
 						if (page >= Math.ceil(+options.length / 25)) next.setDisabled(true);
 						else next.setDisabled(false);
 						if (page > 1) prev.setDisabled(false);
@@ -111,7 +111,7 @@ module.exports = {
 					} else if (clickButton.customId == 'done') {
 						if (msg.compatibilityType == 'channels' || msg.compatibilityType == 'roles') {
 							if (answered.length > 0) {
-								if (Array.isArray(answered)) {
+								if (msg.property.includes('s')) {
 									answered.forEach(id => { 
 										if (values[msg.assigner] && values[msg.assigner].includes(id)) {
 											const index = values[msg.assigner].indexOf(id);
@@ -119,11 +119,11 @@ module.exports = {
 										} else if (values[msg.assigner] && values[msg.assigner].length > 0) values[msg.assigner].push(id);
 										else values[msg.assigner] = [id];
 									});
-								} else values[msg.assigner] = answered;	
+								} else values[msg.assigner] = answered[0];	
 							}
 						} else if (msg.compatibilityType == 'number') {
 							if (answered.length > 0) {
-								if (Array.isArray(answered)) {
+								if (msg.property.includes('s')) {
 									answered.forEach(id => { 
 										if (values[msg.assigner] && values[msg.assigner].includes(id)) {
 											const index = values[msg.assigner].indexOf(id);
@@ -131,7 +131,7 @@ module.exports = {
 										} else if (values[msg.assigner] && values[msg.assigner].length > 0) values[msg.assigner].push(id);
 										else values[msg.assigner] = [id];
 									});
-								} else values[msg.assigner] = answered;	
+								} else values[msg.assigner] = answered[0];	
 							}
 						}
 						messageCollector.stop('finished');
@@ -178,7 +178,7 @@ module.exports = {
 								msg.client.constants.standard.invite
 							)
 							.setDescription(`${msg.language.select[msg.property].desc}\n${msg.language.page}: \`${page}/${Math.ceil(+options.length / 25)}\``)
-							.addField(msg.language.selected, `${answered.map(c => msg.property == 'channels' ? `<#${c}>` : msg.property == 'roles' ? `<@&${c}>` : ` ${c}`)} `);
+							.addField(msg.language.selected, `${msg.property.includes('s') ? answered.map(c => msg.compatibilityType == 'channels' ? `<#${c}>` : msg.compatibilityType == 'roles' ? `<@&${c}>` : ` ${c}`) : msg.compatibilityType == 'channels' ? `<#${answered}>` : msg.compatibilityType == 'roles' ? `<@&${answered}>` : `${answered}`} `);
 						const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
 						clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 					} else if (clickButton.customId == 'back') {
@@ -213,7 +213,7 @@ module.exports = {
 							else answered.push(id);
 						}));
 						if (answered.length > 0) {
-							if (Array.isArray(answered)) {
+							if (msg.property.includes('s')) {
 								answered.forEach(id => { 
 									if (values[msg.assigner] && values[msg.assigner].includes(id)) {
 										const index = values[msg.assigner].indexOf(id);
