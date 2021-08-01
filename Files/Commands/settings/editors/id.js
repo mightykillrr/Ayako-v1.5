@@ -8,10 +8,10 @@ module.exports = {
 		if (res && res.rowCount > 0) fail = res.rows;
 		else return misc.aborted(msg);
 		const options = [];
-		fail = fail.sort((a, b) => a.id - b.id);
 		for (let j = 0; j < fail.length; j++) {
-			options.push({label: `${msg.language.number}: ${fail[j].id} | ${fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent] ? `${Array.isArray(fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]) ? `${fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent][0]} ${Array.isArray(fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]) && fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent] > 1 ? `+ ${fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent].length}` : ''}` : fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]}` : ''}`, value: `${fail[j].id}`});
+			options.push({label: `${msg.language.number}: ${fail[j].id} | ${fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent] ? `${Array.isArray(fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]) ? `${fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent][0]} ${Array.isArray(fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]) && fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent] > 1 ? `+ ${fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent].length}` : ''}` : fail[j][msg.client.constants.commands.settings.setupQueries[msg.file.name].removeIdent]}` : ''}`, value: fail[j].id});
 		}
+		options.sort((a, b) => a.value - b.value);
 		const take = [];
 		for(let j = 0; j < options.length; j++) {take.push(options[j]);}
 		const menu = new Discord.MessageSelectMenu()

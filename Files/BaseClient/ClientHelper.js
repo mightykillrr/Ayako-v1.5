@@ -461,7 +461,13 @@ module.exports = {
 	async txtFileWriter(object) {
 		object = object.map(o => o);
 		let content = '';
-		if (object[0].source == 'massban') {
+		if (object[0].source == 'debug') {
+			for (let i = 0; i < object.length; i++) {
+				content += `${object[i][object.toBeLogged?object.toBeLogged[0]:'']} - ${object[i][object.toBeLogged?object.toBeLogged[1]:'']} - ${object[i][object.toBeLogged?object.toBeLogged[2]:'']}\n`;
+				const path = `.\\Files\\Downloads\\Debug\\${Date.now()}.txt`;
+				fs.writeFile(path, content, (err) => {if (err) throw err;});
+			}
+		} if (object[0].source == 'massban') {
 			for (let i = 0; i < object.length; i++) {
 				content += `${object[i].tag} / ${object[i].id}\n`;
 			}

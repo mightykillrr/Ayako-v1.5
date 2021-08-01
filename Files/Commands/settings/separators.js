@@ -27,22 +27,22 @@ module.exports = {
 	displayEmbed(msg, r) {
 		const sep = msg.guild.roles.cache.get(r.separator);
 		const stop = r.stoprole ? msg.guild.roles.cache.get(r.stoprole) : null;
-		console.log(1, Date.now()); // 1  +0s
 		const affected = r.stoprole ? 
-			(sep.rawPosition > stop.rawPosition ? sep.rawPosition - stop.rawPosition : 
+			(sep.rawPosition > stop.rawPosition ? 
+				sep.rawPosition - stop.rawPosition : 
 				stop.rawPosition - sep.rawPosition)-1 : 
 			(sep.rawPosition >= msg.guild.roles.highest.rawPosition ? 
-				msg.guild.roles.cache.filter(r => r.rawPosition > sep.rawPosition && r.rawPosition < msg.guild.roles.highest.rawPosition) : 
-				msg.guild.roles.cache.filter(r => r.rawPosition < sep.rawPosition && r.rawPosition > msg.guild.roles.highest.rawPosition));
-		console.log(2, Date.now()); // 2 +1.134s
-		const affectedRoles = r.stoprole ? 
-			(sep.rawPosition > stop.rawPosition ? 
-				msg.guild.roles.cache.filter(r => r.rawPosition < sep.rawPosition && r.rawPosition > stop.rawPosition) : 
-				msg.guild.roles.cache.filter(r => r.rawPosition > sep.rawPosition && r.rawPosition < stop.rawPosition)) : 
-			(sep.rawPosition > msg.guild.roles.highest.rawPosition ? 
-				msg.guild.roles.cache.filter(r => r.rawPosition < sep.rawPosition && r.rawPosition > msg.guild.roles.highest.rawPosition) : 
-				msg.guild.roles.cache.filter(r => r.rawPosition > sep.rawPosition && r.rawPosition < msg.guild.roles.highest.rawPosition));
-		console.log(3, Date.now()); // 3 +5.546s
+				0 : 
+				msg.guild.roles.highest.rawPosition - sep.rawPosition-1);
+		const affectedRoles = new Array;
+		const roles = msg.guild.roles.cache.sort((a, b) => a.rawPosition - b.rawPosition).map(o => o);
+		if (r.stoprole) {
+			if (sep.rawPosition > stop.rawPosition) for (let i = stop.rawPosition+1; i < roles.length && i < sep.rawPosition; i++) affectedRoles.push(roles[i]);
+			else for (let i = sep.rawPosition+1; i < roles.length && i < stop.rawPosition; i++) affectedRoles.push(roles[i]);
+		} else {
+			if (sep.rawPosition >= msg.guild.roles.highest.rawPosition) null;
+			else for (let i = sep.rawPosition+1; i < roles.length && i < msg.guild.roles.highest.rawPosition; i++) affectedRoles.push(roles[i]);
+		}
 		const embed = new Discord.MessageEmbed();
 		if (r.isvarying == true) {
 			embed.addFields(
@@ -93,7 +93,7 @@ module.exports = {
 				},
 				{
 					name: `${msg.language.affected} ${affected} ${msg.language.roles}`,
-					value: `${`${affectedRoles.map(r => ` ${r}`)}`.length > 1020 ? msg.language.tooManyRoles : affectedRoles.map(r => ` ${r}`)}`,
+					value: `${`${affectedRoles.map(r => ` ${r}`)}`.length > 1020 ? msg.language.tooManyRoles : `${affectedRoles.map(r => ` ${r}`)}`.length > 0 ? affectedRoles.map(r => ` ${r}`) : `${msg.language.none}`}`,
 					inline: false
 				}
 			);

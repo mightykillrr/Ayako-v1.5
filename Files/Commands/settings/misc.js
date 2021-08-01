@@ -30,7 +30,6 @@ module.exports = {
 			for (let i = 0; i < Object.entries(lengthVar).length; i++) {
 				if (Object.entries(oldSettings)[i][1] !== Object.entries(newSettings)[i][1]) changed.push([[Object.entries(oldSettings)[i][0], Object.entries(oldSettings)[i][1]], [Object.entries(newSettings)[i][0], Object.entries(newSettings)[i][1]]]);
 			}
-			console.log(oldSettings, newSettings);
 			embed
 				.setColor(msg.client.constants.commands.settings.log.color)
 				.setTimestamp()

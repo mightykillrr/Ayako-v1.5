@@ -818,6 +818,10 @@
         "column": {
             "select": "Select the Column you want to edit",
             "desc": "Select the Column you want to edit below"
+        },
+        "onetimerunner": {
+            "select": "Are you sure you want to run this Function?\nThis can only be run __**once** every 7 Days__",
+            "desc": "Click `Yes` or `No`"
         }
     },
     "mod": {
@@ -1838,10 +1842,10 @@
                     "oneTimeRunner": {
                         "name": "Apply ALL Separators to EVERY Member of your Server",
                         "description": "Can only be run once every __7 days__.",
-                        "cant": "You don't have any Separators set so you can't uset his function",
-                        "time": "You can't use this Function just yet since your Server used it in the past 7 days",
+                        "cant": "You don't have any Separators set, so you can't uset his function",
+                        "time": "You can't use this Function just yet, since your Server used it in the past 7 days",
                         "recommended": "Are you sure you want to run this Function?\nThis can only be run __**once** every 7 Days__",
-                        "stats": "Adding Roles to {{amount}} Server Members\nThis Process may take up to {{time}} until finished",
+                        "stats": "Adding `{{members}}` Roles to `{{amount}}` Server Members\nThis Process may take up to `{{time}}` until finished and will be finished at approximately {{finishTime}}",
                         "answers": "`Yes` or `No`"
                     }
                 },

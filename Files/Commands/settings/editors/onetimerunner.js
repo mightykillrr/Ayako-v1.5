@@ -1,39 +1,19 @@
 const Discord = require('discord.js');
 const misc = require('../misc.js');
-const ms = require('ms');
+const moment = require('moment');
+require('moment-duration-format');
 
 module.exports = {
 	key: ['onetimerunner'],
 	async exe(msg, i, embed, values, answer, AddRemoveEditView, fail, srmEditing, comesFromSRM, answered) {
-		const req = [];
-		for (let i = 0; i < 9999; i++) {req.push(i);}
-		const options = [];
-		req.forEach(r => {
-			options.push({label: `${r}`, value: `${r}`});
-		});
-		const take = [];
-		for(let j = 0; j < 25; j++) {take.push(options[j]);}
-		const menu = new Discord.MessageSelectMenu()
-			.setCustomId(msg.property)
-			.addOptions(take)
-			.setMinValues(1)
-			.setMaxValues(msg.property.includes('s') ? take.length : 1)
-			.setPlaceholder(msg.language.select[msg.property].select);
-		const next = new Discord.MessageButton()
+		const yes = new Discord.MessageButton()
 			.setCustomId('yes')
-			.setLabel(msg.language.yes)
-			.setDisabled(options.length < 26 ? true : false)
+			.setLabel(msg.language.Yes)
 			.setStyle('SUCCESS');
-		const prev = new Discord.MessageButton()
+		const no = new Discord.MessageButton()
 			.setCustomId('no')
-			.setLabel(msg.language.no)
-			.setDisabled(true)
-			.setStyle('DANGER');
-		const done = new Discord.MessageButton()
-			.setCustomId('done')
-			.setLabel(msg.language.done)
-			.setDisabled(true)
-			.setStyle('PRIMARY');
+			.setLabel(msg.language.No)
+			.setStyle('SECONDARY');
 		const back = new Discord.MessageButton()
 			.setCustomId('back')
 			.setLabel(msg.language.back)
@@ -45,8 +25,8 @@ module.exports = {
 				msg.client.constants.emotes.settingsLink, 
 				msg.client.constants.standard.invite
 			)
-			.setDescription(`${msg.language.select[msg.property].desc}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
-		const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
+			.setDescription(`${msg.language.select[msg.property].select}\n\n${msg.language.select[msg.property].desc}`);
+		const rows = msg.client.ch.buttonRower([[yes, no], [back]]);
 		if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
 		else msg.m.edit({embeds: [embed], components: rows}).catch(() => {});
 		const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
@@ -56,7 +36,11 @@ module.exports = {
 			buttonsCollector.on('collect', async (clickButton) => {
 				if (clickButton.user.id == msg.author.id) {
 					if (clickButton.customId == 'yes') {
-						const result = await require('../../Events/guildEvents/guildMemberUpdate/separator').oneTimeRunner(msg);
+						await clickButton.defer();
+						messageCollector.stop();
+						buttonsCollector.stop();
+						const result = await require('../../../Events/guildEvents/guildMemberUpdate/separator').oneTimeRunner(msg);
+						await clickButton.deleteReply().catch(() => {});
 						if (!result) {
 							embed
 								.setAuthor(
@@ -65,6 +49,7 @@ module.exports = {
 									msg.client.constants.standard.invite
 								)
 								.setDescription(msg.lan.edit.oneTimeRunner.time);
+							msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 						} else {
 							embed
 								.setAuthor(
@@ -72,13 +57,10 @@ module.exports = {
 									msg.client.constants.emotes.settingsLink, 
 									msg.client.constants.standard.invite
 								)								
-								.setDescription(msg.client.ch.stp(msg.lan.edit[msg.property].stats, {amount: result.length, time: ms(result.length*1500*10)}));
-							msg.m.edit({embeds: [embed]}).catch(() => {});
+								.setDescription(msg.client.ch.stp(msg.lan.edit.oneTimeRunner.stats, {amount: `\`${result.length}\``, time: `\`${moment.duration(result.length * 1000).format(`h [${msg.language.time.hours}], m [${msg.language.time.minutes}], s [${msg.language.time.seconds}]`)}\``}));
+							msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 						}
-					} else if (clickButton.customId == 'no') {
-						resolve(false);
-						return misc.aborted(msg, [messageCollector, buttonsCollector]);
-					} else if (clickButton.customId == 'back') {
+					} else if (clickButton.customId == 'back' || clickButton.customId == 'no') {
 						msg.property = undefined;
 						messageCollector.stop();
 						buttonsCollector.stop();
