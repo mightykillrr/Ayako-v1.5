@@ -1845,7 +1845,7 @@
                         "cant": "You don't have any Separators set, so you can't uset his function",
                         "time": "You can't use this Function just yet, since your Server used it in the past 7 days",
                         "recommended": "Are you sure you want to run this Function?\nThis can only be run __**once** every 7 Days__",
-                        "stats": "Adding `{{members}}` Roles to `{{amount}}` Server Members\nThis Process may take up to `{{time}}` until finished and will be finished at approximately {{finishTime}}",
+                        "stats": "Adding and Removing `{{roles}}` Roles from `{{members}}` Server Members\nThis Process may take up to `{{time}}` until finished,\nand will be finished at approximately {{finishTime}}",
                         "answers": "`Yes` or `No`"
                     }
                 },

@@ -57,7 +57,7 @@ module.exports = {
 									msg.client.constants.emotes.settingsLink, 
 									msg.client.constants.standard.invite
 								)								
-								.setDescription(msg.client.ch.stp(msg.lan.edit.oneTimeRunner.stats, {amount: `\`${result.length}\``, time: `\`${moment.duration(result.length * 1000).format(`h [${msg.language.time.hours}], m [${msg.language.time.minutes}], s [${msg.language.time.seconds}]`)}\``}));
+								.setDescription(msg.client.ch.stp(msg.lan.edit.oneTimeRunner.stats, {members: result[1], roles: result[0], time: moment.duration(result[0] * 1000).format(`h [${msg.language.time.hours}], m [${msg.language.time.minutes}], s [${msg.language.time.seconds}]`), finishTime: `<t:${Math.floor(Date.now()/1000) + result[0]}:T>`}));
 							msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 						}
 					} else if (clickButton.customId == 'back' || clickButton.customId == 'no') {
