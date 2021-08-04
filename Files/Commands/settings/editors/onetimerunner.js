@@ -1,7 +1,5 @@
 const Discord = require('discord.js');
 const misc = require('../misc.js');
-const moment = require('moment');
-require('moment-duration-format');
 
 module.exports = {
 	key: ['onetimerunner'],
@@ -39,27 +37,7 @@ module.exports = {
 						await clickButton.defer();
 						messageCollector.stop();
 						buttonsCollector.stop();
-						const result = await require('../../../Events/guildEvents/guildMemberUpdate/separator').oneTimeRunner(msg);
-						await clickButton.deleteReply().catch(() => {});
-						if (!result) {
-							embed
-								.setAuthor(
-									msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
-									msg.client.constants.emotes.settingsLink, 
-									msg.client.constants.standard.invite
-								)
-								.setDescription(msg.lan.edit.oneTimeRunner.time);
-							msg.m.edit({embeds: [embed], components: []}).catch(() => {});
-						} else {
-							embed
-								.setAuthor(
-									msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
-									msg.client.constants.emotes.settingsLink, 
-									msg.client.constants.standard.invite
-								)								
-								.setDescription(msg.client.ch.stp(msg.lan.edit.oneTimeRunner.stats, {members: result[1], roles: result[0], time: moment.duration(result[0] * 1000).format(`h [${msg.language.time.hours}], m [${msg.language.time.minutes}], s [${msg.language.time.seconds}]`), finishTime: `<t:${Math.floor(Date.now()/1000) + result[0]}:T>`}));
-							msg.m.edit({embeds: [embed], components: []}).catch(() => {});
-						}
+						require('../../../Events/guildEvents/guildMemberUpdate/separator').oneTimeRunner(msg, embed, clickButton);
 					} else if (clickButton.customId == 'back' || clickButton.customId == 'no') {
 						msg.property = undefined;
 						messageCollector.stop();
