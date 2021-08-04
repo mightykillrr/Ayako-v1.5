@@ -52,34 +52,9 @@ module.exports = {
 		const client = msg.client;
 		const ch = client.ch;
 		const res = await ch.query('SELECT * FROM roleseparator WHERE active = true AND guildid = $1;', [msg.guild.id]);
-		const r = res.rows[0];
 		//if (+r.lastrun + 604800000 > Date.now()) return false;
 		msg.client.ch.query('UPDATE roleseparator SET lastrun = $1 WHERE guildid = $2;', [Date.now(), msg.guild.id]);
-		await msg.guild.members.fetch();
-		const members = [...msg.guild.members.cache.entries()];
-		const roles = new Array;
-		if (res && res.rowCount > 0) {
-			res.rows.forEach(async (row) => {
-				const guild = client.guilds.cache.get(row.guildid);
-				if (guild) {
-					const separator = guild.roles.cache.get(row.separator);
-					if (separator) {
-						let tempRoles;
-						if (r.isvarying) {
-							if (row.stoprole) {
-								const stopRole = guild.roles.cache.get(row.stoprole);
-								if (stopRole) {
-									if (stopRole.rawPosition > separator.rawPosition) tempRoles = guild.roles.cache.filter(r => r.rawPosition < stopRole.rawPosition && r.rawPosition > separator.rawPosition && r.id !== stopRole.id && r.id !== separator.id);
-									else if (stopRole.rawPosition < separator.rawPosition) tempRoles = guild.roles.cache.filter(r => r.rawPosition > stopRole.rawPosition && r.rawPosition < separator.rawPosition && r.id !== stopRole.id && r.id !== separator.id);
-								} else ch.query('UPDATE roleseparator SET active = false WHERE separator = $1;', [row.separator]);
-							} else tempRoles = guild.roles.cache.filter(r => r.rawPosition < msg.guild.roles.highest.rawPosition && r.rawPosition > separator.rawPosition && r.id !== msg.guild.roles.highest.id && r.id !== separator.id);
-						} else if (r.isvarying == false) tempRoles = guild.roles.cache.filter(r => row.roles.includes(r.id));
-						roles.push([separator.id, tempRoles.map(o => o.id)]);
-					} else ch.query('UPDATE roleseparator SET active = false WHERE separator = $1;', [row.separator]);
-				}
-			});
-		} else return;
-		let membersWithRoles = await getNewMembers(members, roles);
+		let membersWithRoles = await this.getNewMembers(msg.guild, res);
 		membersWithRoles = [...new Set(membersWithRoles)];
 		if (membersWithRoles.length > 0) {
 			for (let i = 0; i < membersWithRoles.length; i++) {
@@ -114,18 +89,44 @@ module.exports = {
 			else if (m.giveTheseRoles) allRoles = allRoles + m.giveTheseRoles;
 		});
 		return [allRoles, membersWithRoles.length];
+	},
+	async getNewMembers(guild, res) {
+		const obj = new Object;
+		obj.members = new Array, obj.separators = new Array, obj.rowroles = new Array, obj.roles = new Array, obj.highestRole = new Object({id: guild.roles.highest.id, rawPosition: guild.roles.highest.rawPosition});
+		await guild.members.fetch();
+		guild.members.cache.forEach(member => {
+			const roles = new Array; 
+			member.roles.cache.forEach(role => {
+				roles.push({id: role.id, rawPosition: role.rawPosition});
+			});
+			obj.members.push({id: member.user.id, roles: roles});
+		});
+		guild.roles.cache.forEach(role => {
+			obj.roles.push({id: role.id, rawPosition: role.rawPosition});
+		});
+		res.rows.forEach(r => {
+			if (r.stoprole) obj.separators.push({separator: {id: r.separator, rawPosition: guild.roles.cache.get(r.separator)?.rawPosition}, stoprole: {id: r.stoprole, rawPosition: guild.roles.cache.get(r.stoprole)?.rawPosition}});
+			else obj.separators.push({separator: {id: r.separator, rawPosition: guild.roles.cache.get(r.separator)?.rawPosition}});
+			if (r.roles && r.roles.length > 0) obj.roles.forEach(roleid => {
+				const role = guild.roles.cache.get(roleid);
+				obj.rowroles.push({id: role.id, rawPosition: role.rawPosition});
+			});
+		});
+		const worker = new Worker('./Files/Events/guildEvents/guildMemberUpdate/separatorWorker.js', {workerData: {res: res.rows, obj: obj}});
+		let output;
+		await new Promise((resolve, reject) => {
+			worker.once('message', result => {
+				output = result;
+				resolve();
+				worker.terminate();
+			});
+			worker.once('error', error => {
+				reject();
+				throw error;
+			});
+		});
+		console.log(output);
+		return output;
 	}
 };
 
-async function getNewMembers(members, roles) {
-	const worker = new Worker('./Files/Events/guildEvents/guildMemberUpdate/separatorWorker.js', {workerData: {members: members, roles: roles}});
-	let res;
-	await new Promise((resolve,) => {
-		worker.once('message', result => {
-			res = result;
-			resolve();
-			worker.terminate();
-		});
-	});
-	return res;
-}
