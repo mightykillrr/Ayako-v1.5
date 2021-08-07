@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 
 module.exports = {
 	async execute(msg) {
-		if (!msg.channel || msg.channel.type == 'dm' || !msg.author) return;
+		if (!msg.channel || msg.channel.type == 'dm' || !msg.author || !msg.guild) return;
 		if (msg.guild.id == '298954459172700181') {
 			if (msg.author.id == '673362753489993749') {
 				if (msg.embeds) {

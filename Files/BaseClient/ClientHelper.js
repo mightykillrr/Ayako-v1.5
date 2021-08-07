@@ -518,6 +518,7 @@ module.exports = {
 	 * @param {number|object} user - A User or User ID that will be converted into a Member.
 	 */
 	async member(guild, user) {
+		if (!guild) return null;
 		let id;
 		if (user.id) id = user.id;
 		else id = user;
