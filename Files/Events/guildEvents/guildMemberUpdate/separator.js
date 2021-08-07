@@ -1,6 +1,7 @@
 const { Worker } = require('worker_threads');
 const moment = require('moment');
 require('moment-duration-format');
+const fs = require('fs');
 
 module.exports = {
 	async execute(oldMember, newMember) {
@@ -54,9 +55,12 @@ module.exports = {
 		const client = msg.client;
 		const ch = client.ch;
 		const res = await ch.query('SELECT * FROM roleseparator WHERE active = true AND guildid = $1;', [msg.guild.id]);
-		if (+r.lastrun + 604800000 > Date.now()) return false;
+		let membersWithRoles;
+		//if (+res.rows[0].lastrun + 604800000 > Date.now()) membersWithRoles = false;
+		//else {
 		msg.client.ch.query('UPDATE roleseparator SET lastrun = $1 WHERE guildid = $2;', [Date.now(), msg.guild.id]);
-		let membersWithRoles = await this.getNewMembers(msg.guild, res);
+		membersWithRoles = await this.getNewMembers(msg.guild, res);
+		//}
 		await clickButton.deleteReply().catch(() => {});
 		if (membersWithRoles == 'timeout') {
 			embed
@@ -69,8 +73,7 @@ module.exports = {
 			msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 			return;
 		}
-		membersWithRoles = [...new Set(membersWithRoles)];
-		if (membersWithRoles.length == 0) {
+		if (!Array.isArray(membersWithRoles)) {
 			embed
 				.setAuthor(
 					msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
@@ -81,17 +84,16 @@ module.exports = {
 			msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 		} else {
 			let allRoles = 0;
-			membersWithRoles = membersWithRoles.filter(m => (m.giveTheseRoles && m.giveTheseRoles.length > 0) || (m.removeTheseRoles && m.removeTheseRoles.length > 0));
 			membersWithRoles.forEach((m, index) => {
 				if (m.giveTheseRoles && m.removeTheseRoles) allRoles = allRoles + m.giveTheseRoles.length + m.removeTheseRoles.length;
 				else if (m.removeTheseRoles) allRoles = allRoles + m.removeTheseRoles.length; 
 				else if (m.giveTheseRoles) allRoles = allRoles + m.giveTheseRoles.length;
 				const fakeMember = m;
 				const realMember = msg.guild.members.cache.get(m.id);
-				fakeMember.giveTheseRoles.forEach((roleID, rindex) => {
+				if (fakeMember.giveTheseRoles) fakeMember.giveTheseRoles.forEach((roleID, rindex) => {
 					if (realMember.roles.cache.has(roleID)) membersWithRoles[index].giveTheseRoles.splice(rindex, 1); 
 				});
-				fakeMember.removeTheseRoles.forEach((roleID, rindex) => {
+				if (fakeMember.removeTheseRoles) fakeMember.removeTheseRoles.forEach((roleID, rindex) => {
 					if (!realMember.roles.cache.has(roleID)) membersWithRoles[index].removeTheseRoles.splice(rindex, 1);
 				});
 			});
@@ -101,7 +103,7 @@ module.exports = {
 					msg.client.constants.emotes.settingsLink, 
 					msg.client.constants.standard.invite
 				)								
-				.setDescription(msg.client.ch.stp(msg.lan.edit.oneTimeRunner.stats, {members: membersWithRoles.length, roles: allRoles, time: moment.duration(allRoles * 1000).format(`h [${msg.language.time.hours}], m [${msg.language.time.minutes}], s [${msg.language.time.seconds}]`), finishTime: `<t:${Math.floor(Date.now()/1000) + allRoles}:T>`}));
+				.setDescription(msg.client.ch.stp(msg.lan.edit.oneTimeRunner.stats, {members: membersWithRoles.length ? membersWithRoles.length : 0, roles: allRoles ? allRoles : 0, time: moment.duration(allRoles * 1000).format(`h [${msg.language.time.hours}], m [${msg.language.time.minutes}], s [${msg.language.time.seconds}]`), finishTime: `<t:${Math.floor(Date.now()/1000) + allRoles}:T>`}));
 			msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 		}
 		this.assinger(msg, membersWithRoles);
@@ -145,6 +147,7 @@ module.exports = {
 	},
 	async assinger(msg, membersWithRoles) {
 		if (membersWithRoles.length > 0) {
+			membersWithRoles = membersWithRoles.sort((a,b) => {a.id - b.id;});
 			for (let i = 0; i < membersWithRoles.length; i++) {
 				const giveRoles = membersWithRoles[i].giveTheseRoles;
 				const takeRoles = membersWithRoles[i].removeTheseRoles;
@@ -156,6 +159,7 @@ module.exports = {
 							const r = giveRoles[j];
 							setTimeout(() => {
 								if (!member.roles.cache.has(r)) member.roles.add(r);
+								else console.log(10, member.user.id, r);
 							}, j*giveRoles.length);
 						}
 					}
@@ -164,6 +168,7 @@ module.exports = {
 							const r = takeRoles[j];
 							setTimeout(() => {
 								if (member.roles.cache.has(r)) member.roles.remove(r);
+								else console.log(11, member.user.id, r);
 							}, j*takeRoles.length);
 						}
 					}

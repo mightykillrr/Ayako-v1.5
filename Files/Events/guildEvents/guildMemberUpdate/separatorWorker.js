@@ -24,8 +24,9 @@ async function getMembers(wd) {
 			roles.push({id: separator.id, affectedRoles: tempRoles.map(o => o.id)});
 		});
 	} else return;
-	const membersWithRoles = new Array;
+	let  membersWithRoles = new Array;
 	const promised = await new Promise((resolve,) => {
+		
 		for (let i = 0; obj.members.length > i; i++) {
 			const member = obj.members[i];
 			roles.forEach(roleArr => {
@@ -40,19 +41,26 @@ async function getMembers(wd) {
 					if (temp && temp.length > 0) loosesThisSep.push(false);
 					else loosesThisSep.push(true);
 				});
-				if (loosesThisSep.includes(true)) member.removeTheseRoles ? member.removeTheseRoles.push(roleArr.id) : member.removeTheseRoles = [roleArr.id];
+				if (!loosesThisSep.includes(false)) member.removeTheseRoles ? member.removeTheseRoles.push(roleArr.id) : member.removeTheseRoles = [roleArr.id];
+				membersWithRoles.push(member);
+			});
+		}
+		if (Array.isArray(membersWithRoles)) {
+			membersWithRoles = [...new Set(membersWithRoles)];
+			membersWithRoles.forEach(member => {
 				if (member.removeTheseRoles || member.giveTheseRoles) {
 					if (member.giveTheseRoles && member.giveTheseRoles.length > 0) member.giveTheseRoles.forEach(r => {
-						if (member.removeTheseRoles.includes(r)) member.removeTheseRoles.splice(member.removeTheseRoles.indexOf(r), 1);
+						if (member.roles.map(o => o.id).includes(r)) member.giveTheseRoles.splice(member.giveTheseRoles.indexOf(r));
 					});
 					if (member.removeTheseRoles && member.removeTheseRoles.length > 0) member.removeTheseRoles.forEach(r => {
-						if (!member.roles.includes(r)) member.removeTheseRoles.splice(member.removeTheseRoles.indexOf(r), 1);
+						if (!member.roles.map(o => o.id).includes(r)) member.removeTheseRoles.splice(member.removeTheseRoles.indexOf(r));
 					});
-					membersWithRoles.push(member);
 				}
 			});
-			if (i == obj.members.length-1) resolve(true);
 		}
+		membersWithRoles = membersWithRoles.filter(m => (m.giveTheseRoles && m.giveTheseRoles.length > 0) || (m.removeTheseRoles && m.removeTheseRoles.length > 0));
+
+		resolve(true);
 	});
 	const int = setInterval(() => {
 		if (promised == true) {

@@ -135,7 +135,6 @@ module.exports = {
 		buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') msg.client.ch.collectorEnd(msg);});
 	},
 	async list(msg, answer, AddRemoveEditView, fail) {
-		
 		let r = [], answered = [], values = {};
 		const res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
 		if (res && res.rowCount > 0) r = res.rows;
@@ -241,7 +240,7 @@ module.exports = {
 				} else if (clickButton.customId == 'done') {
 					messageCollector.stop();
 					buttonsCollector.stop();
-					values.id = answered[0];
+					values.id = answered;
 					msg.r = msg.rows.find(r => r.id == values.id);
 					gotID(values.id, clickButton, AddRemoveEditView, fail);
 				} else if (clickButton.customId == 'id') {

@@ -34,7 +34,7 @@ module.exports = {
 			buttonsCollector.on('collect', async (clickButton) => {
 				if (clickButton.user.id == msg.author.id) {
 					if (clickButton.customId == 'yes') {
-						await clickButton.defer();
+						await clickButton.deferReply();
 						messageCollector.stop();
 						buttonsCollector.stop();
 						require('../../../Events/guildEvents/guildMemberUpdate/separator').oneTimeRunner(msg, embed, clickButton);
