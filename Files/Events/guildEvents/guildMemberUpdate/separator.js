@@ -1,7 +1,6 @@
 const { Worker } = require('worker_threads');
 const moment = require('moment');
 require('moment-duration-format');
-const fs = require('fs');
 
 module.exports = {
 	async execute(oldMember, newMember) {
@@ -103,7 +102,7 @@ module.exports = {
 					msg.client.constants.emotes.settingsLink, 
 					msg.client.constants.standard.invite
 				)								
-				.setDescription(msg.client.ch.stp(msg.lan.edit.oneTimeRunner.stats, {members: membersWithRoles.length ? membersWithRoles.length : 0, roles: allRoles ? allRoles : 0, time: moment.duration(allRoles * 1000).format(`h [${msg.language.time.hours}], m [${msg.language.time.minutes}], s [${msg.language.time.seconds}]`), finishTime: `<t:${Math.floor(Date.now()/1000) + allRoles}:T>`}));
+				.setDescription(msg.client.ch.stp(msg.lan.edit.oneTimeRunner.stats, {members: membersWithRoles && membersWithRoles.length > 0 ? membersWithRoles.length : '0', roles: allRoles && allRoles > 0 ? allRoles : '0', time: moment.duration(allRoles * 1000).format(`h [${msg.language.time.hours}], m [${msg.language.time.minutes}], s [${msg.language.time.seconds}]`), finishTime: `<t:${Math.floor(Date.now()/1000) + allRoles}:T>`}));
 			msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 		}
 		this.assinger(msg, membersWithRoles);

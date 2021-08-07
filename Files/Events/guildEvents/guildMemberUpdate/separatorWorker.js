@@ -8,7 +8,7 @@ async function getMembers(wd) {
 		clearInterval(int);
 		// eslint-disable-next-line no-undef
 		process.exit();
-	}, obj.members.length/10);
+	}, obj.members.length/10 > 10000 ? obj.members.length/10 : 10000);
 	const roles = new Array;
 	if (res && res.length > 0) {
 		res.forEach(async (row) => {
