@@ -20,7 +20,6 @@ module.exports = {
 		if (!answer) await rower(msg);
 		msg.client.constants.commands.settings.editReq.splice(2, 1);
 		let res = await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE guildid = $1;`, [msg.guild.id]);
-		if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
 		msg.lanSettings = msg.language.commands.settings;
 		msg.lan = msg.lanSettings[msg.file.name];
 		let embed;
@@ -45,7 +44,9 @@ module.exports = {
 			.setStyle('SECONDARY')
 			.setLabel(msg.language.List)
 			.setDisabled(embed.fields.length > 0 ? false : true);
-		const rows = msg.client.ch.buttonRower([[edit, list]]);
+		let rows;
+		if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm))) rows = msg.client.ch.buttonRower([[list]]);
+		else rows = msg.client.ch.buttonRower([[edit, list]]);
 		if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
 		else if (msg.m) msg.m.edit(msg, {embeds: [embed], components: rows}).catch(() => {});
 		else msg.m = await msg.client.ch.reply(msg, {embeds: [embed], components: rows});
@@ -287,7 +288,8 @@ module.exports = {
 				} else if (clickButton.customId == 'back') {
 					messageCollector.stop();
 					buttonsCollector.stop();
-					return module.exports.edit(msg, clickButton, {});
+					if (AddRemoveEditView == 'edit') return module.exports.edit(msg, clickButton, {});
+					else return module.exports.display(msg, clickButton);
 				}
 			} else msg.client.ch.notYours(clickButton, msg);
 		});
@@ -316,7 +318,7 @@ async function listdisplay(msg, answer, id, AddRemoveEditView, fail, values) {
 		msg.client.constants.standard.invite
 	)
 		.setColor(msg.client.constants.commands.settings.color);
-	const button = new Discord.MessageButton()
+	const edit = new Discord.MessageButton()
 		.setCustomId('edit')
 		.setStyle('PRIMARY')
 		.setLabel(msg.language.Edit);
@@ -325,7 +327,9 @@ async function listdisplay(msg, answer, id, AddRemoveEditView, fail, values) {
 		.setEmoji(msg.client.constants.emotes.back)
 		.setCustomId('back')
 		.setStyle('DANGER');
-	const rows = msg.client.ch.buttonRower([button, back]);
+	let rows;
+	if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm))) rows = msg.client.ch.buttonRower([back]);
+	else msg.client.ch.buttonRower([edit, back]);
 	if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
 	else msg.m.edit({embeds: [embed], components: rows}).catch(() => {});
 	const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
