@@ -360,8 +360,15 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 				msg.client.constants.standard.invite
 			);
 	}
+	msg.client.constants.commands.settings.edit[msg.file.name].id = 'id';
 	if (srmEditing) msg.property = Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == srmEditing[0])[1];
 	else msg.property = AddRemoveEditView == 'edit' ? msg.client.constants.commands.settings.editReq[i] : msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.setupQueries[msg.file.name][AddRemoveEditView][i]];
+	if (!msg.property && i <= msg.client.constants.commands.settings.setupQueries[msg.file.name].removeReq.length) throw new Error(
+		'No Message Property defined!'+
+		srmEditing !== null && srmEditing !== undefined ? `I'm searching for ${srmEditing[0]} in ${msg.client.constants.commands.settings.edit[msg.file.name]}`
+			: AddRemoveEditView == 'edit' ? `I'm searching for ${msg.client.constants.commands.settings.editReq[i]} in ${JSON.stringify(msg.client.constants.commands.settings.edit[msg.file.name])}`
+				: `I'm searching for ${msg.client.constants.commands.settings.setupQueries[msg.file.name][AddRemoveEditView][i]} in ${JSON.stringify(msg.client.constants.commands.settings.edit[msg.file.name])}`
+	);
 	if ((srmEditing && i == 0) || (!srmEditing && (AddRemoveEditView == 'edit' ? i < msg.client.constants.commands.settings.editReq.length : i < msg.client.constants.commands.settings.setupQueries[msg.file.name][AddRemoveEditView].length)) && msg.property) {
 		msg.compatibilityType = msg.property.includes('s') ? msg.property : msg.property+'s';
 		msg.assigner = comesFromSRM ? 
