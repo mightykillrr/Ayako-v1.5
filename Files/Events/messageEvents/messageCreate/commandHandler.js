@@ -43,20 +43,20 @@ module.exports = {
 			if (!cooldowns.has(msg.command.name)) cooldowns.set(msg.command.name, new Discord.Collection());
 			const now = Date.now();
 			let timestamps = cooldowns.get(msg.command.name);
-			let cooldownAmount = (msg.command.cooldown || 0);
-			const res = await msg.client.ch.query('SELECT * FROM cooldowns WHERE channelid = $1 AND command = $2;', [msg.channel.id, msg.command.name]);
-			if (res && res.rowCount > 0) cooldownAmount = res.rows[0].cooldown;
-			if (timestamps.has(msg.channel.id)) {
-				const expirationTime = +timestamps.get(msg.channel.id) + +cooldownAmount;
-				if (now < expirationTime) {
-					const timeLeft = (expirationTime - now) / 1000;
-					const m = await msg.client.ch.reply(msg, msg.client.ch.stp(msg.language.commands.commandHandler.PleaseWait, {time: timeLeft.toFixed(1)}), {allowedMentions: {repliedUser: true}});
-					setTimeout(() => {
-						m.delete().catch(() => {});
-						msg.delete().catch(() => {});
-					}, 5000);
-				}
-			}
+			//let cooldownAmount = (msg.command.cooldown || 0);
+			//const res = await msg.client.ch.query('SELECT * FROM cooldowns WHERE activechannelid = $1 AND command = $2;', [msg.channel.id, msg.command.name]);
+			//if (res && res.rowCount > 0) cooldownAmount = res.rows[0].cooldown;
+			//if (timestamps.has(msg.channel.id)) {
+			//	const expirationTime = +timestamps.get(msg.channel.id) + +cooldownAmount;
+			//	if (now < expirationTime) {
+			//		const timeLeft = (expirationTime - now) / 1000;
+			//		const m = await msg.client.ch.reply(msg, msg.client.ch.stp(msg.language.commands.commandHandler.PleaseWait, {time: timeLeft.toFixed(1)}), {allowedMentions: {repliedUser: true}});
+			//		setTimeout(() => {
+			//			m.delete().catch(() => {});
+			//			msg.delete().catch(() => {});
+			//		}, 5000);
+			//	}
+			//}
 			timestamps.set(msg.channel.id, now);
 		}
 		this.thisGuildOnly(msg);
