@@ -32,7 +32,9 @@ module.exports = {
 		let interaction;
 		const resolved = await new Promise((resolve,) => {
 			buttonsCollector.on('collect', (clickButton) => {
+				console.log(1)
 				if (clickButton.user.id == msg.author.id) {
+					console.log(2)
 					buttonsCollector.stop();
 					messageCollector.stop();
 					if (clickButton.customId == 'true') values[msg.assigner] = true;
