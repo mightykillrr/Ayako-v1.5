@@ -1258,6 +1258,65 @@
                     }
                 }
             },
+            "antivirus": {
+                "category": ["Auto Moderation"],
+                "type": "Anti-Virus",
+                "bantof": "Ban Members",
+                "kicktof": "Kick Members",
+                "mutetof": "Mute Members",
+                "warntof": "Warn Members",
+                "verbaltof": "Verbally warn Members",
+                "muteafterwarnsamount": "Mute after **{{amount}}** warns",
+                "kickafterwarnsamount": "Kick after **{{amount}}** warns",
+                "banafterwarnsamount": "Ban after **{{amount}}** warns",
+                "edit": {
+                    "active": {
+                        "name": "Active",
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `True`"
+                    },
+                    "bantof": {
+                        "name": "Ban Members",
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `True`"
+                    },
+                    "kicktof": {
+                        "name": "Kick Members",
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `False`"
+                    },
+                    "mutetof": {
+                        "name": "Mute Members",
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `False`"
+                    },
+                    "warntof": {
+                        "name": "Warn Members",
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `True`"
+                    },
+                    "verbaltof": {
+                        "name": "Verbally warn Members",
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `True`"
+                    },
+                    "muteafterwarnsamount": {
+                        "name": "Mute after **{{amount}}** warns",
+                        "answers": "`Number`",
+                        "recommended": "Recommended: `3`"
+                    },
+                    "kickafterwarnsamount": {
+                        "name": "Kick after **{{amount}}** warns",
+                        "answers": "`Number`",
+                        "recommended": "Recommended: `5`"
+                    },
+                    "banafterwarnsamount": {
+                        "name": "Ban after **{{amount}}** warns",
+                        "answers": "`Number`",
+                        "recommended": "Recommended: `6`"
+                    }
+                }
+            },
             "autorole": {
                 "category": ["Automation"],
                 "type": "Auto-Role",

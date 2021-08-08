@@ -483,11 +483,24 @@
                     "bots": "boolean",
                     "deleteable": "boolean",
                     "deletetime": "seconds"
+                },
+                "antivirus": {
+                    "active": "boolean",
+                    "bantof": "boolean",
+                    "kicktof": "boolean",
+                    "mutetof": "boolean",
+                    "warntof": "boolean",
+                    "verbaltof": "boolean",
+                    "muteafterwarnsamount": "number",
+                    "kickafterwarnsamount": "number",
+                    "banafterwarnsamount": "number"
+
                 }
             },
             "tablenames": {
                 "cooldowns": "cooldowns",
                 "antispam": "antispamsettings",
+                "antivirus": "antivirus",
                 "blacklist": "blacklists",
                 "autorole": "autorole",
                 "disabled": "disabledcommands",
@@ -527,6 +540,10 @@
                 "autorole": {
                     "cols": "guildid, active",
                     "vals": ["{{msg.guild.id}}", true]
+                },
+                "antivirus": {
+                    "cols": "guildid, active, bantof, warntof, kicktof, mutetof, verbaltof, muteafterwarnsamount, banafterwarnsamount, kickafterwarnsamount",
+                    "vals": ["{{msg.guild.id}}", true, true, true, false, true, true, 2, 4, 3]
                 },
                 "disabled": {
                     "cols": "guildid, active, channels, id, uniquetimestamp, commands",
