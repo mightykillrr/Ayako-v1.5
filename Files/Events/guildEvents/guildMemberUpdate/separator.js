@@ -55,11 +55,11 @@ module.exports = {
 		const ch = client.ch;
 		const res = await ch.query('SELECT * FROM roleseparator WHERE active = true AND guildid = $1;', [msg.guild.id]);
 		let membersWithRoles;
-		//if (+res.rows[0].lastrun + 604800000 > Date.now()) membersWithRoles = false;
-		//else {
-		msg.client.ch.query('UPDATE roleseparator SET lastrun = $1 WHERE guildid = $2;', [Date.now(), msg.guild.id]);
-		membersWithRoles = await this.getNewMembers(msg.guild, res);
-		//}
+		if (+res.rows[0].lastrun + 604800000 > Date.now()) membersWithRoles = false;
+		else {
+			msg.client.ch.query('UPDATE roleseparator SET lastrun = $1 WHERE guildid = $2;', [Date.now(), msg.guild.id]);
+			membersWithRoles = await this.getNewMembers(msg.guild, res);
+		}
 		await clickButton.deleteReply().catch(() => {});
 		if (membersWithRoles == 'timeout') {
 			embed
@@ -158,7 +158,6 @@ module.exports = {
 							const r = giveRoles[j];
 							setTimeout(() => {
 								if (!member.roles.cache.has(r)) member.roles.add(r);
-								else console.log(10, member.user.id, r);
 							}, j*giveRoles.length);
 						}
 					}
@@ -167,7 +166,6 @@ module.exports = {
 							const r = takeRoles[j];
 							setTimeout(() => {
 								if (member.roles.cache.has(r)) member.roles.remove(r);
-								else console.log(11, member.user.id, r);
 							}, j*takeRoles.length);
 						}
 					}

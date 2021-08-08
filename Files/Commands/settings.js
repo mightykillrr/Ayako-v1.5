@@ -81,7 +81,7 @@ module.exports = {
 					messageCollector.stop();
 					this.edit(msg, file, clickButton);
 				}
-			} else msg.client.ch.notYours(clickButton);
+			} else msg.client.ch.notYours(clickButton, msg);
 		});
 		buttonsCollector.on('end', (collected, reason) => {if (reason == 'time') m.edit({embeds: [embed], components: []});});
 		messageCollector.on('collect', (message) => {

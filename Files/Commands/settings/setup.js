@@ -46,7 +46,7 @@ module.exports = {
 				else return misc.notValid(msg);
 				buttonsCollector.stop();
 				messageCollector.stop();
-			} else msg.client.ch.notYours(clickButton);
+			} else msg.client.ch.notYours(clickButton, msg);
 		});
 		buttonsCollector.on('end', (collected, reason) => {
 			if (reason == 'time') {
