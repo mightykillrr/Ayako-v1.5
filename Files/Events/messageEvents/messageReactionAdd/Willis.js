@@ -6,7 +6,7 @@ module.exports = {
 		if (user.id == client.user.id) return; 
 		const ch = client.ch;
 		const guild = reaction.message.guild;
-		const member = await ch.member(guild, user.id);
+		const member = await guild.members.fetch(user.id);
 		if (reaction.message.channel.id == '805839305377447936') {
 			const msg = await reaction.message.channel.messages.fetch(reaction.message.id);
 			if (member && msg.author.id && msg.author.id) {

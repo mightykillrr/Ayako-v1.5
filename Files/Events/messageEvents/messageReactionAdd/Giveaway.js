@@ -41,7 +41,7 @@ module.exports = {
 			const embed = new Discord.MessageEmbed()
 				.setAuthor(lan.author.name, Constants.standard.icon, Constants.standard.invite);
 			if (requirement.includes('role')) {
-				const member = await ch.member(guild, user);
+				const member = await guild.members.fetch(user.id);
 				if (member) {
 					if(!member.roles.cache.has(reqRole.id)) {
 						reaction.users.remove(user).catch(() => {});
@@ -56,7 +56,7 @@ module.exports = {
 					}
 				}
 			} else if (requirement.includes('guild')) {
-				const member = await ch.member(reqGuild, user).fetch();
+				const member = await guild.members.fetch(user.id);
 				if(!member) {
 					dmChannel = await user.createDM().catch(() => {});
 					if (dmChannel) {

@@ -6,7 +6,7 @@ module.exports = {
 		let wasMuted = null;
 		const res = await ch.query('SELECT * FROM warns WHERE closed = $1 AND type = $2 AND guildid = $3 AND userid = $4 AND closed = $5;', [false, 'Mute', guild.id, user.id, null]);
 		let Muterole;
-		const member = await ch.member(guild, rawmember.user);
+		const member = await guild.members.fetch(rawmember.id);
 		if (res && res.rowCount > 0) {
 			const resM = await ch.query('SELECT * FROM muterole WHERE guildid = $1;', [guild.id]);
 			if (resM && resM > 0) {

@@ -27,7 +27,7 @@ module.exports = {
 							failed.push(`${arg} `+msg.lan.already);
 						} else {
 							if (user.id !== msg.author.id) {
-								const member = await msg.client.ch.member(msg.guild, user);
+								const member = await msg.guild.members.fetch(user.id);
 								if (member) {
 									if (+msg.member.roles.highest.rawPosition > +member.roles.highest.rawPosition) {
 										if (+msg.member.roles.highest.rawPosition !== +member.roles.highest.rawPosition) {
@@ -48,7 +48,7 @@ module.exports = {
 						failed.push(`${arg} `+msg.lan.already);
 					} else {
 						if (user.id !== msg.author.id) {
-							const member = await msg.client.ch.member(msg.guild, user);
+							const member = await msg.guild.members.fetch(user.id);
 							if (member) {
 								if (+msg.member.roles.highest.rawPosition > +member.roles.highest.rawPosition) {
 									if (+msg.member.roles.highest.rawPosition !== +member.roles.highest.rawPosition) {

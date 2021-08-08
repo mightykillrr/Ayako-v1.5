@@ -12,9 +12,8 @@ module.exports = {
 		const user = msg.args[0].replace(/\D+/g, '');
 		const BypassRole = msg.guild.roles.cache.find(role => role.id === '389470002992119810');
 		const PreRole = msg.guild.roles.cache.find(role => role.id === '805315426543599676');
-		const member = await msg.client.ch.member(msg.guild, user);
-		const done1 = await member.roles.remove(PreRole);
-		const done2 = await member.roles.add(BypassRole);
+		const done1 = await msg.member.roles.remove(PreRole);
+		const done2 = await msg.member.roles.add(BypassRole);
 		if (!done1 || !done2) {
 			msg.react(msg.client.constants.emotes.crossID).catch(()=>{});
 			msg.client.ch.reply('Something went wrong when I tried to update the Members Roles. Please check manually.');

@@ -9,13 +9,13 @@ module.exports = {
 			.setColor(con.color)
 			.setDescription(msg.client.constants.emotes.loading, lan.loading);
 		const emMsg = await msg.client.ch.reply(msg, em);
-		const member = await msg.client.ch.member(msg.guild, target);
+		const member = await msg.guild.members.fetch(target.id);
 		if (!member) {
 			em.setDescription(msg.client.constants.emotes.cross, lan.noMember);
 			emMsg?.edit(em);
 			return false;
 		}
-		const exec = await msg.client.ch.member(msg.guild, executor);
+		const exec = await msg.guild.members.fetch(executor.id);
 		if (exec.roles.highest.rawPosition < member.roles.highest.rawPosition || exec.roles.highest.rawPosition == member.roles.highest.rawPosition) {
 			em.setDescription(msg.client.constants.emotes.cross, lan.exeNoPerms);
 			emMsg?.edit(em);

@@ -16,7 +16,7 @@ module.exports = {
 			const language = await ch.languageSelector(guild);
 			const lan = language.guildMemberAddVerification;
 			if (member.joinedTimestamp < (+Date.now() - +1800000)) {
-				if (await ch.member(guild, user)) {
+				if (await guild.members.fetch(member.id)) {
 					let invite = guild.vanityURLCode ? `discord.gg/${guild.vanityURLCode}` : undefined;
 					const textchannels = guild.channels.cache.filter((c) => c.type == 'text');
 					const map = textchannels.map(x => x);

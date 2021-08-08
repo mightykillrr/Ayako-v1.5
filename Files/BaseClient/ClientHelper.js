@@ -512,21 +512,6 @@ module.exports = {
 	 */
 	containsNonLatinCodepoints(text) {return regexes.tester.test(text);},
 	/**
-	 * Returns a Discord Member from the Discord API if the provided User is a Member.
-	 * @constructor
-	 * @param {object} guild - The Guild to return the Member from.
-	 * @param {number|object} user - A User or User ID that will be converted into a Member.
-	 */
-	async member(guild, user) {
-		if (!guild) return null;
-		let id;
-		if (user.id) id = user.id;
-		else id = user;
-		await guild.members.fetch();
-		if (guild.members.cache.get(id)) return await guild.members.cache.get(id).fetch();
-		else return null;
-	},
-	/**
 	 * Checks and returns Duplicates of 2 BitFields.
 	 * @constructor
 	 * @param {object} bit1 - The first BitField.

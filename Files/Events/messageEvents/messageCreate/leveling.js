@@ -61,14 +61,13 @@ module.exports = {
 				}, 60000);
 				const result = await msg.client.ch.query('SELECT * FROM levelserver WHERE userid = $1 AND guildid = $2;', [msg.author.id, msg.guild.id]);
 				if (result && result.rowCount > 0) {
-					const member = await msg.client.ch.member(msg.guild, msg.author);
 					if (result.rows[0].blroleid) {
 						for (const id of [...result.rows[0].blroleid.entries()]) {
 							const role = msg.guild.roles.cache.get(id);
 							if (!role) {
 								result.rows[0].blroleid.splice(result.rows[0].blroleid.indexOf(id), 1);
 								msg.client.ch.query('UPDATE levelserver SET blroleid = $1 WHERE guildid = $2;', [result.rows[0].blroleid, msg.guild.id]);
-							} else if (member.roles.cache.has(role.id)) return;
+							} else if (msg.member.roles.cache.has(role.id)) return;
 						}
 					}
 					const curXP = result.rows[0].xp;
@@ -80,7 +79,7 @@ module.exports = {
 							const role = msg.guild.roles.cache.get(row.role);
 							if (!role) return msg.client.ch.query('DELETE FROM levelmultiroles WHERE guildid = $1 AND roleid = $2;', [msg.guild.id, row.roleid]);
 							else {
-								if (member && member.roles.cache.has(role.id)) multiplier + row.multiplier;
+								if (msg.member && msg.member.roles.cache.has(role.id)) multiplier + row.multiplier;
 							}
 						});
 					}

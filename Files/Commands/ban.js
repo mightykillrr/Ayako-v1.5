@@ -9,7 +9,7 @@ module.exports = {
 		const lan = msg.lan;
 		if (!user) return msg.client.ch.reply(msg, lan.noUser);
 		let banReason = msg.args.slice(1).join(' ') ? msg.args.slice(1).join(' ') : lan.reason;
-		const guildmember = await msg.client.ch.member(msg.guild, user);
+		const guildmember = await msg.guild.members.fetch(user.id);
 		if (guildmember) {
 			const res = await msg.client.ch.query('SELECT * FROM modrolesnew WHERE guildid = $1;', [msg.guild.id]);
 			if (res && res.rowCount > 0) {

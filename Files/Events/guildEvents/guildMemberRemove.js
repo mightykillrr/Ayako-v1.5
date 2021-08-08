@@ -5,7 +5,7 @@ require('moment-duration-format');
 module.exports = {
 	async execute(member) {
 		const client = member.client;
-		const user = await client.users.fetch(member.user.id);
+		const user = await member.guild.members.fetch(user.id);
 		const guild = member.guild;
 		const ch = client.ch;
 		const Constants = client.constants;

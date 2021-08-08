@@ -41,12 +41,12 @@ module.exports = {
 									users = await reaction.users.fetch();
 									users = users											
 										.filter(u => u.bot === false)
-										.filter(async u => await ch.member(guild, u.id).fetch());
+										.filter(async u => await guild.members.fetch(u.id));
 									if (r.requirement) {
 										if (r.requirement == 'role') {
 											const role = guild.roles.cache.get(r.reqroleid);
 											if (role && role.id) {
-												users = users.filter(async u => (await ch.member(guild, u.id).fetch()).roles.cache.has(role.id));
+												users = users.filter(async u => (await msg.guild.members.fetch(u.id)).roles.cache.has(role.id));
 											} else {
 												const embed = new Discord.MessageEmbed()
 													.setDescription(description)
@@ -63,7 +63,7 @@ module.exports = {
 										if (r.requirement == 'guild') {
 											const reqGuild = client.guilds.cache.get(r.reqserverid);
 											if (reqGuild && reqGuild.id) {
-												users = users.filter(u => ch.member(reqGuild, u.id));
+												users = users.filter(async u => await guild.members.fetch(u.id));
 											} else {
 												const embed = new Discord.MessageEmbed()
 													.setDescription(description)
@@ -81,7 +81,7 @@ module.exports = {
 									users = users
 										.random(winnercount)
 										.filter(u => u)
-										.map(async u => await ch.member(guild, u.id).fetch());
+										.map(async u => await msg.guild.members.fetch(u.id));
 								}
 								if (abort == false) {
 									const embed = new Discord.MessageEmbed()

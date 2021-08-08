@@ -3,7 +3,7 @@ const Discord = require('discord.js');
 module.exports = {
 	async execute(msg) {
 		if (!msg.channel || msg.channel.type == 'dm' || !msg.author || !msg.guild) return;
-		const member = await msg.client.ch.member(msg.guild, msg.author);
+		const member = msg.member;
 		if (msg.guild.id == '366219406776336385' && msg.channel.id !== '801804774759727134') {
 			if (msg.content.toLocaleLowerCase().includes('discord.gg/')) {
 				if (msg.author.id !== '267835618032222209' && msg.author.id !== '400086473337995265') {

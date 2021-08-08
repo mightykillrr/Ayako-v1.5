@@ -1,7 +1,6 @@
 module.exports = {
 	async execute(member) {
-		const client = member.client;
-		const user = await client.users.fetch(member.id);
+		const user = await member.guild.members.fetch(member.id);
 		require('./giveaway.js').execute(member, user);
 		require('./log.js').execute(member, user);
 		require('./mute.js').execute(member, user);

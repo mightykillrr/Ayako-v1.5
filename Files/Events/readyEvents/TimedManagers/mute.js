@@ -21,7 +21,7 @@ module.exports = {
 								} else muterole = guild.roles.cache.find(role => role.name === 'Muted');
 								if (guild && guild.id) {
 									if (user && user.id) {
-										const member = await ch.member(guild, user.id);
+										const member = await guild.members.fetch(user.id);
 										if (member) {
 											const language = await ch.languageSelector(guild);
 											if (member.roles.cache.has(muterole.id)) {

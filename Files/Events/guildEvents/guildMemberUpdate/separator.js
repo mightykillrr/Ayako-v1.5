@@ -7,7 +7,7 @@ module.exports = {
 		const client = oldMember ? oldMember.client : newMember.client;
 		const ch = client.ch;
 		const guild = oldMember ? oldMember.guild : newMember.guild;
-		const member = newMember ? newMember : ch.member(guild, oldMember.user);
+		const member = newMember ? newMember : await guild.members.fetch(newMember.id);
 		const res = await ch.query('SELECT * FROM roleseparator WHERE active = true AND guildid = $1;', [guild.id]);
 		if (res && res.rowCount > 0) {
 			res.rows.forEach(async (row) => {

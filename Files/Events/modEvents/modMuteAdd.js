@@ -11,9 +11,9 @@ module.exports = {
 		const emMsg = await msg.client.ch.reply(msg, em);
 		let role;
 		let logchannel;
-		const member = await msg.client.ch.member(msg.guild, target);
-		const exec = await msg.client.ch.member(msg.guild, executor);
-		const memberClient = await msg.client.ch.member(msg.client.user);
+		const member = await msg.guild.members.fetch(target.id);
+		const exec = await msg.guild.members.fetch(executor.id);
+		const memberClient = msg.guild.me;
 		if (exec?.roles.highest.rawPosition < member?.roles.highest.rawPosition || exec?.roles.highest.rawPosition == member?.roles.highest.rawPosition) {
 			em.setDescription(msg.client.constants.emotes.cross, lan.exeNoPerms);
 			emMsg?.edit(em);
