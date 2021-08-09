@@ -5,7 +5,6 @@ const fs = require('fs');
 const http = require('http');
 const https = require('https');
 const DiscordEpoch = 1420070400000;
-const ms = require('ms');
 const Constants = require('../Constants.json');
 const { imgur } = require('./ImgurClient');
 const URL = require('url');

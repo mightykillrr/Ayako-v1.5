@@ -69,10 +69,10 @@ module.exports = {
 					typeID = 11;
 					embed.addField(language.user_limit, `${language.before}: \`${oldChannel.userLimit}\`\n${language.after}: \`${newChannel.userLimit}\``);
 				}
-				if (oldChannel.permissionOverwrites !== newChannel.permissionOverwrites) {
+				if (oldChannel.permissionOverwrites.cache !== newChannel.permissionOverwrites.cache) {
 					const oldPerms = [];
 					const newPerms = [];
-					for (const [, overwrite] of oldChannel.permissionOverwrites.entries()) {
+					for (const [, overwrite] of oldChannel.permissionOverwrites.cache.entries()) {
 						const temp = {};
 						temp.id = overwrite.id;
 						temp.type = overwrite.type;
@@ -80,7 +80,7 @@ module.exports = {
 						temp.deny = overwrite.deny; 
 						oldPerms.push(temp);
 					}
-					for (const [, overwrite] of newChannel.permissionOverwrites.entries()) {
+					for (const [, overwrite] of newChannel.permissionOverwrites.cache.entries()) {
 						const temp = {};
 						temp.id = overwrite.id;
 						temp.type = overwrite.type;

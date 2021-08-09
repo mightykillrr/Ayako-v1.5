@@ -28,7 +28,7 @@ module.exports = {
 						.setDescription(ch.stp(lan.description.withUser, {user: entry.executor, channel: channel, type: language.channels[channel.type]}))
 						.setColor(con.color)
 						.setTimestamp();
-					channel.permissionOverwrites = channel.permissionOverwrites.map(o => o);
+					channel.permissionOverwrites = channel.permissionOverwrites.cache.map(o => o);
 					for (let i = 0; channel.permissionOverwrites.length > i; i++) {
 						const perm = channel.permissionOverwrites[i];
 						let disable = `${perm.type == 'member' ? `<@${perm.id}>` : perm.type == 'role' ? `<@&${perm.id}>` : language.unknown+' '+perm}\n`;

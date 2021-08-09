@@ -8,7 +8,6 @@ module.exports = {
 		const guild = member.guild;
 		const ch = client.ch;
 		const Constants = client.constants;
-		user.username = user.username.replace(/`/g, '');
 		const language = await ch.languageSelector(guild);
 		const lan = language.guildMemberAddLog;
 		const con = Constants.guildMemberAddLog;
