@@ -233,16 +233,6 @@ module.exports = {
 		return `${path}.${pathend}`;
 	},
 	/**
-	 * Used for Downloading files, this creates a Placeholder File before the actual File is downloaded.
-	 * @constructor
-	 * @param {string} path - The Path this Placeholder File will be created at.
-	 */
-	async makeFile(path) {
-		this.logger('Make File used on ', path);
-		const file = fs.readFileSync(path);
-		return file;
-	},
-	/**
 	 * Extracts a File Name out of a File Path.
 	 * @constructor
 	 * @param {string} path - The Path of the File the Name will be extracted from.
@@ -342,12 +332,6 @@ module.exports = {
 		return unix;
 	},
 	/**
-	 * A useless function, I don't even know why I created this.
-	 * @constructor
-	 * @param {string} input - The Input MS will translate from.
-	 */
-	ms(input) {return ms(input);},
-	/**
 	 * Identifies and returns the Difference of two Arrays.
 	 * @constructor
 	 * @param {array} array1 - The first Array.
@@ -355,14 +339,6 @@ module.exports = {
 	 */
 	getDifference (array1, array2) {
 		return array1.filter(i => {return array2.indexOf(i) < 0;});
-	},
-	/**
-	 * A Title Creator, converting every first Letter of a Word into Uppercase.
-	 * @constructor
-	 * @param {string} str - The String to convert into a Title.
-	 */
-	toTitleCase (str) {
-		return str.replace(regexes.strReplacer1, ' ').replace(regexes.strReplacer2, (txt) => { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
 	},
 	/**
 	 * Extracts a Dynamic Avatar URL from a Discord User.
@@ -512,13 +488,6 @@ module.exports = {
 	 */
 	containsNonLatinCodepoints(text) {return regexes.tester.test(text);},
 	/**
-	 * Checks and returns Duplicates of 2 BitFields.
-	 * @constructor
-	 * @param {object} bit1 - The first BitField.
-	 * @param {object} bit2 - The second BitField.
-	 */
-	bitDuplicates(bit1, bit2) {return new Discord.Permissions(bit1.bitfield & bit2.bitfield);},
-	/**
 	 * Checks and returns Uniques of 2 Bitfields.
 	 * @constructor
 	 * @param {object} bit1 - The first BitField.
@@ -643,5 +612,4 @@ module.exports = {
 		});
 		return actionRows;
 	}
-
 };
