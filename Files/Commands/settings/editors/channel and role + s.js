@@ -13,7 +13,7 @@ module.exports = {
 			} else  if (msg.compatibilityType == 'roles') options.push({label: r.name.length > 25 ? `${r.name.slice(0, 24)}\u2026` : r.name, value: r.id});
 		});
 		const take = [];
-		for(let j = 0; j < 25; j++) {take.push(options[j]);}
+		for(let j = 0; j < 25 && j < options.length; j++) {take.push(options[j]);}
 		const menu = new Discord.MessageSelectMenu()
 			.setCustomId(msg.property)
 			.addOptions(take)

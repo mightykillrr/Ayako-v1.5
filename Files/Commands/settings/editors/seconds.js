@@ -11,7 +11,7 @@ module.exports = {
 			options.push({label: `${r}`, value: `${r}`});
 		});
 		const take = [];
-		for(let j = 0; j < 25; j++) {take.push(options[j]);}
+		for(let j = 0; j < 25 && j < options.length; j++) {take.push(options[j]);}
 		const menu = new Discord.MessageSelectMenu()
 			.setCustomId(msg.property)
 			.addOptions(take)

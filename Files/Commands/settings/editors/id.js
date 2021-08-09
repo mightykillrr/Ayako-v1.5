@@ -13,7 +13,7 @@ module.exports = {
 		}
 		options.sort((a, b) => a.value - b.value);
 		const take = [];
-		for(let j = 0; j < options.length; j++) {take.push(options[j]);}
+		for (let j = 0; j < 25 && j < options.length; j++) {take.push(options[j]);}
 		const menu = new Discord.MessageSelectMenu()
 			.setCustomId(msg.property)
 			.addOptions(take)
