@@ -340,7 +340,10 @@
         "red": "🔴",
         "trash": "<:Trash:834326440761229363>",
         "trashID": "834326440761229363",
-        "trashLink": "https://cdn.discordapp.com/emojis/834326440761229363.png?v=1"
+        "trashLink": "https://cdn.discordapp.com/emojis/834326440761229363.png?v=1",
+        "flags": {
+            "en": "🇺🇸 🇬🇧"
+        }
     },
     "error": "ff0000",
     "mod": {
@@ -445,7 +448,8 @@
                 "overview": {
                     "prefix": "string",
                     "interactionsmode": "boolean",
-                    "muteroleid": "role"
+                    "muteroleid": "role",
+                    "lan": "lan"
                 },
                 "disabled": {
                     "commands": "commands",
@@ -566,8 +570,8 @@
                     "removeReq": ["id", "cooldown"]
                 },
                 "overview": {
-                    "cols": "guildid, interactionsmode",
-                    "vals": ["{{msg.guild.id}}", true]
+                    "cols": "guildid, interactionsmode, lan",
+                    "vals": ["{{msg.guild.id}}", true, "en"]
                 },
                 "forcecooldowns": {
                     "cols": null,

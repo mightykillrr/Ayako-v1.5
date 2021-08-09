@@ -418,9 +418,9 @@ module.exports = {
 	 */
 	async languageSelector(guild) {
 		if (guild.id) {
-			const resLan = await this.query('SELECT * FROM language WHERE guildid = $1;', [guild.id]);
+			const resLan = await this.query('SELECT lan FROM guildsettings WHERE guildid = $1;', [guild.id]);
 			let lang = 'en';
-			if (resLan && resLan.rowCount > 0) lang = resLan.rows[0].language;
+			if (resLan && resLan.rowCount > 0) lang = resLan.rows[0].lan;
 			const language = require(`../Languages/lan-${lang}.json`);
 			return language;
 		} else {

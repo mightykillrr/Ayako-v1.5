@@ -775,6 +775,12 @@
     "cooldown": "Cooldown",
     "add": "Add",
     "remove": "Remove",
+    "languages": {
+        "en": {
+            "name": "English",
+            "status": "unfinished"
+        }
+    },
     "select": {
         "roles": {
             "select": "Select 1 or more Roles",
@@ -783,6 +789,10 @@
         "channels": {
             "select": "Select 1 or more Channels",
             "desc": "Select the Channel(s) you want to add/remove below"
+        },
+        "lan": {
+            "select": "Select a Language",
+            "desc": "Select the Language below"
         },
         "role": {
             "select": "Select a Role",
@@ -1149,6 +1159,7 @@
                 "muteroleid": "Mute Role",
                 "interactionsmode": "Interactions Mode",
                 "prefix": "Prefix",
+                "lan": "Bot Language",
                 "edit": {
                     "muteroleid": {
                         "name": "Mute Roles",
@@ -1168,6 +1179,11 @@
                         "name": "Prefix",
                         "answers": "Any String",
                         "recommended": "Recommended: `,`, `.`, `!`"
+                    },
+                    "lan": {
+                        "name": "Bot Language",
+                        "answers": "Language Key",
+                        "recommended": "You might experience translation Issues on Languages marked as `unfinished`"
                     }
                 }
             },
