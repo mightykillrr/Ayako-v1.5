@@ -811,6 +811,10 @@
             "select": "Select Seconds",
             "desc": "Select the Seconds"
         },
+        "minutes": {
+            "select": "Select Minutes",
+            "desc": "Select the Minutes"
+        },
         "id": {
             "select": "Select the Entry",
             "desc": "Select the Entry below"
@@ -1670,16 +1674,17 @@
             },
             "disboard": {
                 "category": ["Automation"],
-                "role": "Ping Role",
-                "channelid": "The Channel in which Bump Reminders will be sent",
                 "type": "DISBOARD",
+                "roleid": "Ping Role",
+                "channelid": "Reminder Channel",
+                "repeatreminder": "Repeat Reminder",
                 "edit": {
                     "active": {
                         "name": "Active",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
                     },
-                    "role": {
+                    "roleid": {
                         "name": "Ping Role",
                         "answers": "`Mention or ID`",
                         "recommended": "The Role that will be pinged when you can use `!d bump` again",
@@ -1696,6 +1701,11 @@
                             "no": "I couldn't find this Channel\n",
                             "wrongGuild": "This Channel is not Part of this Server\n"
                         }
+                    },
+                    "repeatreminder": {
+                        "name": "Repeat Reminder",
+                        "answers": "Time in Minutes",
+                        "recommended": "The Time (in Minutes) after which a new Reminder is sent in case no one has bumped yet"
                     }
                 }
             },

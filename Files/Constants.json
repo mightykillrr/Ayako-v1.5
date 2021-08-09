@@ -456,11 +456,6 @@
                     "bluserid": "users",
                     "active": "boolean"
                 },
-                "disboard": {
-                    "enabled": "boolean",
-                    "channelid": "channel",
-                    "role": "role"
-                },
                 "interactions": {
                     "size": "boolean",
                     "block": "string"
@@ -494,7 +489,12 @@
                     "muteafterwarnsamount": "number",
                     "kickafterwarnsamount": "number",
                     "banafterwarnsamount": "number"
-
+                },
+                "disboard": {
+                    "active": "boolean",
+                    "roleid": "role",
+                    "channelid": "channel",
+                    "repeatreminder": "minutes"
                 }
             },
             "tablenames": {
@@ -541,6 +541,10 @@
                     "cols": "guildid, active",
                     "vals": ["{{msg.guild.id}}", true]
                 },
+                "disboard": {
+                    "cols": "guildid, active, repeatreminder",
+                    "vals": ["{{msg.guild.id}}", true, 30]
+                },
                 "antivirus": {
                     "cols": "guildid, active, bantof, warntof, kicktof, mutetof, verbaltof, muteafterwarnsamount, banafterwarnsamount, kickafterwarnsamount",
                     "vals": ["{{msg.guild.id}}", true, true, true, false, true, true, 2, 4, 3]
@@ -552,10 +556,6 @@
                     "remove": ["id"],
                     "removeIdent": "commands",
                     "removeReq": ["id", "channels"]
-                },
-                "disboard": {
-                    "cols": "guildid, active",
-                    "vals": ["{{msg.guild.id}}", true]
                 },
                 "cooldowns": {
                     "cols": "guildid, active, command, cooldown, id, uniquetimestamp",

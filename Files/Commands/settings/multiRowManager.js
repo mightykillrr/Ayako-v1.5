@@ -354,7 +354,6 @@ async function listdisplay(msg, answer, id, AddRemoveEditView, fail, values) {
 }
 
 async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, srmEditing, comesFromSRM) {
-	console.log(values)
 	if (!Array.isArray(fail)) fail = new Array;
 	if (typeof values !== 'object' || !values || values.lenght == 0) values = new Object;
 	if (i == 0) {
