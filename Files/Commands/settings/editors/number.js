@@ -106,7 +106,7 @@ module.exports = {
 						const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
 						clickButton.update({embeds: [embed], components: rows}).catch(() => {});
 					} else if (clickButton.customId == 'done') {
-						if (answered.length > 0) values[msg.property] = answered;
+						if (answered.length > 0) values[msg.assigner] = answered;
 						messageCollector.stop('finished');
 						buttonsCollector.stop('finished');
 						interaction = clickButton;

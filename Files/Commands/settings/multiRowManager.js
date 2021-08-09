@@ -354,6 +354,7 @@ async function listdisplay(msg, answer, id, AddRemoveEditView, fail, values) {
 }
 
 async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, srmEditing, comesFromSRM) {
+	console.log(values)
 	if (!Array.isArray(fail)) fail = new Array;
 	if (typeof values !== 'object' || !values || values.lenght == 0) values = new Object;
 	if (i == 0) {
@@ -498,7 +499,8 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 			else setTimeout(() => {require('./singleRowManager').redirecter(msg, null, AddRemoveEditView, fail, values, values.id ? 'redirecter' : null);}, 3000);
 			misc.log(oldSettings, msg, newSettings);
 		} else editer(msg, values, fail, answer, AddRemoveEditView, comesFromSRM);
-	} else if (!msg.property) throw new Error(
+	} else if (srmEditing && comesFromSRM) editer(msg, values, fail, answer, AddRemoveEditView, comesFromSRM);
+	else if (!msg.property) throw new Error(
 		'No Message Property defined!'+
 		srmEditing ? `I'm searching for ${srmEditing[0]} in ${msg.client.constants.commands.settings.edit[msg.file.name]}`
 			: AddRemoveEditView == 'edit' ? `I'm searching for ${msg.client.constants.commands.settings.editReq[i]} in ${msg.client.constants.commands.settings.edit[msg.file.name]}`
