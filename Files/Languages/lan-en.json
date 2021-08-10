@@ -1244,7 +1244,7 @@
                     },
                     "bpchannelid": {
                         "name": "Whitelisted Channels",
-                        "recommended": "This is a switch.\nIf the entered Channel is already bypassed it will be removed.",
+                        "recommended": "This is a Switch.\nIf the entered Channel is already bypassed it will be removed.",
                         "select": "Select 1 or more Channels",
                         "desc": "Select the Channel(s) you want to bypass below",
                         "fail": {
@@ -1254,7 +1254,7 @@
                     },
                     "bproleid": {
                         "name": "Whitelisted Roles",
-                        "recommended": "This is a switch.\nIf the entered Role is already bypassed it will be removed.",
+                        "recommended": "This is a Switch.\nIf the entered Role is already bypassed it will be removed.",
                         "select": "Select 1 or more Roles",
                         "desc": "Select the Role(s) you want to bypass below",
                         "fail": {
@@ -1265,7 +1265,7 @@
                     "bpuserid": {
                         "name": "Whitelisted Users",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a switch.\nIf the entered User is already bypassed they will be removed.",
+                        "recommended": "This is a Switch.\nIf the entered User is already bypassed they will be removed.",
                         "fail": {
                             "no": "I couldn't find this User\n",
                             "wrongGuild": "This User is not Part of this Server\n"
@@ -1352,7 +1352,7 @@
                     "botroleid": {
                         "name": "Roles given to joining Bots",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a switch.\nIf the entered Role is already added it will be removed.",
+                        "recommended": "This is a Switch.\nIf the entered Role is already added it will be removed.",
                         "select": "Select 1 or more Roles",
                         "desc": "Select the Role(s) you want to add/remove below",
                         "fail": {
@@ -1363,7 +1363,7 @@
                     "userroleid": {
                         "name": "Roles given to joining Users",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a switch.\nIf the entered Role is already added it will be removed.",
+                        "recommended": "This is a Switch.\nIf the entered Role is already added it will be removed.",
                         "select": "Select 1 or more Roles",
                         "desc": "Select the Role(s) you want to add/remove below",
                         "fail": {
@@ -1374,7 +1374,7 @@
                     "allroleid": {
                         "name": "Roles given to joining Bots and Users",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a switch.\nIf the entered Role is already added it will be removed.",
+                        "recommended": "This is a Switch.\nIf the entered Role is already added it will be removed.",
                         "select": "Select 1 or more Roles",
                         "desc": "Select the Role(s) you want to add/remove below",
                         "fail": {
@@ -1455,7 +1455,7 @@
                     "bpchannelid": {
                         "name": "Whitelisted Channels",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a switch.\nIf the entered Channel is already added it will be removed.",
+                        "recommended": "This is a Switch.\nIf the entered Channel is already added it will be removed.",
                         "fail": {
                             "no": "I couldn't find this Channel\n",
                             "wrongGuild": "This Channel is not Part of this Server\n"
@@ -1464,7 +1464,7 @@
                     "bproleid": {
                         "name": "Whitelisted Roles",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a switch.\nIf the entered Role is already added it will be removed.",
+                        "recommended": "This is a Switch.\nIf the entered Role is already added it will be removed.",
                         "fail": {
                             "no": "I couldn't find this Role\n",
                             "wrongGuild": "This Role is not Part of this Server\n"
@@ -1473,7 +1473,7 @@
                     "bpuserid": {
                         "name": "Whitelisted Users",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a switch.\nIf the entered User is already added it will be removed.",
+                        "recommended": "This is a Switch.\nIf the entered User is already added it will be removed.",
                         "fail": {
                             "no": "I couldn't find this User\n",
                             "wrongGuild": "This User is not Part of this Server\n"
@@ -1513,7 +1513,7 @@
                     "activechannelid": {
                         "name": "Active Channels",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a switch.\nIf the entered Channel is already added it will be removed.\nThe Cooldown will only apply in these Channels, if none are set it applies on the whole Server.",
+                        "recommended": "This is a Switch.\nIf the entered Channel is already added it will be removed.\nThe Cooldown will only apply in these Channels, if none are set it applies on the whole Server.",
                         "fail": {
                             "no": "I couldn't find this Channel\n",
                             "wrongGuild": "This Channel is not Part of this Server\n"
@@ -1522,7 +1522,7 @@
                     "bproleid": {
                         "name": "Whitelisted Roles",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a switch.\nIf the entered Role is already added it will be removed.\nMembers with one of these Roles will bypass the Cooldown.",
+                        "recommended": "This is a Switch.\nIf the entered Role is already added it will be removed.\nMembers with one of these Roles will bypass the Cooldown.",
                         "fail": {
                             "no": "I couldn't find this Role\n",
                             "wrongGuild": "This Role is not Part of this Server\n"
@@ -1531,7 +1531,7 @@
                     "bpchannelid": {
                         "name": "Whitelisted Channels",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a switch.\nIf the entered Channel is already added it will be removed.\nIf no Active Channels are set and the Cooldown applies on the whole Server, they will not apply on Channels listed here.",
+                        "recommended": "This is a Switch.\nIf the entered Channel is already added it will be removed.\nIf no Active Channels are set and the Cooldown applies on the whole Server, they will not apply on Channels listed here.",
                         "fail": {
                             "no": "I couldn't find this Channel\n",
                             "wrongGuild": "This Channel is not Part of this Server\n"
@@ -1540,7 +1540,7 @@
                     "bpuserid": {
                         "name": "Whitelisted Users",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a switch.\nIf the entered User is already added it will be removed.\nUsers listed here bypass the Cooldown",
+                        "recommended": "This is a Switch.\nIf the entered User is already added it will be removed.\nUsers listed here bypass the Cooldown",
                         "fail": {
                             "no": "I couldn't find this User\n",
                             "wrongGuild": "This User is not Part of this Server\n"
@@ -1607,7 +1607,7 @@
                     "bproleid": {
                         "name": "Whitelisted Roles",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a switch.\nIf the entered Role is already added it will be removed.\nMembers with one of these Roles can still use these Commands.",
+                        "recommended": "This is a Switch.\nIf the entered Role is already added it will be removed.\nMembers with one of these Roles can still use these Commands.",
                         "fail": {
                             "no": "I couldn't find this Role\n",
                             "wrongGuild": "This Role is not Part of this Server\n"
@@ -1616,7 +1616,7 @@
                     "blroleid": {
                         "name": "Blacklisted Roles",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a switch.\nIf the entered Role is already added it will be removed.\nMembers with one of these Roles can not use any of these Commands, even if they have a Role that Whitelists them, doesn't apply if the User itself is Whitelisted.",
+                        "recommended": "This is a Switch.\nIf the entered Role is already added it will be removed.\nMembers with one of these Roles can not use any of these Commands, even if they have a Role that Whitelists them, doesn't apply if the User itself is Whitelisted.",
                         "fail": {
                             "no": "I couldn't find this Role\n",
                             "wrongGuild": "This Role is not Part of this Server\n"
@@ -1625,7 +1625,7 @@
                     "channels": {
                         "name": "Channel",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a switch.\nIf the entered Channel is already added it will be removed.\nThe Channel(s) these Commands are disabled in.",
+                        "recommended": "This is a Switch.\nIf the entered Channel is already added it will be removed.\nThe Channel(s) these Commands are disabled in.",
                         "fail": {
                             "no": "I couldn't find this Channel\n",
                             "wrongGuild": "This Channel is not Part of this Server\n"
@@ -1634,7 +1634,7 @@
                     "bpuserid": {
                         "name": "Whitelisted Users",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a switch.\nIf the entered User is already added it will be removed.\nUsers listed here can use these Commands in the Channels they are disabled in, no matter if they have a Blacklisted Role.",
+                        "recommended": "This is a Switch.\nIf the entered User is already added it will be removed.\nUsers listed here can use these Commands in the Channels they are disabled in, no matter if they have a Blacklisted Role.",
                         "fail": {
                             "no": "I couldn't find this User\n",
                             "wrongGuild": "This User is not Part of this Server\n"
@@ -1643,7 +1643,7 @@
                     "bluserid": {
                         "name": "Blacklisted Users",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a switch.\nIf the entered User is already added it will be removed.\nUsers listed here can never use these Commands in the Channels they are disabled in, no matter if they have a Whitelisted Role",
+                        "recommended": "This is a Switch.\nIf the entered User is already added it will be removed.\nUsers listed here can never use these Commands in the Channels they are disabled in, no matter if they have a Whitelisted Role",
                         "fail": {
                             "no": "I couldn't find this User\n",
                             "wrongGuild": "This User is not Part of this Server\n"
@@ -1803,8 +1803,8 @@
                     },
                     "blchannelid": {
                         "name": "Blacklisted Channels",
-                        "answers": "`Mention or ID`",
-                        "recommended": "This is a switch.\nIf the entered Channel is already bypassed it will be removed.\nDeleted Messages of Members in these Channels won't be snipe-able",
+                        "answers": "`Mentions or IDs`",
+                        "recommended": "This is a Switch.\nIf the entered Channel is already blacklisted it will be removed.\nDeleted Messages of Members in these Channels won't be snipe-able",
                         "fail": {
                             "no": "I couldn't find this Channel\n",
                             "wrongGuild": "This Channel is not Part of this Server\n"
@@ -1812,8 +1812,8 @@
                     },
                     "blroleid": {
                         "name": "Blacklisted Roles",
-                        "answers": "`Mention or ID`",
-                        "recommended": "This is a switch.\nIf the entered Role is already bypassed it will be removed.\nDeleted Messages of Members with these Roles won't be snipe-able",
+                        "answers": "`Mentions or IDs`",
+                        "recommended": "This is a Switch.\nIf the entered Role is already blacklisted it will be removed.\nDeleted Messages of Members with these Roles won't be snipe-able",
                         "fail": {
                             "no": "I couldn't find this Role\n",
                             "wrongGuild": "This Role is not Part of this Server\n"
@@ -1821,8 +1821,8 @@
                     },
                     "bluserid": {
                         "name": "Blacklisted Users",
-                        "answers": "`Mention or ID`",
-                        "recommended": "This is a switch.\nIf the entered User is already bypassed it will be removed.\nDeleted Messages of these Users won't be snipe-able",
+                        "answers": "`Mentions or IDs`",
+                        "recommended": "This is a Switch.\nIf the entered User is already blacklisted it will be removed.\nDeleted Messages of these Users won't be snipe-able",
                         "fail": {
                             "no": "I couldn't find this User\n",
                             "wrongGuild": "This User is not Part of this Server\n"
@@ -1861,7 +1861,61 @@
                 }
             },
             "suggestions": {
-                "category": ["Automation"]
+                "category": ["Automation"],
+                "type": "Suggestions",
+                "channelid": "Suggestion Channel",
+                "bluserid": "Blacklisted Users",
+                "blroleid": "Blacklisted Roles",
+                "approverroleid": "Approver / Denyer Roles",
+                "anon": "Anonymous Votes",
+                "edit": {
+                    "active": {
+                        "name": "Active",
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `True`"
+                    },
+                    "blroleid": {
+                        "name": "Blacklisted Roles",
+                        "answers": "`Mentions or IDs`",
+                        "recommended": "This is a Switch.\nIf the entered Role is already added it will be removed.\nUsers with one of these Roles won't be able to send Suggestions",
+                        "fail": {
+                            "no": "I couldn't find this Role\n",
+                            "wrongGuild": "This Role is not Part of this Server\n"
+                        }
+                    },
+                    "bluserid": {
+                        "name": "Blacklisted Users",
+                        "answers": "`Mentions or IDs`",
+                        "recommended": "This is a Switch.\nIf the entered User is already added it will be removed.\nThese Users won't be able to send Suggestions",
+                        "fail": {
+                            "no": "I couldn't find this User\n",
+                            "wrongGuild": "This User is not Part of this Server\n"
+                        }
+                    },
+                    "channelid": {
+                        "name": "Suggestion Channel",
+                        "answers": "`Mention or ID`",
+                        "recommended": "A Channel where Suggestions will be posted",
+                        "fail": {
+                            "no": "I couldn't find this Channel\n",
+                            "wrongGuild": "This Channel is not Part of this Server\n"
+                        }
+                    },
+                    "approverroleid": {
+                        "name": "Approver / Denyer Roles",
+                        "answers": "`Mentions or IDs`",
+                        "recommended": "This is a Switch.\nIf the entered Role is already added it will be removed.\nUsers with one of these Roles will be able to approve and deny Suggestions",
+                        "fail": {
+                            "no": "I couldn't find this Role\n",
+                            "wrongGuild": "This Role is not Part of this Server\n"
+                        }
+                    },
+                    "anon": {
+                        "name": "Anonymous Votes",
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `True`"
+                    }
+                }
             },
             "ticketing": {
                 "category": ["Automation"]
@@ -1918,7 +1972,7 @@
                     "roles": {
                         "name": "Roles of this Separator",
                         "answers": "`Mention or ID`",
-                        "recommended": "This is a switch.\nIf the entered Role is already bypassed it will be removed.\nRoles entered here will trigger the Separator Role",
+                        "recommended": "This is a Switch.\nIf the entered Role is already bypassed it will be removed.\nRoles entered here will trigger the Separator Role",
                         "fail": {
                             "no": "I couldn't find this Role\n",
                             "wrongGuild": "This Role is not Part of this Server\n"

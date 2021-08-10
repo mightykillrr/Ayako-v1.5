@@ -499,6 +499,14 @@
                     "roleid": "role",
                     "channelid": "channel",
                     "repeatreminder": "minutes"
+                },
+                "suggestions": {
+                    "active": "boolean",
+                    "channelid": "channel",
+                    "bluserid": "users",
+                    "blroleid": "roles",
+                    "approverroleid": "roles",
+                    "anon": "boolean"
                 }
             },
             "tablenames": {
@@ -610,8 +618,8 @@
                     "removeReq": ["id", "roles"]
                 },
                 "suggestions": {
-                    "cols": "guildid",
-                    "vals": ["{{msg.guild.id}}"]
+                    "cols": "guildid, active, anon",
+                    "vals": ["{{msg.guild.id}}", true, true]
                 },
                 "ticketing": {
                     "cols": "guildid, channelid",
