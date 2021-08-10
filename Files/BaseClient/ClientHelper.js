@@ -291,6 +291,7 @@ module.exports = {
 		if (BitField.has(64)) Perms.push(lan.permissions.ADD_REACTIONS);
 		if (BitField.has(128)) Perms.push(lan.permissions.VIEW_AUDIT_LOG);
 		if (BitField.has(256)) Perms.push(lan.permissions.PRIORITY_SPEAKER);
+		if (BitField.has(512)) Perms.push(lan.permissions.STREAM);
 		if (BitField.has(1024)) Perms.push(lan.permissions.VIEW_CHANNEL);
 		if (BitField.has(1024)) Perms.push(lan.permissions.READ_MESSAGES);
 		if (BitField.has(2048)) Perms.push(lan.permissions.SEND_MESSAGES);
@@ -610,5 +611,14 @@ module.exports = {
 			actionRows.push(row);
 		});
 		return actionRows;
-	}
+	},
+	async embedBuilder(msg, answer) {
+		const FinishedEmbed = await client.commands.get('embedbuilder').builder(msg, answer);
+		return FinishedEmbed;
+	},
+	aborted(msg, collectors) {
+		collectors?.forEach(collector => collector.stop());
+		msg.m?.delete().catch(() => {});
+		msg.reply({content: msg.language.aborted});
+	},
 };

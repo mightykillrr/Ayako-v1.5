@@ -504,6 +504,7 @@
         "ADD_REACTIONS": "Add Reactions",
         "VIEW_AUDIT_LOG": "View Audit Log",
         "PRIORITY_SPEAKER": "Priority Speaker",
+        "STREAM": "Stream",
         "VIEW_CHANNEL": "View Channel",
         "READ_MESSAGES": "Read Messages",
         "SEND_MESSAGES": "Send Messages",
@@ -940,6 +941,51 @@
                 "description": "**Please stop Spamming**"
             },
             "success": "User {{target}} was warned"
+        }
+    },
+    "embedBuilder": {
+        "author": "Ayako Embed Builder",
+        "decide": "Decide what to add, edit or remove next via Buttons",
+        "placeholder": "This will be your Embed",
+        "embed": {
+            "title": {
+                "title": "Title",
+                "text": "Title Text",
+                "link": "Title Link"
+            },
+            "description": {
+                "description": "Description"
+            },
+            "author": {
+                "author": "Author",
+                "icon": "Author Icon",
+                "text": "Author Text",
+                "link": "Author Link"
+            },
+            "color": {
+                "color": "Color"
+            },
+            "image": {
+                "image": "Image"
+            },
+            "thumbnail": {
+                "thumbnail": "Thumbnail"
+            },
+            "field": {
+                "field": "Fields",
+                "name": "Field Title",
+                "value": "Field Value",
+                "inline": "Field Inline"
+            },
+            "footer": {
+                "footer": "Footer",
+                "icon": "Footer Icon",
+                "text": "Footer Text",
+                "link": "Footer Link"
+            }, 
+            "timestamp": {
+                "timestamp": "Timestamp"
+            }
         }
     },
     "commands": {

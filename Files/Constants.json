@@ -386,6 +386,34 @@
             "color": "ff0000"
         }
     },
+    "embedBuilder": {
+        "embed": {
+            "title": {
+                "text": "text",
+                "link": "url"
+            },
+            "description": "text",
+            "author": {
+                "icon": "url",
+                "text": "text",
+                "link": "url"
+            },
+            "color": "hex",
+            "image": "url",
+            "thumbnail": "url",
+            "field": {
+                "title": "text",
+                "value": "text",
+                "inline": "boolean"
+            },
+            "footer": {
+                "icon": "url",
+                "text": "text",
+                "link": "url"
+            }, 
+            "timestamp": "unix"
+        }
+    },
     "commands": {
         "toxicityCheck": "ff0000",
         "massban": {

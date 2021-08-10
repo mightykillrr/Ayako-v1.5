@@ -109,10 +109,8 @@ module.exports = {
 		}
 
 	},
-	async aborted(msg, collectors) {
+	aborted(msg, collectors) {
 		msg.client.constants.commands.settings.editReq.splice(2, 1);
-		collectors.forEach(collector => collector.stop());
-		msg.m.delete().catch(() => {});
-		msg.reply({content: msg.language.aborted});
+		msg.client.ch.aborted(msg, collectors);
 	},
 };
