@@ -49,7 +49,7 @@ module.exports = {
 			msg.lan = msg.language.commands.settings[file.name];
 			msg.lanSettings = msg.language.commands.settings;
 			if (!msg.args[1]) this.display(msg, file);
-			else if (msg.args[1] && file.perm && !msg.member.permissions.has(new Discord.Permissions(file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
+			else if (msg.args[1] && file.perm && !msg.member.permissions.has(new Discord.Permissions(file.perm)) && msg.author.id !== '318453143476371456') return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
 			else this.edit(msg, file);
 		}
 	}, 

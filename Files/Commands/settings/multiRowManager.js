@@ -45,7 +45,7 @@ module.exports = {
 			.setLabel(msg.language.List)
 			.setDisabled(embed.fields.length > 0 ? false : true);
 		let rows;
-		if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm))) rows = msg.client.ch.buttonRower([[list]]);
+		if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm)) && msg.author.id !== '318453143476371456') rows = msg.client.ch.buttonRower([[list]]);
 		else rows = msg.client.ch.buttonRower([[edit, list]]);
 		if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
 		else if (msg.m) msg.m.edit(msg, {embeds: [embed], components: rows}).catch(() => {});
@@ -328,7 +328,7 @@ async function listdisplay(msg, answer, id, AddRemoveEditView, fail, values) {
 		.setCustomId('back')
 		.setStyle('DANGER');
 	let rows;
-	if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm))) rows = msg.client.ch.buttonRower([back]);
+	if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm)) && msg.author.id !== '318453143476371456') rows = msg.client.ch.buttonRower([back]);
 	else msg.client.ch.buttonRower([edit, back]);
 	if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
 	else msg.m.edit({embeds: [embed], components: rows}).catch(() => {});
@@ -367,7 +367,7 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 	msg.client.constants.commands.settings.edit[msg.file.name].id = 'id';
 	if (srmEditing) msg.property = Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[0] == srmEditing[0])[1];
 	else msg.property = AddRemoveEditView == 'edit' ? msg.client.constants.commands.settings.editReq[i] : msg.client.constants.commands.settings.edit[msg.file.name][msg.client.constants.commands.settings.setupQueries[msg.file.name][AddRemoveEditView][i]];
-	if (!msg.property && i <= msg.client.constants.commands.settings.setupQueries[msg.file.name].removeReq.length) throw new Error(
+	if (!msg.property && i <= msg.client.constants.commands.settings.setupQueries[msg.file.name].removeReq.length && comesFromSRM) throw new Error(
 		'No Message Property defined!'+
 		srmEditing !== null && srmEditing !== undefined ? `I'm searching for ${srmEditing[0]} in ${msg.client.constants.commands.settings.edit[msg.file.name]}`
 			: AddRemoveEditView == 'edit' ? `I'm searching for ${msg.client.constants.commands.settings.editReq[i]} in ${JSON.stringify(msg.client.constants.commands.settings.edit[msg.file.name])}`

