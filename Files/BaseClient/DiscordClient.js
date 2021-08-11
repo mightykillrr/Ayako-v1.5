@@ -62,7 +62,7 @@ for (const folder of eventsDir) {
 }
 
 //Connect to Discord
-client.login(auth.token).then(() => {
+client.login(auth.devToken).then(() => {
 	console.log('| Discord Client connected at '+ new Date().toUTCString());
 });
 

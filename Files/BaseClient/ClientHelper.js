@@ -32,6 +32,7 @@ module.exports = {
 		if (!fs.existsSync('.\\Files\\Downloads\\Guilds')) fs.mkdirSync('.\\Files\\Downloads\\Guilds');
 		if (!fs.existsSync('.\\Files\\Downloads\\Users')) fs.mkdirSync('.\\Files\\Downloads\\Users');
 		if (!fs.existsSync('.\\Files\\Downloads\\Massbans')) fs.mkdirSync('.\\Files\\Downloads\\Massbans');
+		if (!fs.existsSync('.\\Files\\Downloads\\Captchas')) fs.mkdirSync('.\\Files\\Downloads\\Captchas');
 	},
 	/**
 	 * Sends a Message to a channel.

@@ -12,6 +12,8 @@
   "dependencies": {
     "@cloudcomponents/cdk-s3-antivirus": "^1.2.0",
     "@top-gg/sdk": "^3.1.1",
+    "canvas": "^2.8.0",
+    "captcha-canvas": "^2.3.1",
     "discord.js": "^13.0.1",
     "express": "^4.17.1",
     "imgur": "^1.0.2",
