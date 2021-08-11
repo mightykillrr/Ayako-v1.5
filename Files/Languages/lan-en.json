@@ -1973,7 +1973,47 @@
                 "category": ["Automation", "Fun"]
             },
             "verification": {
-                "category": ["Automation"]
+                "category": ["Automation"],
+                "type": "Verification",
+                "greetdesc": "Greet Embed Description",
+                "logchannel": "Log Channel",
+                "finishedrole": "Verified Role",
+                "finisheddesc": "Finished Embed Description",
+                "edit": {
+                    "finishedrole": {
+                        "name": "Verified Role",
+                        "answers": "`Mention or ID`",
+                        "recommended": "The Role applied to Users once passing Verification",
+                        "fail": {
+                            "no": "I couldn't find this Role\n",
+                            "wrongGuild": "This Role is not Part of this Server\n"
+                        }
+                    },
+                    "logchannel": {
+                        "name": "Log Channel",
+                        "answers": "`Mention or ID`",
+                        "recommended": "The log Channel where verifications are logged",
+                        "fail": {
+                            "no": "I couldn't find this Channel\n",
+                            "wrongGuild": "This Channel is not Part of this Server\n"
+                        }
+                    },
+                    "greetdesc": {
+                        "name": "Greet Embed Description",
+                        "answers": "Any String",
+                        "recommended": "`{user}` will be replaced with a Mention of the User this Embed is made for"
+                    },
+                    "finisheddesc": {
+                        "name": "Finished Embed Description",
+                        "answers": "Any String",
+                        "recommended": "`{user}` will be replaced with a Mention of the User this Embed is made for"
+                    },
+                    "active": {
+                        "name": "Active",
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `True`"
+                    }
+                }
             },
             "welcome": {
                 "category": ["Automation"]
