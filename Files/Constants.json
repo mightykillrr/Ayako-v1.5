@@ -535,6 +535,14 @@
                     "blroleid": "roles",
                     "approverroleid": "roles",
                     "anon": "boolean"
+                },
+                "verification": {
+                    "active": "boolean",
+                    "greetdesc": "string",
+                    "logchannel": "channel",
+                    "finishedrole": "role",
+                    "finishdesc": "string",
+                    "pendingrole": "role"
                 }
             },
             "tablenames": {

@@ -1210,7 +1210,7 @@
                     "muteroleid": {
                         "name": "Mute Roles",
                         "select": "Select a Role",
-                        "desc": "Select the Role you want as Mute Role",
+                        "desc": "**This is not required**\n\nThe Role that will be used to mute Members",
                         "fail": {
                             "no": "I couldn't find this Role\n",
                             "wrongGuild": "This Role is not Part of this Server\n"
@@ -1559,7 +1559,7 @@
                     "activechannelid": {
                         "name": "Active Channels",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a Switch.\nIf the entered Channel is already added it will be removed.\nThe Cooldown will only apply in these Channels, if none are set it applies on the whole Server.",
+                        "recommended": "**This is not required**\n\nThis is a Switch.\nIf the entered Channel is already added it will be removed.\nThe Cooldown will only apply in these Channels, if none are set it applies on the whole Server.",
                         "fail": {
                             "no": "I couldn't find this Channel\n",
                             "wrongGuild": "This Channel is not Part of this Server\n"
@@ -1671,7 +1671,7 @@
                     "channels": {
                         "name": "Channel",
                         "answers": "`Mention(s) or ID(s)`",
-                        "recommended": "This is a Switch.\nIf the entered Channel is already added it will be removed.\nThe Channel(s) these Commands are disabled in.",
+                        "recommended": "**This is not required**\n\nThis is a Switch.\nIf the entered Channel is already added it will be removed.\nThe Channel(s) these Commands are disabled in.",
                         "fail": {
                             "no": "I couldn't find this Channel\n",
                             "wrongGuild": "This Channel is not Part of this Server\n"
@@ -1749,7 +1749,7 @@
                     "roleid": {
                         "name": "Ping Role",
                         "answers": "`Mention or ID`",
-                        "recommended": "The Role that will be pinged when you can use `!d bump` again",
+                        "recommended": "**This is not required**\n\nThe Role that will be pinged when you can use `!d bump` again",
                         "fail": {
                             "no": "I couldn't find this Role\n",
                             "wrongGuild": "This Role is not Part of this Server\n"
@@ -1767,7 +1767,7 @@
                     "repeatreminder": {
                         "name": "Repeat Reminder",
                         "answers": "Time in Minutes",
-                        "recommended": "The Time (in Minutes) after which a new Reminder is sent in case no one has bumped yet"
+                        "recommended": "**This is not required**\n\nThe Time (in Minutes) after which a new Reminder is sent in case no one has bumped yet"
                     }
                 }
             },
@@ -1897,7 +1897,7 @@
                     "deleteable": {
                         "name": "Snipes delete-able",
                         "answers": "`True` or `False`",
-                        "recommended": "Recommended: `False`"
+                        "recommended": "Recommended: `True`"
                     },
                     "deletetime": {
                         "name": "Time until Snipes are deleted",
@@ -1979,6 +1979,7 @@
                 "logchannel": "Log Channel",
                 "finishedrole": "Verified Role",
                 "finisheddesc": "Finished Embed Description",
+                "pendingrole": "Pending Verification Role",
                 "edit": {
                     "finishedrole": {
                         "name": "Verified Role",
@@ -1992,7 +1993,7 @@
                     "logchannel": {
                         "name": "Log Channel",
                         "answers": "`Mention or ID`",
-                        "recommended": "The log Channel where verifications are logged",
+                        "recommended": "**This is not required**\n\nThe log Channel where verifications are logged",
                         "fail": {
                             "no": "I couldn't find this Channel\n",
                             "wrongGuild": "This Channel is not Part of this Server\n"
@@ -2001,17 +2002,22 @@
                     "greetdesc": {
                         "name": "Greet Embed Description",
                         "answers": "Any String",
-                        "recommended": "`{user}` will be replaced with a Mention of the User this Embed is made for"
+                        "recommended": "**This is not required**\n\n`{user}` will be replaced with a Mention of the User this Embed is made for"
                     },
                     "finisheddesc": {
                         "name": "Finished Embed Description",
                         "answers": "Any String",
-                        "recommended": "`{user}` will be replaced with a Mention of the User this Embed is made for"
+                        "recommended": "**This is not required**\n\n`{user}` will be replaced with a Mention of the User this Embed is made for"
                     },
                     "active": {
                         "name": "Active",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
+                    },
+                    "pendingrole": {
+                        "name": "Pending Verification Role",
+                        "answers": "`Mention or ID`",
+                        "recommended": "**This is not required**\n\n"
                     }
                 }
             },
@@ -2030,7 +2036,7 @@
                     "stoprole": {
                         "name": "Stop-Role",
                         "answers": "`Mention or ID`",
-                        "recommended": "The Role which marks the end to the Separator Roles trigger.\nIf none is defined the Separator Role will work till the very top of the Role List",
+                        "recommended": "**This is not required**\n\nThe Role which marks the end to the Separator Roles trigger.\nIf none is defined the Separator Role will work till the very top of the Role List",
                         "fail": {
                             "no": "I couldn't find this Role\n",
                             "wrongGuild": "This Role is not Part of this Server\n"
