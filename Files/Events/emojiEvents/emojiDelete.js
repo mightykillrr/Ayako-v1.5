@@ -2,8 +2,8 @@ const Discord = require('discord.js');
 
 module.exports = {
 	async execute(emoji) {
-		const ch = client.ch;
 		const client = emoji.client;
+		const ch = client.ch;
 		const Constants = client.constants;
 		const guild = emoji.guild;
 		const language = await ch.languageSelector(guild);
