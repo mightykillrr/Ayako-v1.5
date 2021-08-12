@@ -70,7 +70,9 @@ module.exports = {
 			.setStyle('PRIMARY')
 			.setLabel(msg.language.Edit);
 		const rows = msg.client.ch.buttonRower([button]);
-		const m = await msg.client.ch.reply(msg, {embeds: [embed], components: rows});
+		let m;
+		if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm)) && msg.author.id !== '318453143476371456') m = await msg.client.ch.reply(msg, {embeds: [embed]});
+		else m = await msg.client.ch.reply(msg, {embeds: [embed], components: rows});
 		msg.m = m;
 		const buttonsCollector = m.createMessageComponentCollector({time: 60000});
 		const messageCollector = msg.channel.createMessageCollector({time: 60000});
