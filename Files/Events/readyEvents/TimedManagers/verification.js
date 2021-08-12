@@ -11,7 +11,7 @@ module.exports = {
 					const unverifiedRole = guild.roles.cache.get(r.pendingrole);
 					if (unverifiedRole) {
 						unverifiedRole.members.forEach(async (member) => {
-							if (member.joinedTimestamp < (+Date.now() - 1800000)) {
+							if (member.joinedTimestamp < (+Date.now() - (r.kickafter * 60000))) {
 								const language = await client.ch.languageSelector(guild);
 								const lan = language.verification;
 								const embed = new Discord.MessageEmbed()
