@@ -1,6 +1,6 @@
 module.exports = {
 	async execute(msg) {
-		if (msg.channel.type == 'dm') return;
+		if (msg.channel.type == 'DM') return;
 		require('./giveaway.js').execute(msg);
 		if (!msg.author) return;
 		require('./log.js').execute(msg);

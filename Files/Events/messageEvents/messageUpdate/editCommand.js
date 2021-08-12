@@ -9,7 +9,7 @@ module.exports = {
 		let prefix;
 		let prefixStandard = client.constants.standard.prefix;
 		let prefixCustom;
-		if (newMsg.channel.type !== 'dm') {
+		if (newMsg.channel.type !== 'DM') {
 			const res = await ch.query('SELECT * FROM guildsettings WHERE guildid = $1;', [newMsg.guild.id]);
 			if (res && res.rowCount > 0) prefixCustom = res.rows[0].prefix;
 		}

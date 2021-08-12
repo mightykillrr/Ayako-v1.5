@@ -37,7 +37,7 @@ module.exports = {
 						embed.setDescription(ch.stp(lan.descriptionBotNoAudit, {bot: user}));
 					}
 				} else {
-					const newInvites = await guild.fetchInvites();
+					const newInvites = await guild.invites.fetch();
 					client.invites.set(guild.id, newInvites);
 					let usedInvite;
 					if (cachedInvites) usedInvite = newInvites.find(inv => cachedInvites.find(i => i.code == inv.code).uses < inv.uses);

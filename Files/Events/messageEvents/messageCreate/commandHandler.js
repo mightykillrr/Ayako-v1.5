@@ -10,7 +10,7 @@ module.exports = {
 		let prefix;
 		let prefixStandard = Constants.standard.prefix;
 		let prefixCustom;
-		if (msg.channel.type !== 'dm' && msg.guild) {
+		if (msg.channel.type !== 'DM' && msg.guild) {
 			const res = await ch.query('SELECT * FROM guildsettings WHERE guildid = $1;', [msg.guild.id]);
 			if (res && res.rowCount > 0) prefixCustom = res.rows[0].prefix;
 		}
@@ -35,7 +35,7 @@ module.exports = {
 	async execute(rawmsg) {
 		const msg = await this.prefix(rawmsg);
 		if (!msg) return; 
-		if (msg.channel.type == 'dm') this.DMcommand(msg);
+		if (msg.channel.type == 'DM') this.DMcommand(msg);
 		if (msg.author.id == auth.ownerID) {
 			if (msg.command.name == 'eval') return msg.command.exe(msg);
 			cooldowns.set(msg.command.name, new Discord.Collection());
@@ -149,7 +149,7 @@ module.exports = {
 
 	},
 	async commandExe(msg) {
-		if (msg.channel.type !== 'dm') {
+		if (msg.channel.type !== 'DM') {
 			const res = await msg.client.ch.query('SELECT * FROM logchannels WHERE guildid = $1;', [msg.guild.id]);
 			if (res && res.rowCount > 0) msg.logchannel = msg.client.channels.cache.get(res.rows[0].modlogs);
 		}

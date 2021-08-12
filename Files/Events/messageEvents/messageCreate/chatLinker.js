@@ -1,6 +1,6 @@
 module.exports = {
 	async execute(msg) {
-		if (msg.channel.type == 'dm') return;
+		if (msg.channel.type == 'DM') return;
 		if (msg.author.id == '852255485956325437' || msg.author.id == '852256273881890817') return;
 		if (msg.channel.id !== '851779578846117888' && msg.channel.id !== '851779018117218324') return;
 		let webhook;

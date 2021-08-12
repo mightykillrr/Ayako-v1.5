@@ -38,7 +38,7 @@ let data = {
 
 module.exports = {
 	async execute(msg) {
-		if (msg.channel.type == 'dm') return;
+		if (msg.channel.type == 'DM') return;
 		if (msg.author.id === msg.client.user.id) return;
 		if (msg.author.bot) return;
 		let warnnr;

@@ -8,7 +8,7 @@ module.exports = {
 		const ch = client.ch;
 		const Constants = client.constants;
 		const guild = invite.guild;
-		client.invites.set(guild.id, await guild.fetchInvites());
+		client.invites.set(guild.id, await guild.invites.fetch());
 		const language = await ch.languageSelector(guild);
 		const lan = language.inviteDelete;
 		const con = Constants.inviteDelete;

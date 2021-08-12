@@ -6,7 +6,7 @@ module.exports = {
 	async execute(msg) {
 		if (!msg.author) return;
 		if (msg.author.bot) return;
-		if (msg.channel.type == 'dm') return;
+		if (msg.channel.type == 'DM') return;
 		const language = await msg.client.ch.languageSelector(msg.guild);
 		const resG = await msg.client.ch.query('SELECT * FROM levelglobal WHERE userid = $1;', [msg.author.id]);
 		if (resG && resG.rowCount > 0) {

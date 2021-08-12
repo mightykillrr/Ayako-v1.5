@@ -4,7 +4,7 @@ module.exports = {
 	execute(msg) {
 		if (!msg.channel || !msg.author) return;
 		if (msg.author.id == msg.client.user.id) return;
-		if (msg.channel.type !== 'dm') return;
+		if (msg.channel.type !== 'DM') return;
 		const dmembed = new Discord.MessageEmbed()
 			.setColor(msg.client.constants.standard.color)
 			.setDescription(`${msg.author} / ${msg.author.id}\n\u200b${msg.content}`)
