@@ -32,8 +32,8 @@ module.exports = {
 		messageCollector.on('collect', (message) => {
 			if (message.author.id == msg.author.id) {
 				if (message.content == msg.language.cancel) return misc.aborted(msg, [messageCollector, buttonsCollector]);
-				if (msg.content == msg.language.yes) yesFunc(message, null);
-				else if (msg.content == msg.language.no) noFunc(message, null);
+				if (message.content == msg.language.yes) yesFunc(message, null);
+				else if (message.content == msg.language.no) noFunc(message, null);
 				else return misc.notValid(msg);
 				buttonsCollector.stop();
 				messageCollector.stop();

@@ -157,7 +157,7 @@ module.exports = {
 						for (let j = 0; j < giveRoles.length; j++) {
 							const r = giveRoles[j];
 							setTimeout(() => {
-								if (!member.roles.cache.has(r)) member.roles.add(r);
+								if (!member.roles.cache.has(r)) member.roles.add(r).catch(() => {});
 							}, j*giveRoles.length);
 						}
 					}
@@ -165,7 +165,7 @@ module.exports = {
 						for (let j = 0; j < takeRoles.length; j++) {
 							const r = takeRoles[j];
 							setTimeout(() => {
-								if (member.roles.cache.has(r)) member.roles.remove(r);
+								if (member.roles.cache.has(r)) member.roles.remove(r).catch(() => {});
 							}, j*takeRoles.length);
 						}
 					}

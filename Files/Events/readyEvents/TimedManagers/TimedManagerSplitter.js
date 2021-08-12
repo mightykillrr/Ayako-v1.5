@@ -1,11 +1,12 @@
 module.exports = {
 	execute() {
-		//require('./stats').execute();
-		return
+		require('./reminder').execute();
+		require('./verification').execute();
+		return;
 		require('./willis').execute();
 		require('./disboard').execute();
 		require('./voteReminder').execute();
-		require('./reminder').execute();
 		require('./mute').execute();
+		require('./stats').execute();
 	}
 };

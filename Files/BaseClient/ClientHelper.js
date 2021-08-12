@@ -622,4 +622,7 @@ module.exports = {
 		msg.m?.delete().catch(() => {});
 		msg.reply({content: msg.language.aborted});
 	},
+	colorGetter(member) {
+		return member.roles.highest.color !== 0 ? member.roles.highest.color : 'b0ff00';
+	}
 };

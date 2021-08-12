@@ -542,7 +542,11 @@
                     "logchannel": "channel",
                     "finishedrole": "role",
                     "finishdesc": "string",
-                    "pendingrole": "role"
+                    "pendingrole": "role",
+                    "startchannel": "channel",
+                    "selfstart": "boolean",
+                    "kickafter": "minutes",
+                    "kicktof": "boolean"
                 }
             },
             "tablenames": {
@@ -666,8 +670,8 @@
                     "vals": ["{{msg.guild.id}}", true, 1800000]
                 },
                 "verification": {
-                    "cols": "guildid, active",
-                    "vals": ["{{msg.guild.id}}", true]
+                    "cols": "guildid, active, kickafter, kicktof, selfstart",
+                    "vals": ["{{msg.guild.id}}", false, 30, true, false]
                 },
                 "welcome": {
                     "cols": "guildid, active",

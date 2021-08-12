@@ -1,13 +1,6 @@
 const Discord = require('discord.js');
 const misc = require('./misc.js');
-
 const fs = require('fs');
-const files = fs.readdirSync('./Files/Commands/settings/editors').filter(file => file.endsWith('.js'));
-const editors = new Discord.Collection();
-for (const file of files) {
-	const editorfile = require(`./editors/${file}`);
-	editors.set(editorfile.key, editorfile);
-}
 
 module.exports = {
 	exe(msg, answer) {
@@ -383,6 +376,12 @@ async function repeater(msg, i, embed, values, answer, AddRemoveEditView, fail, 
 					Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.setupQueries[msg.file.name].add[i] || a[0] == msg.client.constants.commands.settings.setupQueries[msg.file.name].add[i])[0] : 
 					Object.entries(msg.client.constants.commands.settings.edit[msg.file.name]).find(a => a[1] == msg.client.constants.commands.settings.setupQueries[msg.file.name].removeReq[i] || a[0] == msg.client.constants.commands.settings.setupQueries[msg.file.name].removeReq[i])[0];
 		let answered = [];
+		const files = fs.readdirSync('./Files/Commands/settings/editors').filter(file => file.endsWith('.js'));
+		const editors = new Discord.Collection();
+		for (const file of files) {
+			const editorfile = require(`./editors/${file}`);
+			editors.set(editorfile.key, editorfile);
+		}
 		const editor = editors.find(f => f.key.includes(msg.property));
 		const returned = await editor.exe(msg, i, embed, values, answer, AddRemoveEditView, fail, srmEditing, comesFromSRM, answered);
 		if (Array.isArray(returned) && returned[0] == 'repeater') repeater(returned[1], returned[2], returned[3], returned[4], returned[5], returned[6], returned[7], returned[8], returned[9]);

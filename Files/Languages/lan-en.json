@@ -177,22 +177,6 @@
         "inviteInfoUses": "__Invite used:__ {{invite.url}} / `{{invite.code}}`\n__Inviter__ (__Invite Creator__): {{invite.inviter}} / `{{invite.inviter.tag}}` / `{{invite.inviter.id}}`\n__Invite uses:__ `{{invite.uses}}`",
         "inviteInfo": "__Invite used:__ {{invite.url}} / `{{invite.code}}`\n__Inviter__ (__Invite Creator__): {{invite.inviter}} / `{{invite.inviter.tag}}`"
     },
-    "guildMemberAddVerification": {
-        "author": {
-            "name": "Ayako Verification"
-        },
-        "description": "<a:ToiletSpin:709805618030182510> **Welcome to {{guild.name}}!**",
-        "footer": "You can't read the text? Don't panic! A new Captcha Code will be sent to you every Minute until you verified",
-        "field": "If you don't verify, you won't be able to use the server!",
-        "finishDesc": "**Thank you for verifying!**\n{{finishdesc}}",
-        "kickMsg": "You have been kicked from `{{guild.name}}` because you didn't verify.\nYou can rejoin anytime with this link:",
-        "hint": "Hint",
-        "hintmsg": "Please type the letters in the image you see below -> Example: `mhjkl` \n**The captcha contains 5 Letters, no numbers**",
-        "kickReason": "Invite for unverified and kicked User {{user.tag}} / {{user.id}}",
-        "openDMs": "`{{user}} **Please open your DM's** in order to verify as human. A Captcha will then be sent within 1 Minute.\n**You can close your DM's afterwards**.`",
-        "wrongInput": "That was wrong... Are you a robot?.\nThe solution was `{{solution}}`",
-        "finishedTitle": "Nice! You finished the Verification"
-    },
     "guildMemberAddWelcome": {
         "welcome": "Hi %i205 <a:Wave4:711645667118022779>\nWelcome to {{guild.name}}~\nFell free to look around <:comfy:759895974159843338>"
     },
@@ -535,7 +519,6 @@
         "ALL_TEXT": "All Text Channel Permissions",
         "ALL_VOICE": "All Voice Channel Permissions",
         "ALL": "All Permissions",
-        "STREAM": "Stream",
         "VIEW_GUILD_INSIGHTS": "View Guild Insights",
         "STAGE_MODERATOR": "Stage Moderator",
         "REQUEST_TO_SPEAK": "Request to Speak"
@@ -631,6 +614,25 @@
     "syncedAt": "Synced at",
     "enlableEmotes": "Give access to globally accessible emotes",
     "punishments": "Punishments",
+    "verification": {
+        "author": {
+            "name": "Ayako Verification"
+        },
+        "description": "<a:ToiletSpin:709805618030182510> **Welcome to {{guild.name}}!**",
+        "field": "If you don't verify, you won't be able to use the server!",
+        "finishDesc": "**Thank you for verifying!**",
+        "kickMsg": "You have been kicked from `{{guild.name}}` because you didn't verify.\nYou can rejoin anytime with a valid Invite Link",
+        "hintmsg": "Please type the letters in the image you see on the image below, traced by a line -> Example: `mhjkl` \n**The captcha contains 5 Letters, no numbers**",
+        "kickReason": "Ayako Verification | Unverified for too long",
+        "openDMs": "`{{user}} **Please open your DM's** in order to verify as human. A Captcha will then be sent within 1 Minute.\n**You can close your DM's afterwards**.`",
+        "wrongInput": "That was wrong... Are you a robot?.\nThe solution was `{{solution}}`",
+        "finishedTitle": "Nice! You finished the Verification",
+        "log": {
+            "start": "User {{user}} /`{{user.tag}}` / `{{user.id}}`\nstarted Verification",
+            "end": "User {{user}} / `{{user.tag}}` / `{{user.id}}`\nfinished Verification"
+        }
+    },
+
     "expireBehavior": {
         "name": "What happens when subscription expires",
         "zero": "Remove Role {{role}}",
@@ -644,6 +646,7 @@
     "revoked": "Revoked",
     "aliases": "Aliases",
     "command": "Command",
+    "hint": "Hint",
     "category": "Category",
     "dms": "DMs",
     "finished": "Finished",
@@ -1978,8 +1981,12 @@
                 "greetdesc": "Greet Embed Description",
                 "logchannel": "Log Channel",
                 "finishedrole": "Verified Role",
-                "finisheddesc": "Finished Embed Description",
+                "finishdesc": "Finished Embed Description",
                 "pendingrole": "Pending Verification Role",
+                "startchannel": "Command Channel",
+                "selfstart": "Self Start",
+                "kickafter": "Kick unverified Users Timeout",
+                "kicktof": "Kick unverified Users after the Timeout",
                 "edit": {
                     "finishedrole": {
                         "name": "Verified Role",
@@ -2002,23 +2009,48 @@
                     "greetdesc": {
                         "name": "Greet Embed Description",
                         "answers": "Any String",
-                        "recommended": "**This is not required**\n\n`{user}` will be replaced with a Mention of the User this Embed is made for"
+                        "recommended": "**This is not required**\n\n`{{user}}` will be replaced with a Mention of the User this Embed is made for"
                     },
-                    "finisheddesc": {
+                    "finishdesc": {
                         "name": "Finished Embed Description",
                         "answers": "Any String",
-                        "recommended": "**This is not required**\n\n`{user}` will be replaced with a Mention of the User this Embed is made for"
+                        "recommended": "**This is not required**\n\n`{{user}}` will be replaced with a Mention of the User this Embed is made for"
                     },
                     "active": {
                         "name": "Active",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
                     },
+                    "selfstart": {
+                        "name": "Self Start",
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `False`\n\nSetting this to `True` will still require a Command Channel"
+                    },
                     "pendingrole": {
                         "name": "Pending Verification Role",
                         "answers": "`Mention or ID`",
-                        "recommended": "**This is not required**\n\n"
+                        "recommended": "**This is not required\n\nHowever:** If you don't use this Role be sure @everyone does not have permissions to send Messages in any Channel"
+                    },
+                    "startchannel": {
+                        "name": "Command Channel",
+                        "answers": "`Mention or ID`",
+                        "recommended": "Pending Members will have to start Verification with the `{{prefix}}verify` Command here",
+                        "fail": {
+                            "no": "I couldn't find this Channel\n",
+                            "wrongGuild": "This Channel is not Part of this Server\n"
+                        }
+                    },
+                    "kickafter": {
+                        "name": "Kick unverified Users Timeout",
+                        "answers": "Time in Minutes",
+                        "recommended": "Recommended: 30\n\nThe unverified Users Kick Timeout, after it has passed unverified Users will be kicked from the Server"
+                    },
+                    "kicktof": {
+                        "name": "Kick unverified Users after the Timeout",
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `True`"
                     }
+
                 }
             },
             "welcome": {
