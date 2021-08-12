@@ -11,7 +11,7 @@ module.exports = {
 			.setAuthor(msg.client.ch.stp(msg.lan.avatarOf, {user: user}), msg.client.constants.standard.image, msg.client.ch.displayAvatarURL(user))
 			.setImage(msg.client.ch.displayAvatarURL(user))
 			.setTimestamp()
-			.setColor(msg.guild.me.displayHexColor)
+			.setColor(msg.client.ch.colorGetter(msg.guild ? msg.guild.me : null))
 			.setFooter(msg.client.ch.stp(msg.language.requestedBy, {user: msg.author}));
 		msg.channel.send(avatarEmbed);
 	}

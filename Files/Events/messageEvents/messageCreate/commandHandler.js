@@ -121,10 +121,7 @@ module.exports = {
 					m.delete().catch(() => {});
 					this.commandExe(msg);
 				}
-			} else {
-				m.delete().catch(() => {});
-				return;
-			}
+			} else return m.delete().catch(() => {});
 		}).catch(() => {m.delete().catch(() => {});});
 		m.awaitReactions((reaction, user) => (reaction.emoji.id === msg.constants.emotes.tickID || reaction.emoji.id === msg.constants.emotes.crossID) && user.id === msg.author.id,
 			{max: 1, time: 60000}).then(rawcollected => {
@@ -132,10 +129,7 @@ module.exports = {
 			if (rawcollected.first()._emoji.id == msg.constants.emotes.tickID) {
 				m.delete().catch(() => {});
 				this.commandExe(msg);
-			} else {
-				m.delete().catch(() => {});
-				return;
-			}
+			} else return m.delete().catch(() => {});
 		}).catch(() => {m.delete().catch(() => {});});
 	},
 	async DMcommand(msg) {

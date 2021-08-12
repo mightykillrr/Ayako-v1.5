@@ -21,7 +21,7 @@ module.exports = {
 			.setDescription(msg.lan.thanks.desc)
 			.addField(msg.lan.thanks.field, '\u200B')
 			.setTimestamp()
-			.setColor(msg.guild.me.displayHexColor);
+			.setColor(msg.client.ch.colorGetter(msg.guild ? msg.guild.me : null));
 		msg.client.ch.reply(msg, SuggestReplyEmbed);
 
 	}

@@ -113,8 +113,8 @@ module.exports = {
 					if (!promise) return msg.client.ch.aborted(msg);
 					editing = Object.entries(editing).find(a => a[1] == editing2);
 				}
-                if (!Array.isArray(editing)) editing = Object.entries(editing)[0];
-                console.log(editing)
+				if (!Array.isArray(editing)) editing = Object.entries(editing)[0];
+				console.log(editing);
 			}
 
 		}

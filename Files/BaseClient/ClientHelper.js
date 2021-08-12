@@ -419,16 +419,12 @@ module.exports = {
 	 * @param {object} guild - The Guild the Language is Selected for.
 	 */
 	async languageSelector(guild) {
-		if (guild.id) {
+		if (guild && guild.id) {
 			const resLan = await this.query('SELECT lan FROM guildsettings WHERE guildid = $1;', [guild.id]);
 			let lang = 'en';
 			if (resLan && resLan.rowCount > 0) lang = resLan.rows[0].lan;
-			const language = require(`../Languages/lan-${lang}.json`);
-			return language;
-		} else {
-			const language = require('../Languages/lan-en.json');
-			return language;
-		}
+			return require(`../Languages/lan-${lang}.json`);
+		} else return require('../Languages/lan-en.json');
 	},
 	/**
 	 * Writes a Ban or Massban report including previously sent Messages of the Victim.
@@ -623,6 +619,6 @@ module.exports = {
 		msg.reply({content: msg.language.aborted});
 	},
 	colorGetter(member) {
-		return member.roles.highest.color !== 0 ? member.roles.highest.color : 'b0ff00';
+		return member && member.displayHexColor !== 0 ? member.displayHexColor : 'b0ff00';
 	}
 };

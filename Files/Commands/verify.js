@@ -45,7 +45,7 @@ module.exports = {
 			.setDescription(r.greetdesc ? msg.client.ch.stp(r.greetdesc, {user: msg.author}) : msg.client.ch.stp(lan.description, {guild: msg.guild}))
 			.addField(msg.language.hint, lan.hintmsg)
 			.addField(lan.field, '\u200b')
-			.setColor(msg.client.constants.standard.color)
+			.setColor(msg.client.constants.standard.color);
 		const regenerate = new Discord.MessageButton()
 			.setCustomId('regenerate')
 			.setLabel(lan.regenerate)
