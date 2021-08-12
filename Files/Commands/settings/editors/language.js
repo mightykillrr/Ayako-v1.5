@@ -46,7 +46,7 @@ module.exports = {
 			)
 			.setDescription(`${msg.language.select[msg.property].desc}\n${msg.language.page}: \`1/${Math.ceil(options.length / 25)}\``);
 		const rows = msg.client.ch.buttonRower([[menu], [prev, next], [back, done]]);
-		if (answer) answer.update({embeds: [embed], components: rows}).catch((e) => {console.log(e)});
+		if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
 		else msg.m.edit({embeds: [embed], components: rows}).catch(() => {});
 		const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
 		const messageCollector = msg.channel.createMessageCollector({time: 60000});

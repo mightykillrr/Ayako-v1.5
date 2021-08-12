@@ -347,6 +347,7 @@ module.exports = {
 	 * @param {object} user - The User Object the Avatar URL is extracted from.
 	 */
 	displayAvatarURL(user) {
+		user.user ? user = user.user : user;
 		return user.displayAvatarURL({
 			dynamic: true,
 			size: 2048,
@@ -613,10 +614,10 @@ module.exports = {
 		const FinishedEmbed = await client.commands.get('embedbuilder').builder(msg, answer);
 		return FinishedEmbed;
 	},
-	aborted(msg, collectors) {
+	async aborted(msg, collectors) {
 		collectors?.forEach(collector => collector.stop());
 		msg.m?.delete().catch(() => {});
-		msg.reply({content: msg.language.aborted});
+		this.reply(msg, {content: msg.language.aborted});
 	},
 	colorGetter(member) {
 		return member && member.displayHexColor !== 0 ? member.displayHexColor : 'b0ff00';

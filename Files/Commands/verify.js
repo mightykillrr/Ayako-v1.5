@@ -13,7 +13,7 @@ module.exports = {
 	aliases: [],
 	async exe(msg) {
 		msg.lan = msg.language.verification;
-		const res = await msg.client.ch.query('SELECT * FROM verification WHERE guildid = $1 && active = $2;', [msg.guild.id, true]);
+		const res = await msg.client.ch.query('SELECT * FROM verification WHERE guildid = $1 AND active = $2;', [msg.guild.id, true]);
 		if (res && res.rowCount > 0) {
 			const r = res.rows[0];
 			if (r.startchannel !== msg.channel.id) return;
@@ -33,14 +33,15 @@ module.exports = {
 				if (DM && DM.id) {
 					msg.DM = DM, msg.r = r;
 					this.startProcess(msg);
-				} else return msg.client.ch.reply(msg, msg.lan.openDMs);
+				}
 			} else return msg.client.ch.reply(msg, msg.lan.alreadyVerified);
 		}
 	},
 	async startProcess(msg, answer) {
+		if (msg.m) await msg.m.removeAttachments();
 		const file = await this.generateImage(), lan = msg.lan, r = msg.r;
 		const embed = new Discord.MessageEmbed()
-			.setThumbnail(`attachment://${file.now}`)
+			.setImage(`attachment://${file.now}.png`)
 			.setTitle(lan.author.name, msg.client.constants.standard.image, msg.client.constants.standard.invite)
 			.setDescription(r.greetdesc ? msg.client.ch.stp(r.greetdesc, {user: msg.author}) : msg.client.ch.stp(lan.description, {guild: msg.guild}))
 			.addField(msg.language.hint, lan.hintmsg)
@@ -48,13 +49,14 @@ module.exports = {
 			.setColor(msg.client.constants.standard.color);
 		const regenerate = new Discord.MessageButton()
 			.setCustomId('regenerate')
-			.setLabel(lan.regenerate)
+			.setLabel(msg.language.regenerate)
 			.setStyle('SECONDARY');        
-		if (answer) answer.update({embeds: [embed], components: msg.client.ch.buttonRower(regenerate), files: [file.path]}).catch(() => {});
-		else if (msg.m) msg.m.edit({embeds: [embed], components: msg.client.ch.buttonRower(regenerate), files: [file.path]}).catch(() => {});
-		else msg.m = await msg.client.ch.send(msg.DM, {embeds: [embed], components: msg.client.client.buttonRower(regenerate), files: [file.path]});
+		if (answer) answer.update({embeds: [embed], components: msg.client.ch.buttonRower([regenerate]), files: [file.path]}).catch(() => {});
+		else if (msg.m) msg.m.edit({embeds: [embed], components: msg.client.ch.buttonRower([regenerate]), files: [file.path]}).catch(() => {});
+		else msg.m = await msg.client.ch.send(msg.DM, {embeds: [embed], components: msg.client.ch.buttonRower([regenerate]), files: [file.path]});
+		if (!msg.m || !msg.m.id) return msg.client.ch.send(msg.client.channels.cache.get(r.startchannel), {content: msg.client.ch.stp(msg.lan.openDMs, {user: msg.author, prefix: msg.client.constants.standard.prefix})});
 		const buttonsCollector = msg.m.createMessageComponentCollector({time: 120000});
-		const messageCollector = msg.channel.createMessageCollector({time: 120000});
+		const messageCollector = msg.DM.createMessageCollector({time: 120000});
 		buttonsCollector.on('collect', (clickButton) => {
 			if (clickButton.customId == 'regenerate') {
 				buttonsCollector.stop();
@@ -62,7 +64,14 @@ module.exports = {
 				return this.startProcess(msg, clickButton);
 			}
 		});
-		messageCollector.on('collect', (message) => {
+		messageCollector.on('collect', async (message) => {
+			if (message.content.toLowerCase() == msg.language.cancel.toLowerCase()) {
+				msg.m.delete().catch(() => {});
+				buttonsCollector.stop();
+				messageCollector.stop();
+				msg.client.ch.reply(message, {content: msg.language.aborted});
+				return;
+			}
 			if (message.content.toLowerCase() == file.captcha.text.toLowerCase()) {
 				buttonsCollector.stop();
 				messageCollector.stop();
@@ -70,8 +79,8 @@ module.exports = {
 			} else {
 				buttonsCollector.stop();
 				messageCollector.stop();
-				message.delete().catch(() => {});
-				msg.client.ch.send(msg.DM, {content: msg.client.ch.stp(msg.lan.wrongInput, {solution: file.captcha.text})});
+				const ms = await msg.client.ch.send(msg.DM, {content: msg.client.ch.stp(msg.lan.wrongInput, {solution: file.captcha.text})});
+				setTimeout(() => {ms.delete().catch(() => {});}, 10000);
 				return this.startProcess(msg);
 			}
 		});
@@ -79,6 +88,7 @@ module.exports = {
 			if (reason == 'time') {
 				buttonsCollector.stop();
 				messageCollector.stop();
+				msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 				return this.startProcess(msg);
 			}
 		});
@@ -106,9 +116,9 @@ module.exports = {
 		const embed = new Discord.MessageEmbed()
 			.setTitle(msg.lan.author.name, msg.client.constants.standard.image, msg.client.constants.standard.invite)
 			.setDescription(msg.r.finishdesc ? msg.client.ch.stp(msg.r.finishdesc, {user: msg.author}) : msg.client.ch.stp(msg.lan.description, {guild: msg.guild}))
-			.setColor(msg.client.constants.standard.color)
-			.setFooter(msg.lan.footer);
+			.setColor(msg.client.constants.standard.color);
 		msg.client.ch.send(msg.DM, {embeds: [embed]});
 		msg.member.roles.add(msg.r.finishedrole).catch(() => {});
+		msg.member.roles.remove(msg.r.pendingrole).catch(() => {});
 	}
 };

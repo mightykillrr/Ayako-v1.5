@@ -614,6 +614,7 @@
     "syncedAt": "Synced at",
     "enlableEmotes": "Give access to globally accessible emotes",
     "punishments": "Punishments",
+    "regenerate": "Regenerate",
     "verification": {
         "author": {
             "name": "Ayako Verification"
@@ -622,9 +623,9 @@
         "field": "If you don't verify, you won't be able to use the server!",
         "finishDesc": "**Thank you for verifying!**",
         "kickMsg": "You have been kicked from `{{guild.name}}` because you didn't verify.\nYou can rejoin anytime with a valid Invite Link",
-        "hintmsg": "Please type the letters in the image you see on the image below, traced by a line -> Example: `mhjkl` \n**The captcha contains 5 Letters, no numbers**",
+        "hintmsg": "Please type the letters in the image you see on the image below, traced by a line\nExample: `dhioen` \n**The captcha contains 6 Letters, no numbers**",
         "kickReason": "Ayako Verification | Unverified for too long",
-        "openDMs": "`{{user}} **Please open your DM's** in order to verify as human. A Captcha will then be sent within 1 Minute.\n**You can close your DM's afterwards**.`",
+        "openDMs": "{{user}} **Please open your DM's** in order to verify as human. Then re-send the Command `{{prefix}}verify`.\n**You can close your DM's afterwards**.",
         "wrongInput": "That was wrong... Are you a robot?.\nThe solution was `{{solution}}`",
         "finishedTitle": "Nice! You finished the Verification",
         "log": {

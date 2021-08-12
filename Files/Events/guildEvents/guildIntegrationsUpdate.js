@@ -117,7 +117,6 @@ module.exports = {
 					if (entry.expireGracePeriod) embed.addField(language.expireGracePeriod, entry.expireGracePeriod+' '+language.time.minutes);
 					if (entry.subscriber_count) embed.addField(language.subscribers, entry.subscriber_count);
 					ch.logger('Integration Update Check console at '+ new Date().toUTCString());
-					console.log(embed);
 				}
 				if (entry.actionType == 'UPDATE') {
 					const con = Constants.guildIntegrationsUpdate;
@@ -142,7 +141,6 @@ module.exports = {
 						else embed.addField(language.unknown, `**${language.before}:**\n${change.old}\n\n**${language.after}:**\n${change.new}`);
 					}
 					ch.logger('Integration Update Check console at '+ new Date().toUTCString());
-					console.log(embed);
 				}
 				ch.send(logchannel, embed);
 			}

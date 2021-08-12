@@ -21,7 +21,6 @@ module.exports = {
 					}
 				}
 				if (!words[0]) return;
-				console.log(words);
 				await msg.delete().catch(() => {});
 				const language = await msg.client.ch.languageSelector(msg.guild);
 				const m = await msg.client.ch.send(msg.channel, msg.client.ch.stp(language.commands.toxicityCheck.warning, {user: msg.author}));

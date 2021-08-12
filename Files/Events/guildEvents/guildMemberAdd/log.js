@@ -42,7 +42,7 @@ module.exports = {
 					let usedInvite;
 					if (cachedInvites) usedInvite = newInvites.find(inv => cachedInvites.find(i => i.code == inv.code).uses < inv.uses);
 					embed.setAuthor(lan.author.titleUser, con.author.image, ch.stp(con.author.link, {user: user}));
-					embed.setThumbnail(ch.displayAvatarURL(user));
+					embed.setThumbnail(ch.displayAvatarURL(member.user));
 					embed.setDescription(ch.stp(lan.descriptionUser, {user: user}));
 					if (usedInvite) {
 						if (usedInvite.uses) embed.addField(lan.inviteInfoTitle, ch.stp(lan.inviteInfoUses, {invite: usedInvite}));
