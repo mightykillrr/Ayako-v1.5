@@ -8,6 +8,7 @@ module.exports = {
 		const ch = client.ch;
 		const guild = oldMember ? oldMember.guild : newMember.guild;
 		const member = newMember ? newMember : await guild.members.fetch(newMember.id);
+		if (newMember.guild.id == '715121965563772980') return;
 		const res = await ch.query('SELECT * FROM roleseparator WHERE active = true AND guildid = $1;', [guild.id]);
 		if (res && res.rowCount > 0) {
 			res.rows.forEach(async (row) => {
@@ -32,6 +33,7 @@ module.exports = {
 									const role = guild.roles.cache.get(roles[i]);
 									if (member.roles.cache.has(role.id)) {
 										aknowledgedSeperator = true;
+									console.log('Called 1')
 										if (!member.roles.cache.has(separator.id)) await member.roles.add(separator).catch(() => {});
 									}
 								}
@@ -40,11 +42,16 @@ module.exports = {
 							row.roles.forEach(async id => {
 								if (member.roles.cache.has(id)) {
 									aknowledgedSeperator = true;
+									console.log('Called 2')
 									if (!member.roles.cache.has(separator.id)) await member.roles.add(separator).catch(() => {});
 								}
 							});
 						}
-						if (aknowledgedSeperator == false && member.roles.cache.has(separator.id)) await member.roles.remove(separator).catch(() => {});
+						if (aknowledgedSeperator == false && member.roles.cache.has(separator.id)) {
+							console.log('Called 3')
+
+							await member.roles.remove(separator).catch(() => {});
+						}
 					} else ch.query('UPDATE roleseparator SET active = false WHERE separator = $1;', [row.separator]);
 				}
 			});

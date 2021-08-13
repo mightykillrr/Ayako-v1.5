@@ -5,7 +5,7 @@ const fs = require('fs');
 module.exports = {
 	name: 'verify',
 	perm: null,
-	dm: true,
+	dm: false,
 	takesFirstArg: false,
 	category: 'Automation',
 	description: 'Verify on a Server',
@@ -65,6 +65,7 @@ module.exports = {
 			}
 		});
 		messageCollector.on('collect', async (message) => {
+			if (msg.author.id !== message.author.id) return;
 			if (message.content.toLowerCase() == msg.language.cancel.toLowerCase()) {
 				msg.m.delete().catch(() => {});
 				buttonsCollector.stop();
@@ -84,12 +85,12 @@ module.exports = {
 				return this.startProcess(msg);
 			}
 		});
-		buttonsCollector.on('end', (collected, reason) => {
+		buttonsCollector.on('end', async (collected, reason) => {
 			if (reason == 'time') {
 				buttonsCollector.stop();
 				messageCollector.stop();
-				msg.m.edit({embeds: [embed], components: []}).catch(() => {});
-				return this.startProcess(msg);
+				if (msg.m) await msg.m.removeAttachments();
+				msg.m.edit({embeds: [], components: [], content: `${msg.client.ch.stp(msg.lan.timeError, {channel: r.startchannel, prefix: msg.client.constants.standard.prefix})}`}).catch(() => {});
 			}
 		});
 	},
@@ -105,9 +106,10 @@ module.exports = {
 		return file;
 	},
 	async finished(msg) {
+		msg.language = await msg.client.ch.languageSelector(msg.guild);
 		if (msg.logchannel) {
 			const log = new Discord.MessageEmbed()
-				.setDescription(msg.client.ch.stp(msg.lan.log.end, {user: msg.author}))
+				.setDescription(msg.client.ch.stp(msg.language.verification?.log?.end, {user: msg.author}))
 				.setAuthor(msg.author.tag, msg.client.ch.displayAvatarURL(msg.author))
 				.setTimestamp()
 				.setColor();
@@ -115,10 +117,12 @@ module.exports = {
 		}
 		const embed = new Discord.MessageEmbed()
 			.setTitle(msg.lan.author.name, msg.client.constants.standard.image, msg.client.constants.standard.invite)
-			.setDescription(msg.r.finishdesc ? msg.client.ch.stp(msg.r.finishdesc, {user: msg.author}) : msg.client.ch.stp(msg.lan.description, {guild: msg.guild}))
+			.setDescription(msg.r.finishdesc ? msg.client.ch.stp(msg.r.finishdesc, {user: msg.author}) : msg.client.ch.stp(msg.lan.finishDesc, {guild: msg.guild}))
 			.setColor(msg.client.constants.standard.color);
 		msg.client.ch.send(msg.DM, {embeds: [embed]});
-		msg.member.roles.add(msg.r.finishedrole).catch(() => {});
-		msg.member.roles.remove(msg.r.pendingrole).catch(() => {});
+		console.log('Assinging');
+		await msg.member.roles.add(msg.r.finishedrole).catch((e) => {console.log(e)});
+		await msg.member.roles.remove(msg.r.pendingrole).catch((e) => {console.log(e)});
+		console.log('Done')
 	}
 };

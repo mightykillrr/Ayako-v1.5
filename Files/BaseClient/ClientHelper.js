@@ -610,16 +610,34 @@ module.exports = {
 		});
 		return actionRows;
 	},
+	/**
+	 * Makes the embed Builder publicly available 
+	 * @constructor
+	 * @param {object} msg - The Message that initiates this.
+	 * @param {object} answer - The Interaction to Update, if any.
+	 */
 	async embedBuilder(msg, answer) {
 		const FinishedEmbed = await client.commands.get('embedbuilder').builder(msg, answer);
 		return FinishedEmbed;
 	},
+	/**
+	 * Aborts a Collector. 
+	 * @constructor
+	 * @param {object} msg - The Message that initiates this.
+	 * @param {array} collectors - The Collectors to stop.
+	 */
 	async aborted(msg, collectors) {
 		collectors?.forEach(collector => collector.stop());
 		msg.m?.delete().catch(() => {});
 		this.reply(msg, {content: msg.language.aborted});
 	},
+	/**
+	 * Returns the Client Users Color to use in Embeds 
+	 * @constructor
+	 * @param {object} member - The Client User Member of this Guild.
+	 */
 	colorGetter(member) {
 		return member && member.displayHexColor !== 0 ? member.displayHexColor : 'b0ff00';
-	}
+	},
+
 };
