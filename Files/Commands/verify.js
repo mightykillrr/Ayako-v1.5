@@ -120,9 +120,7 @@ module.exports = {
 			.setDescription(msg.r.finishdesc ? msg.client.ch.stp(msg.r.finishdesc, {user: msg.author}) : msg.client.ch.stp(msg.lan.finishDesc, {guild: msg.guild}))
 			.setColor(msg.client.constants.standard.color);
 		msg.client.ch.send(msg.DM, {embeds: [embed]});
-		console.log('Assinging');
-		await msg.member.roles.add(msg.r.finishedrole).catch((e) => {console.log(e)});
-		await msg.member.roles.remove(msg.r.pendingrole).catch((e) => {console.log(e)});
-		console.log('Done')
+		msg.client.ch.role(msg.member, msg.r.finishedrole, 0, 'add');
+		msg.client.ch.role(msg.member, msg.r.pendingrole, 0, 'del');
 	}
 };

@@ -15,9 +15,9 @@ module.exports = {
 			if (!Muterole) Muterole = guild.roles.cache.find(r => r.name.toLowerCase() == 'muted');
 			if (Muterole) {
 				if (!member.roles.cache.has(Muterole.id)) { 
-					const mres = await member.roles.add(Muterole).catch(() => {wasMuted = false;});
+					const mres = client.ch.role(member, Muterole, 1, 'add');
 					if (mres) wasMuted = true;
-				}
+				} else wasMuted = false;
 			}
 		}
 		const res2 = await ch.query('SELECT * FROM warns WHERE closed = $1 AND type = $2 AND guildid = $3 AND userid = $4 AND closed = $5;', [false, 'Mute', guild.id, user.id, false]);
@@ -31,9 +31,9 @@ module.exports = {
 			if (!Muterole) Muterole = guild.roles.cache.find(r => r.name.toLowerCase() == 'muted');
 			if (Muterole) {
 				if (!member.roles.cache.has(Muterole.id)) { 
-					const mres = await member.roles.add(Muterole).catch(() => {wasMuted = false;});
+					const mres = client.ch.role(member, Muterole, 1, 'add');
 					if (mres) wasMuted = true;
-				}
+				} else wasMuted = false;
 			}
 		}
 		if (wasMuted !== null) {

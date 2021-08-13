@@ -12,9 +12,7 @@ module.exports = {
 			for (let i = 0; i < res.rowCount; i++) {
 				if (member) {
 					const role = guild.roles.cache.get(res.rows[i].roleid);
-					if (!member.roles.cache.has(res.rows[i].roleid)) {
-						member.roles.add(role).catch(() => {});
-					}					
+					if (!member.roles.cache.has(res.rows[i].roleid)) client.ch.role(member, role, 1, 'add');
 				}
 			}
 		}	

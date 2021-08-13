@@ -11,9 +11,7 @@ module.exports = {
 				const member = await guild.members.fetch(user.id);
 				if (member) {
 					const role = guild.roles.cache.get(res.rows[i].roleid);
-					if (member.roles.cache.has(res.rows[i].roleid)) {
-						member.roles.remove(role).catch(() => {});
-					}
+					if (member.roles.cache.has(res.rows[i].roleid)) client.ch.role(member, role, 1, 'del');
 				}
 			}
 		}	

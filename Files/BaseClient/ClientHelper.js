@@ -7,6 +7,7 @@ const https = require('https');
 const DiscordEpoch = 1420070400000;
 const Constants = require('../Constants.json');
 const { imgur } = require('./ImgurClient');
+const SA = require('superagent');
 const URL = require('url');
 const regexes = {
 	templateMatcher: /{{\s?([^{}\s]*)\s?}}/g,
@@ -19,6 +20,7 @@ const regexes = {
 Array.prototype.equals = function(arr2) {
 	return (this.length === arr2.length && this.every((value, index) => value === arr2[index]));
 };
+client.roleQueue = new Discord.Collection();
 
 module.exports = { 
 	/**
@@ -596,7 +598,7 @@ module.exports = {
 		msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 	},
 	/**
-	 * Converts Button Arrays into Action Rows usable by Discord.js. Multiple Action Rows are separated by nested Arrays 
+	 * Converts Button Arrays into Action Rows usable by Discord.js. Multiple Action Rows are separated by nested Arrays.
 	 * @constructor
 	 * @param {array} buttonArrays - The Buttons that will be put into the Action Rows.
 	 */
@@ -611,7 +613,7 @@ module.exports = {
 		return actionRows;
 	},
 	/**
-	 * Makes the embed Builder publicly available 
+	 * Makes the embed Builder publicly available.
 	 * @constructor
 	 * @param {object} msg - The Message that initiates this.
 	 * @param {object} answer - The Interaction to Update, if any.
@@ -632,12 +634,57 @@ module.exports = {
 		this.reply(msg, {content: msg.language.aborted});
 	},
 	/**
-	 * Returns the Client Users Color to use in Embeds 
+	 * Returns the Client Users Color to use in Embeds.
 	 * @constructor
 	 * @param {object} member - The Client User Member of this Guild.
 	 */
 	colorGetter(member) {
 		return member && member.displayHexColor !== 0 ? member.displayHexColor : 'b0ff00';
 	},
+	/**
+	 * Queues a Role into the Role Manager.
+	 * @constructor
+	 * @param {object} member - The Member to add these Rolse to.
+	 * @param {string} roleid - The ID of the Role to add to this Member.
+	 * @param {numeric} priority - 0 = highest, 1 = high, 2 = medium, 3 = low, 4 = lowest.
+	 * @param {string} method - 'add' or 'del'.
+	 */
+	role(member, roleid, priority, method) {
+		if (typeof roleid == 'object') roleid = roleid.id;
+		if (!client.roleQueue.get(member.guild.id))client. roleQueue.set(member.guild.id, [{guild: member.guild.id, member: member.user.id, role: roleid, priority: priority, method: method}]);
+		else client.roleQueue.get(member.guild.id).push({guild: member.guild.id, member: member.user.id, role: roleid, priority: priority, method: method});
+		return 'queued';
+	},
+};
 
+client.roleManager();
+client.roleManager = function() {
+	client.roleQueue.map(o => o).forEach(async (guildRoles) => {
+		let ManageThis;
+		const highest = new Array, high = new Array, medium= new Array, low = new Array, lowest = new Array;
+		for (let i = 0; i < guildRoles.length; i++) {
+			let role = guildRoles[i]; guildRoles[i].index = i;
+			if (role.priority == 0)  highest.push(role);
+			else if (role.priority == 1) high.push(role);
+			else if (role.priority == 2) medium.push(role);
+			else if (role.priority == 3) low.push(role);
+			else if (role.priority == 4) lowest.push(role);
+		}
+		if (highest.length > 0) ManageThis = highest[0];
+		else if (high.length > 0) ManageThis = high[0];
+		else if (medium.length > 0) ManageThis = medium[0];
+		else if (low.length > 0) ManageThis = low[0];
+		else if (lowest.length > 0) ManageThis = lowest[0];
+		else return;
+		if (!ManageThis) return;
+		client.roleQueue.get(ManageThis.guild).splice(ManageThis.index, 1);
+		if (client.roleQueue.get(ManageThis.guild).length == 0) client.roleQueue.delete(ManageThis.guild);
+		const guild = client.guilds.cache.get(ManageThis.guild);
+		const role = guild.roles.cache.get(ManageThis.role);
+		const member = guild.members.cache.get(ManageThis.member);
+		let timeout = 1000;
+		if (ManageThis.method == 'add' && member && role && !member.roles.cache.get(role.id)) timeout = (await SA.put(`https://discord.com/api/v8/guilds/${guild.id}/members/${member.user.id}/roles/${role.id}`).set('Authorization', `Bot ${client.token}`)).headers['x-ratelimit-remaining'];
+		else if (ManageThis.method == 'del' && member && role && member.roles.cache.get(role.id)) timeout = (await SA.delete(`https://discord.com/api/v8/guilds/${guild.id}/members/${member.user.id}/roles/${role.id}`).set('Authorization', `Bot ${client.token}`)).headers['x-ratelimit-remaining'];
+		client.roleManagerTimeout = setTimeout(() => {client.roleManager();}, timeout);		
+	});
 };

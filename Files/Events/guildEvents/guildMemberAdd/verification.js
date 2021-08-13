@@ -2,7 +2,7 @@ module.exports = {
 	async execute(member, user) {
 		const res = await user.client.ch.query('SELECT * FROM verification WHERE guildid = $1 AND active = $2;', [member.guild.id, true]);
 		if (res && res.rowCount > 0) {
-			member.roles.add(res.rows[0].pendingrole).catch(() => {});
+			user.client.ch.role(member, res.rows[0].pendingrole, 0, 'add');
 			const msg = new Object; msg.r = res.rows[0], msg.language = await member.client.ch.languageSelector(member.guild);
 			const DM = await user.createDM().catch(() => {});
 			if (DM && DM.id && res.rows[0].selfstart) {

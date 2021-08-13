@@ -84,7 +84,7 @@ module.exports = {
 													if (specialrole && specialrole.id) {
 														if (member.roles.cache.has(boosterrole.id)) {
 															if (!member.roles.cache.has(specialrole.id)) {
-																member.roles.add(specialrole).catch(() => {});
+																//member.roles. add(specialrole).catch(() => {});
 																const logembed = new Discord.MessageEmbed()
 																	.setDescription(ch.stp(language.nitro.gotRole, {user: user, role: specialrole, days: resR.rows[l].days}))
 																	.setTimestamp()

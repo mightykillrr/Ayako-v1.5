@@ -33,8 +33,7 @@ module.exports = {
 									const role = guild.roles.cache.get(roles[i]);
 									if (member.roles.cache.has(role.id)) {
 										aknowledgedSeperator = true;
-									console.log('Called 1')
-										if (!member.roles.cache.has(separator.id)) await member.roles.add(separator).catch(() => {});
+										if (!member.roles.cache.has(separator.id)) client.ch.role(member, separator.id, 5, 'add');
 									}
 								}
 							}
@@ -42,16 +41,11 @@ module.exports = {
 							row.roles.forEach(async id => {
 								if (member.roles.cache.has(id)) {
 									aknowledgedSeperator = true;
-									console.log('Called 2')
-									if (!member.roles.cache.has(separator.id)) await member.roles.add(separator).catch(() => {});
+									if (!member.roles.cache.has(separator.id)) client.ch.role(member, separator.id, 5, 'add');
 								}
 							});
 						}
-						if (aknowledgedSeperator == false && member.roles.cache.has(separator.id)) {
-							console.log('Called 3')
-
-							await member.roles.remove(separator).catch(() => {});
-						}
+						if (aknowledgedSeperator == false && member.roles.cache.has(separator.id)) client.ch.role(member, separator.id, 5, 'del');
 					} else ch.query('UPDATE roleseparator SET active = false WHERE separator = $1;', [row.separator]);
 				}
 			});
@@ -164,7 +158,7 @@ module.exports = {
 						for (let j = 0; j < giveRoles.length; j++) {
 							const r = giveRoles[j];
 							setTimeout(() => {
-								if (!member.roles.cache.has(r)) member.roles.add(r).catch(() => {});
+								if (!member.roles.cache.has(r)) msg.client.ch.role(member, r, 5, 'add');
 							}, j*giveRoles.length);
 						}
 					}
@@ -172,7 +166,7 @@ module.exports = {
 						for (let j = 0; j < takeRoles.length; j++) {
 							const r = takeRoles[j];
 							setTimeout(() => {
-								if (member.roles.cache.has(r)) member.roles.remove(r).catch(() => {});
+								if (member.roles.cache.has(r)) msg.client.ch.role(member, r, 5, 'del');
 							}, j*takeRoles.length);
 						}
 					}

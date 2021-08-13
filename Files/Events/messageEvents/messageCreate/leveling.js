@@ -138,7 +138,7 @@ module.exports = {
 						if (resR && resR.rowCount > 0) {
 							for (let i = 0; i < resR.rowCount; i++) {
 								const role = msg.guild.roles.cache.find(role => role.id === resR.rows[i].roleid);
-								if (!msg.guild.member(msg.author).roles.cache.has(role.id)) msg.guild.member(msg.author).roles.add(role).catch(() => {});
+								if (!msg.member.roles.cache.has(role.id)) msg.client.ch.role(msg.member, role, 1, 'add');
 							}
 						}
 					}

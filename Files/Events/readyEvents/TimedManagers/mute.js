@@ -25,7 +25,7 @@ module.exports = {
 										if (member) {
 											const language = await ch.languageSelector(guild);
 											if (member.roles.cache.has(muterole.id)) {
-												await member.roles.remove(muterole).catch(() => {});
+												client.ch.role(member, muterole, 1, 'del');
 												client.emit('muteRemove', (client.user, user, guild, language.ready.unmute.reason));
 												closed(guild, user, end);
 											} else closed(guild, user, end);
