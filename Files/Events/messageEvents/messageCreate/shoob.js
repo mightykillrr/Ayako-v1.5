@@ -27,42 +27,42 @@ module.exports = {
 								const rembed = new Discord.MessageEmbed();
 								if (amount > 19) {
 									if (!msg.member.roles.cache.has('755962444547096677')) {
-										msg.client.ch.role(msg.member, twentyRole, 1, 'add');
+										msg.member.roles.add(twentyRole).catch(() => {});
 										rembed.setColor('b0ff00')
 											.setDescription(`${user} now has the ${twentyRole} role`);    
 									}
 								} 
 								if (amount > 49) {
 									if (!msg.member.roles.cache.has('756331367561822258')) {
-										msg.client.ch.role(msg.member, fiftyRole, 1, 'add');
+										msg.member.roles.add(fiftyRole).catch(() => {});
 										rembed.setColor('b0ff00')
 											.setDescription(`${user} now has the ${fiftyRole} role`);    
 									}
 								} 
 								if (amount > 99) {
 									if (!msg.member.roles.cache.has('756331587616112660')) {
-										msg.client.ch.role(msg.member, hundretRole, 1, 'add');
+										msg.member.roles.add(hundretRole).catch(() => {});
 										rembed.setColor('b0ff00')
 											.setDescription(`${user} now has the ${hundretRole} role`);    
 									}
 								} 
 								if (amount > 499) {
 									if (!msg.member.roles.cache.has('756332260805967882')) {
-										msg.client.ch.role(msg.member, fivehundretRole, 1, 'add');
+										msg.member.roles.add(fivehundretRole).catch(() => {});
 										rembed.setColor('b0ff00')
 											.setDescription(`${user} now has the ${fivehundretRole} role`);    
 									}
 								}
 								if (amount > 999) {
 									if (!msg.member.roles.cache.has('756597164850806896')) {
-										msg.client.ch.role(msg.member, kRole, 1, 'add');
+										msg.member.roles.add(kRole).catch(() => {});
 										rembed.setColor('b0ff00')
 											.setDescription(`${user} now has the ${kRole} role`);    
 									}
 								}
 								if (amount > 4999) {
 									if (!msg.member.roles.cache.has('756597282891366434')) {
-										msg.client.ch.role(msg.member, fivekRole, 1, 'add');
+										msg.member.roles.add(fivekRole).catch(() => {});
 										rembed.setColor('b0ff00')
 											.setDescription(`${user} now has the ${fivekRole} role`);    
 									}

@@ -28,7 +28,7 @@ module.exports = {
 				return false;
 			}
 			let err;
-			const unmute = await msg.client.ch.role(target, role, 1, 'del');
+			const unmute = await target.roles.add(role).catch(() => {});
 			if (unmute) {
 				if ((memberClient.roles.highest.rawPosition < member.roles.highest.rawPosition || memberClient.roles.highest.rawPosition == member.roles.highest.rawPosition) || !memberClient.permissions.has(268435456)) return msg.client.ch.reply(msg, lan.meNoPerms);
 				const res = await msg.client.ch.query('SELECT * FROM logchannels WHERE guildid = $1;', [msg.guild.id]);

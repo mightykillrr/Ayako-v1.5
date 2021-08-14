@@ -33,7 +33,7 @@ module.exports = {
 				return false;
 			}
 			let err;
-			const Mute = await msg.client.ch.role(target, role, 1, 'add');
+			const Mute = await target.roles.add(role).catch(() => {});
 			if (Mute) {
 				const dmChannel = await target.createDM().catch(() => {});
 				const DMembed = new Discord.MessageEmbed()

@@ -31,7 +31,7 @@ module.exports = {
 							const successEmbed = new Discord.MessageEmbed()
 								.setDescription(`Congraz! You now have the ${PaidRole} role`)
 								.setColor('#b0ff00');
-							msg.client.ch.role(msg.member, PaidRole, 1, 'add');
+							msg.member.roles.add(PaidRole).catch(() => {});
 							msg.client.ch.reply(msg, successEmbed);
 						} else {
 							const successEmbed = new Discord.MessageEmbed()

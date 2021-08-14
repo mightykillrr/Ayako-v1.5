@@ -6,11 +6,11 @@ module.exports = {
 		const guild = member.guild;
 		const res = await ch.query('SELECT * FROM autorole WHERE guildid = $1;', [guild.id]);
 		if (res && res.rowCount > 0) {
-			for (let i = 0; i < +res.rowCount; i++) {
-				const r = res.rows[i];
-				const role = guild.roles.cache.get(r.roleid);
-				client.ch.role(member, role, 1, 'add');
-			} 
+			let roleArray = new Array;
+			res.rows.forEach((row) => {
+				if (guild.roles.cache.get(row.roleid)) roleArray.push(row.roleid);
+			});
+			if (roleArray.length > 0) member.roles.add(roleArray).catch(() => {});
 		}   
 	}
 };

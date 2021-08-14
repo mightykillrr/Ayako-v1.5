@@ -4,11 +4,12 @@ require('moment-duration-format');
 
 module.exports = {
 	async execute(oldMember, newMember) {
+		const takeThese = new Array, giveThese = new Array;
 		const client = oldMember ? oldMember.client : newMember.client;
 		const ch = client.ch;
 		const guild = oldMember ? oldMember.guild : newMember.guild;
+		if (guild.id == '715121965563772980') return;
 		const member = newMember ? newMember : await guild.members.fetch(newMember.id);
-		if (newMember.guild.id == '715121965563772980') return;
 		const res = await ch.query('SELECT * FROM roleseparator WHERE active = true AND guildid = $1;', [guild.id]);
 		if (res && res.rowCount > 0) {
 			res.rows.forEach(async (row) => {
@@ -33,7 +34,7 @@ module.exports = {
 									const role = guild.roles.cache.get(roles[i]);
 									if (member.roles.cache.has(role.id)) {
 										aknowledgedSeperator = true;
-										if (!member.roles.cache.has(separator.id)) client.ch.role(member, separator.id, 5, 'add');
+										if (!member.roles.cache.has(separator.id)) giveThese.push(separator.id);
 									}
 								}
 							}
@@ -41,15 +42,17 @@ module.exports = {
 							row.roles.forEach(async id => {
 								if (member.roles.cache.has(id)) {
 									aknowledgedSeperator = true;
-									if (!member.roles.cache.has(separator.id)) client.ch.role(member, separator.id, 5, 'add');
+									if (!member.roles.cache.has(separator.id)) giveThese.push(separator.id);
 								}
 							});
 						}
-						if (aknowledgedSeperator == false && member.roles.cache.has(separator.id)) client.ch.role(member, separator.id, 5, 'del');
+						if (aknowledgedSeperator == false && member.roles.cache.has(separator.id)) takeThese.push(separator.id);
 					} else ch.query('UPDATE roleseparator SET active = false WHERE separator = $1;', [row.separator]);
 				}
 			});
 		}
+		if (takeThese.length > 0) newMember.roles.remove(takeThese).catch(() => {});
+		if (giveThese.length > 0) newMember.roles.add(giveThese).catch(() => {});
 	},
 	async oneTimeRunner(msg, embed, clickButton) {
 		const client = msg.client;
@@ -60,6 +63,7 @@ module.exports = {
 		else {
 			msg.client.ch.query('UPDATE roleseparator SET lastrun = $1 WHERE guildid = $2;', [Date.now(), msg.guild.id]);
 			membersWithRoles = await this.getNewMembers(msg.guild, res);
+			await msg.guild.members.fetch();
 		}
 		await clickButton.deleteReply().catch(() => {});
 		if (membersWithRoles == 'timeout') {
@@ -83,19 +87,17 @@ module.exports = {
 				.setDescription(msg.lan.edit.oneTimeRunner.time);
 			msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 		} else {
-			let allRoles = 0;
 			membersWithRoles.forEach((m, index) => {
-				if (m.giveTheseRoles && m.removeTheseRoles) allRoles = allRoles + m.giveTheseRoles.length + m.removeTheseRoles.length;
-				else if (m.removeTheseRoles) allRoles = allRoles + m.removeTheseRoles.length; 
-				else if (m.giveTheseRoles) allRoles = allRoles + m.giveTheseRoles.length;
 				const fakeMember = m;
 				const realMember = msg.guild.members.cache.get(m.id);
-				if (fakeMember.giveTheseRoles) fakeMember.giveTheseRoles.forEach((roleID, rindex) => {
-					if (realMember.roles.cache.has(roleID)) membersWithRoles[index].giveTheseRoles.splice(rindex, 1); 
-				});
-				if (fakeMember.removeTheseRoles) fakeMember.removeTheseRoles.forEach((roleID, rindex) => {
-					if (!realMember.roles.cache.has(roleID)) membersWithRoles[index].removeTheseRoles.splice(rindex, 1);
-				});
+				if (realMember) {
+					if (fakeMember.giveTheseRoles) fakeMember.giveTheseRoles.forEach((roleID, rindex) => {
+						if (realMember.roles.cache.has(roleID)) membersWithRoles[index].giveTheseRoles.splice(rindex, 1); 
+					});
+					if (fakeMember.removeTheseRoles) fakeMember.removeTheseRoles.forEach((roleID, rindex) => {
+						if (!realMember.roles.cache.has(roleID)) membersWithRoles[index].removeTheseRoles.splice(rindex, 1);
+					});
+				}
 			});
 			embed
 				.setAuthor(
@@ -103,15 +105,15 @@ module.exports = {
 					msg.client.constants.emotes.settingsLink, 
 					msg.client.constants.standard.invite
 				)								
-				.setDescription(msg.client.ch.stp(msg.lan.edit.oneTimeRunner.stats, {members: membersWithRoles && membersWithRoles.length > 0 ? membersWithRoles.length : '0', roles: allRoles && allRoles > 0 ? allRoles : '0', time: moment.duration(allRoles * 1000).format(`d [${msg.language.time.days}], h [${msg.language.time.hours}], m [${msg.language.time.minutes}], s [${msg.language.time.seconds}]`), finishTime: `<t:${Math.floor(Date.now()/1000) + allRoles}:F> (<t:${Math.floor(Date.now()/1000) + allRoles}:R>)`}));
+				.setDescription(msg.client.ch.stp(msg.lan.edit.oneTimeRunner.stats, {members: membersWithRoles && membersWithRoles.length > 0 ? membersWithRoles.length : '0', roles: membersWithRoles && membersWithRoles.length > 0 ? (membersWithRoles.length * 2) : '0', time: moment.duration((membersWithRoles ? membersWithRoles.length*2 : 0) * 1000).format(`d [${msg.language.time.days}], h [${msg.language.time.hours}], m [${msg.language.time.minutes}], s [${msg.language.time.seconds}]`), finishTime: `<t:${Math.floor(Date.now()/1000) + (membersWithRoles ? membersWithRoles.length*2 : 0)}:F> (<t:${Math.floor(Date.now()/1000) + (membersWithRoles ? membersWithRoles.length*2 : 0)}:R>)`}));
 			msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 		}
 		this.assinger(msg, membersWithRoles);
 	},
 	async getNewMembers(guild, res) {
+		await guild.members.fetch();
 		const obj = new Object;
 		obj.members = new Array, obj.separators = new Array, obj.rowroles = new Array, obj.roles = new Array, obj.highestRole = new Object({id: guild.roles.highest.id, rawPosition: guild.roles.highest.rawPosition});
-		await guild.members.fetch();
 		guild.members.cache.forEach(member => {
 			const roles = new Array; 
 			member.roles.cache.forEach(role => {
@@ -148,30 +150,15 @@ module.exports = {
 	async assinger(msg, membersWithRoles) {
 		if (membersWithRoles.length > 0) {
 			membersWithRoles = membersWithRoles.sort((a,b) => {a.id - b.id;});
-			for (let i = 0; i < membersWithRoles.length; i++) {
-				const giveRoles = membersWithRoles[i].giveTheseRoles;
-				const takeRoles = membersWithRoles[i].removeTheseRoles;
-				const member = msg.guild.members.cache.get(membersWithRoles[i].id);
-				const timeOut = i == 0 ? 0 : +i * 1000 * +(giveRoles ? +giveRoles.length : 0 + takeRoles ? +takeRoles.length : 0);
-				setTimeout(async () => {
-					if (giveRoles) {
-						for (let j = 0; j < giveRoles.length; j++) {
-							const r = giveRoles[j];
-							setTimeout(() => {
-								if (!member.roles.cache.has(r)) msg.client.ch.role(member, r, 5, 'add');
-							}, j*giveRoles.length);
-						}
-					}
-					if (takeRoles) {
-						for (let j = 0; j < takeRoles.length; j++) {
-							const r = takeRoles[j];
-							setTimeout(() => {
-								if (member.roles.cache.has(r)) msg.client.ch.role(member, r, 5, 'del');
-							}, j*takeRoles.length);
-						}
-					}
-				}, timeOut);
-			}
+			membersWithRoles.forEach((raw, index) => {
+				setTimeout(() => {
+					const giveRoles = raw.giveTheseRoles;
+					const takeRoles = raw.removeTheseRoles;
+					const member = msg.guild.members.cache.get(raw.id);
+					if (giveRoles) member.roles.add(giveRoles).catch(() => {});
+					if (takeRoles) member.roles.remove(takeRoles).catch(() => {});
+				}, index * 3000);
+			});
 		}
 	}
 };

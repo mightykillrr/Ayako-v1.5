@@ -139,8 +139,7 @@ module.exports = {
 				msg.command = msg.client.commands.get('cmdhelp');
 				this.thisGuildOnly(msg);
 			}
-		} else msg.client.ch.reply(msg, msg.language.commands.commandHandler.GuildOnly);
-
+		} else return msg.client.ch.reply(msg, msg.language.commands.commandHandler.GuildOnly);
 	},
 	async commandExe(msg) {
 		if (msg.channel.type !== 'DM') {

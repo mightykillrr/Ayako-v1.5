@@ -15,7 +15,7 @@ module.exports = {
 			if (!Muterole) Muterole = guild.roles.cache.find(r => r.name.toLowerCase() == 'muted');
 			if (Muterole) {
 				if (!member.roles.cache.has(Muterole.id)) { 
-					const mres = client.ch.role(member, Muterole, 1, 'add');
+					const mres = await member.roles.add(Muterole).catch(() => {});
 					if (mres) wasMuted = true;
 				} else wasMuted = false;
 			}
@@ -31,7 +31,7 @@ module.exports = {
 			if (!Muterole) Muterole = guild.roles.cache.find(r => r.name.toLowerCase() == 'muted');
 			if (Muterole) {
 				if (!member.roles.cache.has(Muterole.id)) { 
-					const mres = client.ch.role(member, Muterole, 1, 'add');
+					const mres = await member.roles.add(Muterole).catch(() => {});
 					if (mres) wasMuted = true;
 				} else wasMuted = false;
 			}

@@ -26,7 +26,6 @@ async function getMembers(wd) {
 	} else return;
 	let  membersWithRoles = new Array;
 	const promised = await new Promise((resolve,) => {
-		
 		for (let i = 0; obj.members.length > i; i++) {
 			const member = obj.members[i];
 			roles.forEach(roleArr => {
@@ -59,7 +58,6 @@ async function getMembers(wd) {
 			});
 		}
 		membersWithRoles = membersWithRoles.filter(m => (m.giveTheseRoles && m.giveTheseRoles.length > 0) || (m.removeTheseRoles && m.removeTheseRoles.length > 0));
-
 		resolve(true);
 	});
 	const int = setInterval(() => {
