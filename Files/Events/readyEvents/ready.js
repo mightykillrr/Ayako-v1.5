@@ -25,6 +25,7 @@ module.exports = {
 		setInterval(() => {require('./giveaway.js').execute();}, 11000);
 		setInterval(() => {require('./prunelog.js').execute();}, 120000);
 		setInterval(() => {require('./presence.js').execute();}, 60000);
+		require('./separators.js').execute();
 		setInterval(() => {console.log(new Date().toUTCString());}, 600000);
 	}
 };

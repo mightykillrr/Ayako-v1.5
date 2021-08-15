@@ -2111,7 +2111,8 @@
                         "timeout": "The Operation timed out, please contact Support\nhttps://support.ayakobot.com",
                         "recommended": "Are you sure you want to run this Function?\nThis can only be run __**once** every 7 Days__",
                         "stats": "Adding and Removing `{{roles}}` Roles from `{{members}}` Server Members\nThis Process may take up to `{{time}}` until finished,\nand will be finished at approximately {{finishTime}}",
-                        "answers": "`Yes` or `No`"
+                        "answers": "`Yes` or `No`",
+                        "stillrunning": "The last initiated process is still running"
                     }
                 },
                 "otherEdits": {

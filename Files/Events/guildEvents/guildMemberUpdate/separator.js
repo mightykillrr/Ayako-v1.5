@@ -59,9 +59,10 @@ module.exports = {
 		const ch = client.ch;
 		const res = await ch.query('SELECT * FROM roleseparator WHERE active = true AND guildid = $1;', [msg.guild.id]);
 		let membersWithRoles;
-		if (+res.rows[0].lastrun + 604800000 > Date.now()) membersWithRoles = false;
+		if (+res.rows[0].lastrun + 604800000 > Date.now() && msg.author.id !== client.user.id) membersWithRoles = false;
+		else if (res.rows[0].stillrunning && msg.author.id !== client.user.id) membersWithRoles = true;
 		else {
-			msg.client.ch.query('UPDATE roleseparator SET lastrun = $1 WHERE guildid = $2;', [Date.now(), msg.guild.id]);
+			msg.client.ch.query('UPDATE roleseparator SET lastrun = $1, stillrunning = $3 WHERE guildid = $2;', [Date.now(), msg.guild.id, true]);
 			membersWithRoles = await this.getNewMembers(msg.guild, res);
 			await msg.guild.members.fetch();
 		}
@@ -75,17 +76,29 @@ module.exports = {
 				)
 				.setDescription(msg.lan.edit.oneTimeRunner.timeout);
 			msg.m.edit({embeds: [embed], components: []}).catch(() => {});
+			msg.client.ch.query('UPDATE roleseparator SET lastrun = $1, stillrunning = $3 WHERE guildid = $2;', [null, msg.guild.id, false]);
 			return;
 		}
 		if (!Array.isArray(membersWithRoles)) {
-			embed
-				.setAuthor(
-					msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
-					msg.client.constants.emotes.settingsLink, 
-					msg.client.constants.standard.invite
-				)
-				.setDescription(msg.lan.edit.oneTimeRunner.time);
-			msg.m.edit({embeds: [embed], components: []}).catch(() => {});
+			if (!membersWithRoles) {
+				embed
+					.setAuthor(
+						msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+						msg.client.constants.emotes.settingsLink, 
+						msg.client.constants.standard.invite
+					)
+					.setDescription(msg.lan.edit.oneTimeRunner.time);
+				msg.m.edit({embeds: [embed], components: []}).catch(() => {});
+			} else {
+				embed
+					.setAuthor(
+						msg.client.ch.stp(msg.lanSettings.author, {type: msg.lan.type}), 
+						msg.client.constants.emotes.settingsLink, 
+						msg.client.constants.standard.invite
+					)
+					.setDescription(msg.lan.edit.oneTimeRunner.stillrunning);
+				msg.m.edit({embeds: [embed], components: []}).catch(() => {});
+			}
 		} else {
 			membersWithRoles.forEach((m, index) => {
 				const fakeMember = m;
@@ -105,9 +118,10 @@ module.exports = {
 					msg.client.constants.emotes.settingsLink, 
 					msg.client.constants.standard.invite
 				)								
-				.setDescription(msg.client.ch.stp(msg.lan.edit.oneTimeRunner.stats, {members: membersWithRoles && membersWithRoles.length > 0 ? membersWithRoles.length : '0', roles: membersWithRoles && membersWithRoles.length > 0 ? (membersWithRoles.length * 2) : '0', time: moment.duration((membersWithRoles ? membersWithRoles.length*2 : 0) * 1000).format(`d [${msg.language.time.days}], h [${msg.language.time.hours}], m [${msg.language.time.minutes}], s [${msg.language.time.seconds}]`), finishTime: `<t:${Math.floor(Date.now()/1000) + (membersWithRoles ? membersWithRoles.length*2 : 0)}:F> (<t:${Math.floor(Date.now()/1000) + (membersWithRoles ? membersWithRoles.length*2 : 0)}:R>)`}));
+				.setDescription(msg.client.ch.stp(msg.lan.edit.oneTimeRunner.stats, {members: membersWithRoles && membersWithRoles.length > 0 ? membersWithRoles.length : '0', roles: membersWithRoles && membersWithRoles.length > 0 ? (membersWithRoles.length * 3) : '0', time: moment.duration((membersWithRoles ? membersWithRoles.length*2 : 0) * 1000).format(`d [${msg.language.time.days}], h [${msg.language.time.hours}], m [${msg.language.time.minutes}], s [${msg.language.time.seconds}]`), finishTime: `<t:${Math.floor(Date.now()/1000) + (membersWithRoles ? membersWithRoles.length*3 : 0)}:F> (<t:${Math.floor(Date.now()/1000) + (membersWithRoles ? membersWithRoles.length*3 : 0)}:R>)`}));
 			msg.m.edit({embeds: [embed], components: []}).catch(() => {});
 		}
+		msg.client.ch.query('UPDATE roleseparator SET finishat = $1 WHERE guildid = $2;', [Math.floor(Date.now()/1000) + (membersWithRoles ? membersWithRoles.length*3 : 0), msg.guild.id]);
 		this.assinger(msg, membersWithRoles);
 	},
 	async getNewMembers(guild, res) {
@@ -150,13 +164,14 @@ module.exports = {
 	async assinger(msg, membersWithRoles) {
 		if (membersWithRoles.length > 0) {
 			membersWithRoles = membersWithRoles.sort((a,b) => {a.id - b.id;});
-			membersWithRoles.forEach((raw, index) => {
-				setTimeout(() => {
+			membersWithRoles.forEach( (raw, index) => {
+				setTimeout(async () => {
 					const giveRoles = raw.giveTheseRoles;
 					const takeRoles = raw.removeTheseRoles;
 					const member = msg.guild.members.cache.get(raw.id);
-					if (giveRoles) member.roles.add(giveRoles).catch(() => {});
-					if (takeRoles) member.roles.remove(takeRoles).catch(() => {});
+					if (giveRoles) await member.roles.add(giveRoles).catch(() => {});
+					if (takeRoles) await member.roles.remove(takeRoles).catch(() => {});
+					if (index == (membersWithRoles.lengt-1)) msg.client.ch.query('UPDATE roleseparator SET stillrunning = $1 WHERE guildid = $2;', [false, msg.guild.id]);
 				}, index * 3000);
 			});
 		}

@@ -58,7 +58,7 @@ module.exports = {
 			m = await webhook.send(options).catch(() => {channel.force = true; this.send(channel, options);});
 			if (m) m.sentAs = webhook;
 		} else {
-			m = await channel.send(options).catch((e) => {this.logger('Send Error', e);});
+			m = await channel.send(options).catch(() => {});
 			if (m) m.sentAs = client.user;
 		}
 		return m;

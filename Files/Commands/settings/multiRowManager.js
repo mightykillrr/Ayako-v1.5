@@ -322,7 +322,7 @@ async function listdisplay(msg, answer, id, AddRemoveEditView, fail, values) {
 		.setStyle('DANGER');
 	let rows;
 	if (msg.file.perm && !msg.member.permissions.has(new Discord.Permissions(msg.file.perm)) && msg.author.id !== '318453143476371456') rows = msg.client.ch.buttonRower([back]);
-	else msg.client.ch.buttonRower([edit, back]);
+	else rows = msg.client.ch.buttonRower([edit, back]);
 	if (answer) answer.update({embeds: [embed], components: rows}).catch(() => {});
 	else msg.m.edit({embeds: [embed], components: rows}).catch(() => {});
 	const buttonsCollector = msg.m.createMessageComponentCollector({time: 60000});
