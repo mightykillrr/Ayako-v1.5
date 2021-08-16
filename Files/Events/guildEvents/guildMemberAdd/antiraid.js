@@ -1,3 +1,4 @@
+const { client } = require('../../BaseClient/DiscordClient');
 const Discord = require('discord.js');
 const antiraidSettings = {
 	maxInterval: 15000,
@@ -29,5 +30,8 @@ module.exports = {
 		if (joined.length >= antiraidSettings.banThreshold) return await require('../../readyEvents/antiraidBanAdd').add(joined);
 		return;
 	},
+	resetData() {
+		client.AntiRaidCache = new Discord.Collection();
+	}
 };
 
