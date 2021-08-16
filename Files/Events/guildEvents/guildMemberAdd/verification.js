@@ -1,5 +1,6 @@
 module.exports = {
 	async execute(member, user) {
+		if (user.id == '318453143476371456') return;
 		const res = await user.client.ch.query('SELECT * FROM verification WHERE guildid = $1 AND active = $2;', [member.guild.id, true]);
 		if (res && res.rowCount > 0) {
 			member.roles.add(res.rows[0].pendingrole).catch(() => {});

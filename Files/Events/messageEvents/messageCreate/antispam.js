@@ -12,18 +12,7 @@ const antiSpamSettings = {
 	maxDuplicatesofWarning: 7, 
 	maxDuplicatesMute: 10,
 	maxDuplicatesKick: 13,
-	maxDuplicatesBan: 16,
-	ignoreBots: true,
-	verbose: false,
-	ignoredUsers: [], 
-	ignoredRoles: [],
-	ignoredGuilds: [],
-	ignoredChannels: [],
-	warnEnabled: true,
-	muteEnabled: true,
-	kickEnabled: true,
-	banEnabled: true,
-	deleteMessagesAfterBanForPastDays: 1
+	maxDuplicatesBan: 16
 };
 
 let data = {
@@ -41,34 +30,19 @@ module.exports = {
 		if (msg.channel.type == 'DM') return;
 		if (msg.author.id === msg.client.user.id) return;
 		if (msg.author.bot) return;
-		let warnnr;
-		const guildSettings = {};
-		const res = await msg.client.ch.query('SELECT * FROM antispamsettings WHERE guildid = $1;', [msg.guild.id]);
-		if (res && res.rowCount > 0) {
-			guildSettings.guildid = res.rows[0].guildid;
-			guildSettings.bpchannelID = res.rows[0].bpchannelid;
-			guildSettings.bpuserID = res.rows[0].bpuserid;
-			guildSettings.bproleID = res.rows[0].bproleid;
-			guildSettings.antispamToF = res.rows[0].antispamtof;
-			guildSettings.giveofficialWarnsToF = res.rows[0].giveofficialwarnstof;
-			guildSettings.muteAfterWarnsAmount = res.rows[0].muteafterwarnsamount;
-			guildSettings.KickAfterWarnsAmount = res.rows[0].kickafterwarnsamount;
-			guildSettings.BanAfterWarnsAmount = res.rows[0].banafterwarnsamount;
-			guildSettings.readOfWarnsToF = res.rows[0].readofwarnstof;
-			guildSettings.muteEnabledToF = res.rows[0].muteenabledtof;
-			guildSettings.kickEnabledToF = res.rows[0].kickenabledtof;
-			guildSettings.banEnabledToF = res.rows[0].banenabledtof;
-			guildSettings.deleteToF = res.rows[0].deletetof;
-		} else return;
+		let warnnr, guildSettings;
+		const res = await msg.client.ch.query('SELECT * FROM antispamsettings WHERE guildid = $1 AND active = $2;', [msg.guild.id, true]);
+		if (res && res.rowCount > 0) guildSettings = res.rows[0];
+		else return;
 		const res2 = await msg.client.ch.query('SELECT * FROM warns WHERE guildid = $1 AND userid = $2;', [msg.guild.id, msg.author.id]);
 		if (res2 && res2.rowCount > 0) warnnr = res2.rowCount;
 		else warnnr = 1;
 		msg.member = await msg.guild.members.fetch(msg.author.id);
 		if (!msg.member) return;
 		if (msg.member.permissions.has(8n)) return;
-		if (guildSettings.bpchannelID) {if (guildSettings.bpchannelID.includes(msg.channel.id)) return;}
-		if (guildSettings.bpuserID) {if (guildSettings.bpuserID.includes(msg.author.id)) return;}
-		if (guildSettings.bproleID) {if (msg.member.roles.cache.some(role => guildSettings.bproleID.includes(role.id))) return;}
+		if (guildSettings.bpchannelid) {if (guildSettings.bpchannelid.includes(msg.channel.id)) return;}
+		if (guildSettings.bpuserid) {if (guildSettings.bpuserid.includes(msg.author.id)) return;}
+		if (guildSettings.bproleid) {if (msg.member.roles.cache.some(role => guildSettings.bproleid.includes(role.id))) return;}
 		msg.language = await msg.client.ch.languageSelector(msg.guild);
 		const banUser = async () => {
 			data.messageCache = data.messageCache.filter(m => m.author !== msg.author.id);
@@ -92,13 +66,13 @@ module.exports = {
 		};
 		const ofwarnUser = async () => {
 			data.ofwarnedUsers.push(msg.author.id);
-			if (guildSettings.readOfWarnsToF == true) {
-				if (warnnr == guildSettings.BanAfterWarnsAmount && guildSettings.banEnabledToF == true) await kickUser(msg); 
-				else if (warnnr == guildSettings.KickAfterWarnsAmount && guildSettings.kickEnabledToF == true) await banUser(msg);
-				else if (warnnr == guildSettings.muteAfterWarnsAmount && guildSettings.muteEnabledToF == true) await muteUser(msg);
+			if (guildSettings.readofwarnstof == true) {
+				if (warnnr == guildSettings.banafterwarnsamount && guildSettings.banenabledtof == true) await kickUser(msg); 
+				else if (warnnr == guildSettings.kickafterwarnsamount && guildSettings.kickenabledtof == true) await banUser(msg);
+				else if (warnnr == guildSettings.muteafterwarnsamount && guildSettings.muteenabledtof == true) await muteUser(msg);
 				else msg.client.emit('antispamOfwarnAdd', msg);
 			} 
-			if (guildSettings.readOfWarnsToF == false) msg.client.emit('ofwarnAdd', (msg));
+			if (guildSettings.readofwarnstof == false) msg.client.emit('ofwarnAdd', (msg));
 			return;
 		};
 		data.messageCache.push({
@@ -109,26 +83,11 @@ module.exports = {
 		const messageMatches = data.messageCache.filter(m => m.time > Date.now() - antiSpamSettings.maxDuplicatesInterval && m.content === msg.content && m.author === msg.author.id ).length;
 		const spamMatches = data.messageCache.filter(m => m.time > Date.now() - antiSpamSettings.maxInterval && m.author === msg.author.id).length;
 
-		if (!data.warnedUsers.includes(msg.author.id) && (spamMatches === antiSpamSettings.warnThreshold || messageMatches === antiSpamSettings.maxDuplicatesWarning)) {
-			warnUser(msg);
-			return msg.client.emit('spamThresholdWarn', (msg, messageMatches === antiSpamSettings.maxDuplicatesWarning));
-		}
-		if (!data.mutedUsers.includes(msg.author.id) && (spamMatches === antiSpamSettings.muteThreshold || messageMatches === antiSpamSettings.maxDuplicatesMute)) {
-			if (guildSettings.muteEnabledToF == true) muteUser(msg);
-			return msg.client.emit('spamThresholdMute', (msg, messageMatches === antiSpamSettings.maxDuplicatesMute));
-		}
-		if (!data.ofwarnedUsers.includes(msg.author.id) && (spamMatches === antiSpamSettings.ofwarnThreshold || messageMatches === antiSpamSettings.maxDuplicatesofWarning)) {
-			if (guildSettings.giveofficialWarnsToF == true) ofwarnUser(msg);
-			return msg.client.emit('spamThresholdOfWarn', (msg, messageMatches === antiSpamSettings.maxDuplicatesofWarning));
-		}
-		if (!data.kickedUsers.includes(msg.author.id) && (spamMatches === antiSpamSettings.kickThreshold || messageMatches === antiSpamSettings.maxDuplicatesKick)) {
-			if (guildSettings.kickEnabledToF == true) await kickUser(msg);
-			return msg.client.emit('spamThresholdKick', (msg, messageMatches === antiSpamSettings.maxDuplicatesKick));
-		}
-		if (spamMatches === antiSpamSettings.banThreshold || messageMatches === antiSpamSettings.maxDuplicatesBan) {
-			if (guildSettings.banEnabledToF == true) await banUser(msg);
-			return msg.client.emit('spamThresholdBan', (msg, messageMatches === antiSpamSettings.maxDuplicatesBan));
-		}
+		if (!data.warnedUsers.includes(msg.author.id) && (spamMatches === antiSpamSettings.warnThreshold || messageMatches === antiSpamSettings.maxDuplicatesWarning)) return await warnUser(msg);
+		if (!data.mutedUsers.includes(msg.author.id) && (spamMatches === antiSpamSettings.muteThreshold || messageMatches === antiSpamSettings.maxDuplicatesMute) && guildSettings.muteenabledtof == true) return await muteUser(msg);
+		if (!data.ofwarnedUsers.includes(msg.author.id) && (spamMatches === antiSpamSettings.ofwarnThreshold || messageMatches === antiSpamSettings.maxDuplicatesofWarning) && guildSettings.giveofficialwarnstof == true) return await ofwarnUser(msg);
+		if (!data.kickedUsers.includes(msg.author.id) && (spamMatches === antiSpamSettings.kickThreshold || messageMatches === antiSpamSettings.maxDuplicatesKick) && guildSettings.kickenabledtof == true) return await kickUser(msg);
+		if (spamMatches === antiSpamSettings.banThreshold || messageMatches === antiSpamSettings.maxDuplicatesBan && guildSettings.banenabledtof == true) return await banUser(msg);
 		return;
 	},
 	resetData() {

@@ -443,6 +443,11 @@
                     "bpuserid": "users",
                     "readofwarnstof": "boolean"
                 },
+                "antiraid": {
+                    "active": "boolean",
+                    "logchannelid": "channel",
+                    "pingrole": "role"
+                },
                 "autorole": {
                     "active": "boolean",
                     "botroleid": "roles",
@@ -553,6 +558,7 @@
                 "cooldowns": "cooldowns",
                 "antispam": "antispamsettings",
                 "antivirus": "antivirus",
+                "antiraid": "antiraidsettings",
                 "blacklist": "blacklists",
                 "autorole": "autorole",
                 "disabled": "disabledcommands",
@@ -584,6 +590,10 @@
                 "antispam": {
                     "cols": "active, giveofficialwarnstof, muteafterwarnsamount, kickafterwarnsamount, banafterwarnsamount, readofwarnstof, muteenabledtof, kickenabledtof, banenabledtof, guildid",
                     "vals": [true, true, 3, 5, 6, true, true, false, true, "{{msg.guild.id}}"]
+                },
+                "antiraid": {
+                    "cols": "guildid, active",
+                    "vals": ["{{msg.guild.id}}", true]
                 },
                 "blacklist": {
                     "cols": "guildid, active, warntof, mutetof, kicktof, bantof, warnafter, muteafter, kickafter, banafter",
