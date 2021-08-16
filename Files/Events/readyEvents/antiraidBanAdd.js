@@ -14,7 +14,7 @@ module.exports = {
 			if (guild) {
 				users.sorted.forEach(async (userID) => {
 					const user = client.users.cache.get(userID), msg = new Object;
-					msg.language = await client.ch.languageSelector(guild), msg.client = client;
+					msg.language = await client.ch.languageSelector(guild), msg.client = client, msg.guild = guild;
 					client.emit('modBanAdd', client.user, user, msg.language.autotypes.antiraid, msg);
 				});
 			}
