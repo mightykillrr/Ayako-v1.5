@@ -6,5 +6,6 @@ module.exports = {
 		require('./mute.js').execute(member, user);
 		require('./welcome.js').execute(member, user);
 		require('./verification.js').execute(member, user);
+		require('./antiraid.js').execute(member, user);
 	}
 };

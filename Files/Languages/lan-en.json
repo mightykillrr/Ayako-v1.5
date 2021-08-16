@@ -766,6 +766,7 @@
     "incoming": "Incoming",
     "stageOpen": "Stage Channel Opened/Closed",
     "spam": "Spam",
+    "raid": "Raid",
     "requestedBy": "Requested by {{user.tag}}",
     "notYours": "You cannot interact with someone else's Messages",
     "next": "Next",
@@ -785,6 +786,11 @@
             "name": "English",
             "status": "unfinished"
         }
+    },
+    "autotypes": {
+        "antispam": "Ayako Anti-Spam",
+        "antiraid": "Ayako Anti-Raid",
+        "blacklist": "Ayako Blacklist"
     },
     "select": {
         "roles": {
@@ -1325,6 +1331,39 @@
                         "name": "**Read Warnings** (required for the following 3 options)",
                         "answers": "`True` or `False`",
                         "recommended": "Recommended: `True`"
+                    }
+                }
+            },
+            "antiraid": {
+                "category": ["Auto Moderation"],
+                "type": "Anti-Raid",
+                "logchannelid": "Log Channel",
+                "pingrole": "Ping Role",
+                "edit": {
+                    "active": {
+                        "name": "Active",
+                        "answers": "`True` or `False`",
+                        "recommended": "Recommended: `True`"
+                    },
+                    "logchannelid": {
+                        "name": "Log Channel",
+                        "recommended": "The Channel in which to Log Raids.",
+                        "select": "Select a Channel",
+                        "desc": "Select the Channel below",
+                        "fail": {
+                            "no": "I couldn't find this Channel\n",
+                            "wrongGuild": "This Channel is not Part of this Server\n"
+                        }
+                    },
+                    "pingrole": {
+                        "name": "Ping Role",
+                        "recommended": "The Role which to Ping when a Raid is detected.",
+                        "select": "Select a Role",
+                        "desc": "Select the Role below",
+                        "fail": {
+                            "no": "I couldn't find this Role\n",
+                            "wrongGuild": "This Role is not Part of this Server\n"
+                        }
                     }
                 }
             },
