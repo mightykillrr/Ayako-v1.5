@@ -444,9 +444,7 @@
                     "readofwarnstof": "boolean"
                 },
                 "antiraid": {
-                    "active": "boolean",
-                    "logchannelid": "channel",
-                    "pingrole": "role"
+                    "active": "boolean"
                 },
                 "autorole": {
                     "active": "boolean",

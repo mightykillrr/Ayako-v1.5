@@ -6,7 +6,7 @@ module.exports = {
 	execute() {
 		UserCache.map(o => o).forEach((obj) => {
 			obj.joins.forEach((users) => {
-				if (users.length > 10) banThese(users);
+				if (users.sorted.length > 10) banThese(users);
 			});
 		});
 		function banThese(users) {
