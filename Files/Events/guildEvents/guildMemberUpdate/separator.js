@@ -1,16 +1,13 @@
 const { Worker } = require('worker_threads');
 const moment = require('moment');
 require('moment-duration-format');
-const Discord = require('discord.js');
-const timeOuts = new Discord.Collection();
 
 module.exports = {
 	async execute(oldMember, newMember) {
 		const client = newMember ? newMember.client : oldMember.client;
 		const ch = client.ch;
 		const guild = newMember ? newMember.guild : oldMember.guild;
-		//if (guild.id == '715121965563772980') return;
-		const member = newMember ? newMember : await guild.members.fetch(newMember.id);
+		const member = await guild.members.fetch(newMember.id);
 		const res = await ch.query('SELECT * FROM roleseparator WHERE active = true AND guildid = $1;', [guild.id]);
 		const giveThese = new Array, takeThese = new Array;
 		if (res && res.rowCount > 0) {
@@ -35,24 +32,22 @@ module.exports = {
 								if (member.roles.cache.has(role.id)) has.push(true);
 								else has.push(false); 
 							});
-							if (has.includes(true)) giveThese.push(sep.id);
-							else takeThese.push(sep.id);
+							if (has.includes(true) && !member.roles.cache.has(sep.id)) giveThese.push(sep.id);
+							else if (!has.includes(true) && member.roles.cache.has(sep.id)) takeThese.push(sep.id);
 						} else {
 							const has = new Array;
 							row.roles.forEach(role => {
 								if (member.roles.cache.cache.has(role)) has.push(true);
 								else has.push(false);
 							});
-							if (has.includes(true)) giveThese.push(sep.id);
-							else takeThese.push(sep.id);
+							if (has.includes(true) && !member.roles.cache.has(sep.id)) giveThese.push(sep.id);
+							else if (!has.includes(true) && member.roles.cache.has(sep.id)) takeThese.push(sep.id);
 						}
 					} else ch.query('UPDATE roleseparator SET active = false WHERE separator = $1;', [row.separator]);
 				}
 			});
 		}
-		giveThese.forEach((roleID, index) => {if (member.roles.cache.has(roleID)) giveThese.splice(index, 1);});
 		if (giveThese.length > 0) await member.roles.add(giveThese).catch(() => {});
-		takeThese.forEach((roleID, index) => {if (!member.roles.cache.has(roleID)) takeThese.splice(index, 1);});
 		if (takeThese.length > 0) await member.roles.remove(takeThese).catch(() => {});
 	},
 	async oneTimeRunner(msg, embed, clickButton) {
