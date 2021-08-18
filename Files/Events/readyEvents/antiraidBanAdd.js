@@ -10,6 +10,7 @@ module.exports = {
 			});
 		});
 		function banThese(users) {
+			console.log(0, users);
 			const guild = client.guilds.cache.get(users.guild);
 			if (guild) {
 				users.sorted.forEach(async (userID) => {
@@ -22,6 +23,7 @@ module.exports = {
 		}
 	},
 	async add(users) {
+		console.log(1, users);
 		users.forEach((user) => {
 			if (client.AntiRaidCache.get(users[0].guild)) {
 				if (client.AntiRaidCache.get(users[0].guild).joins.get(user.id.slice(0, 3))) client.AntiRaidCache.get(users[0].guild).joins.get(user.id.slice(0, 3)).sorted.push(user.id);

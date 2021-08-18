@@ -19,7 +19,7 @@ module.exports = {
 				require('./nitro').execute();
 				ch.query('DELETE FROM toxicitycheck;');
 				require('../messageEvents/messageCreate/antispam').resetData();
-				require('./antiraidBanAdd').resetData();
+				require('../guildEvents/guildMemberAdd/antiraid').resetData();
 			}
 		}, 3600000);
 		setInterval(() => {require('./TimedManagers/timedManagerSplitter').execute();}, 2000);
