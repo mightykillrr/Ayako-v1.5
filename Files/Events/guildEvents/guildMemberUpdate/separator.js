@@ -1,58 +1,59 @@
 const { Worker } = require('worker_threads');
 const moment = require('moment');
 require('moment-duration-format');
+const Discord = require('discord.js');
+const timeOuts = new Discord.Collection();
 
 module.exports = {
 	async execute(oldMember, newMember) {
-		const takeThese = new Array, giveThese = new Array;
-		const client = oldMember ? oldMember.client : newMember.client;
+		const client = newMember ? newMember.client : oldMember.client;
 		const ch = client.ch;
-		const guild = oldMember ? oldMember.guild : newMember.guild;
-		if (guild.id == '715121965563772980') return;
+		const guild = newMember ? newMember.guild : oldMember.guild;
+		//if (guild.id == '715121965563772980') return;
 		const member = newMember ? newMember : await guild.members.fetch(newMember.id);
 		const res = await ch.query('SELECT * FROM roleseparator WHERE active = true AND guildid = $1;', [guild.id]);
+		const giveThese = new Array, takeThese = new Array;
 		if (res && res.rowCount > 0) {
 			res.rows.forEach(async (row) => {
 				const guild = client.guilds.cache.get(row.guildid);
 				if (guild) {
-					const separator = guild.roles.cache.get(row.separator);
-					if (separator) {
-						let aknowledgedSeperator = false;
+					const sep = guild.roles.cache.get(row.separator);
+					if (sep) {
 						if (row.isvarying) {
-							const roles = [];
+							const stop = row.stoprole ? guild.roles.cache.get(row.stoprole) : null;
+							const affectedRoles = new Array;
+							const roles = guild.roles.cache.sort((a, b) => a.rawPosition - b.rawPosition).map(o => o);
 							if (row.stoprole) {
-								const stopRole = guild.roles.cache.get(row.stoprole);
-								if (stopRole) {
-									guild.roles.cache.forEach(r => {
-										if ((stopRole.rawPosition > separator.rawPosition) && (r.rawPosition < stopRole.rawPosition && r.rawPosition > separator.rawPosition)) roles.push(r.id);
-										else if ((stopRole.rawPosition < separator.rawPosition) && (r.rawPosition > stopRole.rawPosition && r.rawPosition < separator.rawPosition)) roles.push(r.id);
-									});
-								} else ch.query('UPDATE roleseparator SET active = false WHERE stoprole = $1;', [row.stoprole]);
-							} else guild.roles.cache.forEach(r => {if (r.rawPosition > separator.rawPosition) roles.push(r.id);});
-							if (roles[0]) {
-								for (let i = 0; i < roles.length; i++) {
-									const role = guild.roles.cache.get(roles[i]);
-									if (member.roles.cache.has(role.id)) {
-										aknowledgedSeperator = true;
-										if (!member.roles.cache.has(separator.id)) giveThese.push(separator.id);
-									}
-								}
+								if (sep.rawPosition > stop.rawPosition) for (let i = stop.rawPosition+1; i < roles.length && i < sep.rawPosition; i++) affectedRoles.push(roles[i]);
+								else for (let i = sep.rawPosition+1; i < roles.length && i < stop.rawPosition; i++) affectedRoles.push(roles[i]);
+							} else {
+								if (sep.rawPosition >= guild.roles.highest.rawPosition) null;
+								else for (let i = sep.rawPosition+1; i < roles.length && i < guild.roles.highest.rawPosition; i++) affectedRoles.push(roles[i]);
 							}
-						} else {
-							row.roles.forEach(async id => {
-								if (member.roles.cache.has(id)) {
-									aknowledgedSeperator = true;
-									if (!member.roles.cache.has(separator.id)) giveThese.push(separator.id);
-								}
+							const has = new Array;
+							affectedRoles.map(o => o).forEach(role => {
+								if (member.roles.cache.has(role.id)) has.push(true);
+								else has.push(false); 
 							});
+							if (has.includes(true)) giveThese.push(sep.id);
+							else takeThese.push(sep.id);
+						} else {
+							const has = new Array;
+							row.roles.forEach(role => {
+								if (member.roles.cache.cache.has(role)) has.push(true);
+								else has.push(false);
+							});
+							if (has.includes(true)) giveThese.push(sep.id);
+							else takeThese.push(sep.id);
 						}
-						if (aknowledgedSeperator == false && member.roles.cache.has(separator.id)) takeThese.push(separator.id);
 					} else ch.query('UPDATE roleseparator SET active = false WHERE separator = $1;', [row.separator]);
 				}
 			});
 		}
-		if (takeThese.length > 0) newMember.roles.remove(takeThese).catch(() => {});
-		if (giveThese.length > 0) newMember.roles.add(giveThese).catch(() => {});
+		giveThese.forEach((roleID, index) => {if (member.roles.cache.has(roleID)) giveThese.splice(index, 1);});
+		if (giveThese.length > 0) await member.roles.add(giveThese).catch(() => {});
+		takeThese.forEach((roleID, index) => {if (!member.roles.cache.has(roleID)) takeThese.splice(index, 1);});
+		if (takeThese.length > 0) await member.roles.remove(takeThese).catch(() => {});
 	},
 	async oneTimeRunner(msg, embed, clickButton) {
 		const client = msg.client;
